@@ -1,0 +1,26 @@
+{% extends "config/base_config.html" %}
+
+{% load i18n %}
+
+{% block title %}{{ block.super }} – {% trans "Configuration" %}{% endblock %}
+
+{% block content %}
+    <h1>{% trans "VoteCollector settings" %}</h1>
+
+    <form action="" method="post">{% csrf_token %}
+        {% trans "VoteCollector status" %}: {{ votecollector_status }}
+        {% if votecollector_message %}
+        <div><code>{{ votecollector_message }}</code></div>
+        {% endif %}
+        {{ form.as_p }}
+        <p>
+            <button class="button" type="submit">
+                <span class="icon ok">{%trans 'Save' %}</span>
+            </button>
+            <button class="button" type="button" onclick="window.location='{% url config_votecollector %}'">
+                <span class="icon cancel">{%trans 'Cancel' %}</span>
+            </button>
+        </p>
+        </fieldset>
+    </form>
+{% endblock %}

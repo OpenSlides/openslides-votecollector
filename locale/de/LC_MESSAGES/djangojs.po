@@ -1,0 +1,55 @@
+# German Translation for the VoteCollector Plugin
+# Copyright (C) 2012 Oskar Hahn
+# This file is distributed under GPL 2+.
+msgid ""
+msgstr ""
+"Project-Id-Version: VoteCollector Plugin\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-04-20 10:47+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Oskar Hahn\n"
+"Language: German \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+
+#: static/javascript/votecollect.js:17
+msgid "Stop Polling"
+msgstr "Umfrage stoppen"
+
+#: static/javascript/votecollect.js:24
+#, c-format
+msgid "%s:%s min"
+msgstr "%s:%s min"
+
+#: static/javascript/votecollect.js:25
+#, c-format
+msgid "Poll is running since %s."
+msgstr "Die Abstimmung läuft seit %s."
+
+#: static/javascript/votecollect.js:25
+#, c-format
+msgid "%s of %s votes are cast."
+msgstr "%s von %s Stimmen abgegeben."
+
+#: static/javascript/votecollect.js:29
+msgid "Start Polling"
+msgstr "Umfrage starten"
+
+#: static/javascript/votecollect.js:60
+msgid "start voting..."
+msgstr "Umfrage wird gestartet..."
+
+#: static/javascript/votecollect.js:85
+msgid "stop voting..."
+msgstr "Umfrage wird beendet..."
+
+#: static/javascript/votecollect.js:97
+#, c-format
+msgid ""
+"The vote is over. %s out of %s votes collected. Do you want to save this "
+"values?"
+msgstr ""
+"Die Umfrage ist beendet. %s von %s stimmen abgegeben. Sollen die Werte "
+"gespeichert werden?"

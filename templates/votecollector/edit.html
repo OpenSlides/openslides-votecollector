@@ -1,0 +1,28 @@
+{% extends "votecollector/base_votecollector.html" %}
+
+{% load i18n %}
+
+{% block content %}
+    {% if keypad %}
+        <h1>{% trans "Edit keypad" %}</h1>
+    {% else %}
+        <h1>{% trans "New keypad" %}</h1>
+    {% endif %}
+
+    <form action="" method="post">{% csrf_token %}
+        {{ form.as_p }}
+        <small>* {% trans "required." %}</small>
+        <p>
+            <button class="button" type="submit">
+                <span class="icon ok">{% trans 'Save' %}</span>
+            </button>
+            <button class="button" type="submit" name="apply">
+                <span class="icon apply">{% trans 'Apply' %}</span>
+            </button>
+            <button class="button" type="button" onclick="window.location='{% url votecollector_overview %}'">
+                <span class="icon cancel">{%trans 'Cancel' %}</span>
+            </button>
+        </p>
+    </form>
+
+{% endblock %}
