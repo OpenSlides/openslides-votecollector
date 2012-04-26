@@ -55,7 +55,7 @@ def get_server():
     try:
         server = ServerProxy(config['votecollector_uri'])
     except TypeError:
-        raise VoteCollectorError(_('Server not Found.'))
+        raise VoteCollectorError(_('Server not found.'))
 
     # Test the connection
     try:
@@ -96,7 +96,7 @@ def start_voting(poll_id):
         keypads = keypads.exclude(user=None)
 
     if not keypads.exists():
-        raise VoteCollectorError(_('No Keypads selected.'))
+        raise VoteCollectorError(_('No keypads selected.'))
 
     count = server.voteCollector.startVoting('YesNoAbstain', 0, 0, list(keypads))
 

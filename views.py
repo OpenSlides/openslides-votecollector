@@ -78,9 +78,9 @@ class Overview(ListView):
                     sortfilter[value] = self.request.REQUEST[value]
 
         if 'user' in sortfilter:
-            if sortfilter['user'] == 'anonym':
+            if sortfilter['user'] == 'anonymous':
                 context['keypads'] = context['keypads'].filter(user=None)
-            elif sortfilter['user'] == 'personal':
+            elif sortfilter['user'] == 'personalized':
                 context['keypads'] = context['keypads'].exclude(user=None)
         if 'active' in sortfilter:
             if sortfilter['active'] == 'active':
@@ -140,7 +140,7 @@ class KeypadCreateMulti(FormView):
             try:
                 Keypad(keypad_id=i, active=form.cleaned_data['active']).save()
             except IntegrityError:
-                messages.info(self.request, _('Keypad %d was allready in the Database.') % i)
+                messages.info(self.request, _('Keypad %d is already in database.') % i)
         return super(KeypadCreateMulti, self).form_valid(form)
 
 
@@ -239,7 +239,7 @@ class StartVoting(VotingView):
         if poll is None:
             self.error = _('Unknown poll.')
         elif config['votecollector_in_vote'] == poll.id:
-            self.error = _('Poll allready started.')
+            self.error = _('Poll already started.')
         elif config['votecollector_in_vote']:
             self.error = _('Another poll is running.')
         else:
@@ -352,10 +352,10 @@ class Config(FormView):
         try:
             votecollector_message = get_VoteCollector_status()
         except VoteCollectorError:
-            status = _('No Connection to the VoteCollector.')
+            status = _('No connection to the VoteCollector')
             votecollector_message = ''
         else:
-            status = _('connected.')
+            status = _('Connected')
         context['votecollector_status'] = status
         context['votecollector_message'] = votecollector_message
         return context
@@ -369,8 +369,8 @@ def default_config(sender, key, **kwargs):
     return {
         'votecollector_method': 'both',
         'votecollector_uri': 'http://localhost:8030',
-        'votecollector_please_vote': _('Please vote! 1: Yes, 2: No, 3:Abstain.'),
-        'votecollector_thank_for_vote': _('Thank you for your vote.'),
+        'votecollector_please_vote': _('Please vote!<br>1: Yes | 2: No | 3: Abstain'),
+        'votecollector_thank_for_vote': _('Voting finished.<br>Thank you for your vote.'),
         'votecollector_in_vote': 0,
         'votecollector_active_keypads': 0,
     }.get(key)
@@ -399,18 +399,18 @@ def set_submenu(sender, request, context, **kwargs):
     menu_links = [
         (
             reverse('votecollector_overview'),
-            _('Overview'),
+            _('All keypads'),
             request.path == reverse('votecollector_overview'),
         ),
 
         (
             reverse('votecollector_keypad_new'),
-            _('New'),
+            _('New keypad'),
             request.path == reverse('votecollector_keypad_new'),
         ),
         (
             reverse('votecollector_keypad_new_multi'),
-            _('New (multi)'),
+            _('New keypad range'),
             request.path == reverse('votecollector_keypad_new_multi'),
         ),
     ]

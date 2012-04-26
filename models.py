@@ -23,7 +23,7 @@ class Keypad(models.Model):
         blank=True,
         unique=True,
         verbose_name=_('Participant'),
-        help_text=_('Empty for anonymous'),
+        help_text=_('Leave this field blank for anonymous keypad.'),
     )
     keypad_id = models.IntegerField(unique=True, verbose_name=_('Keypad ID'))
     active = models.BooleanField(default=True, verbose_name=_('Active'))

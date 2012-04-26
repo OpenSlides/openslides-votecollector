@@ -9,8 +9,8 @@
             {% trans "Filter" %}:
             <select class="default-input" name="user" onchange="document.forms['filter'].submit()">
                 <option value="0">-- {% trans "User" %} --</option>
-                <option value="anonym" {% if 'anonym' in sortfilter.user %}selected{% endif %}>{% trans "Anonym" %}</option>
-                <option value="personal" {% if 'personal' in sortfilter.user %}selected{% endif %}>{% trans "Personalized" %}</option>
+                <option value="anonymous" {% if 'anonymous' in sortfilter.user %}selected{% endif %}>{% trans "Anonym" %}</option>
+                <option value="personalized" {% if 'personalized' in sortfilter.user %}selected{% endif %}>{% trans "Personalized" %}</option>
             </select>
             <select class="default-input" name="active" onchange="document.forms['filter'].submit()">
                 <option value="0">-- {% trans "Active" %} --</option>

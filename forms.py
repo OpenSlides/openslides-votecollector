@@ -30,8 +30,8 @@ class KeypadMultiForm(forms.Form, CssClassMixin):
     """
     Form to create several keypads.
     """
-    from_id = forms.IntegerField(min_value=1, label=_('From Keypad ID'))
-    to_id = forms.IntegerField(label=_('To Keypad ID'))
+    from_id = forms.IntegerField(min_value=1, label=_('From keypad ID'))
+    to_id = forms.IntegerField(label=_('... to keypad ID'))
     active = forms.BooleanField(initial=True, required=False, label=_('Active'))
 
 
@@ -44,7 +44,7 @@ class ConfigForm(forms.Form, CssClassMixin):
         ('person', _('Use personalized keypads only')),
         ('both', _('Use ananymous and personalized keypads')),
     )
-    method = forms.ChoiceField(choices=STATUS, label=_('Method for distribution of keypads.'), initial='both')
+    method = forms.ChoiceField(choices=STATUS, label=_('Distribution method for keypads'), initial='both')
     uri = forms.URLField(label=_('URL for VoteCollector'), help_text=_('Example: http://localhost:8030'))
-    please_vote = forms.CharField(required=False, label=_('\'Please vote\' message.'))
-    thank_for_vote = forms.CharField(required=False, label=_('\'Thank you for your vote\' message.'))
+    please_vote = forms.CharField(required=False, label=_('Overlay message \'Please vote\''))
+    thank_for_vote = forms.CharField(required=False, label=_('Overlay message \'Thank you for your vote\''))

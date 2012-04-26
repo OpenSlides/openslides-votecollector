@@ -3,11 +3,10 @@
 {% load i18n %}
 
 {% block content %}
-    <h1>{% trans "Neue Keypads" %}</h1>
+    <h1>{% trans "New keypad range" %}</h1>
 
     <form action="" method="post">{% csrf_token %}
         {{ form.as_p }}
-        <small>* {% trans "required." %}</small>
         <p>
             <button class="button" type="submit">
                 <span class="icon ok">{% trans 'Save' %}</span>
@@ -16,6 +15,6 @@
                 <span class="icon cancel">{% trans 'Cancel' %}</span>
             </button>
         </p>
+        <small>* {%trans "required" %}</small>
     </form>
-
 {% endblock %}
