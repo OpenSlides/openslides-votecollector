@@ -1,0 +1,39 @@
+Installation Instructions for the VoteCollector Plugin in OpenSlides
+====================================================================
+
+
+1. Install OpenSlides
+
+   Download and instructions at http://openslides.org/
+
+   Finally, as described, run the initial set up:
+     python start.py
+
+
+2. Install the VoteCollector
+
+
+3. Install this VoteCollector plugin for OpenSlides
+
+   a) Extract the contents of the plugin directory into the directory
+      '/openslides/votecollector/'.
+
+   b) Edit file '/openslides/settigs.py':
+
+      Add 'votecollector' to 'INSTALLED_PLUGINS'. 
+
+        INSTALLED_PLUGINS = (
+            'votecollector',
+        )
+
+
+4. Update the OpenSlides database and start OpenSlides:
+
+     python start.py --syncdb
+
+
+   Your plugin installation was successfully if you see a new
+   'VoteCollector' tab in the main navigation of OpenSlides.
+
+   Change plugin settings under 'Configuration > VoteCollector'.
+
