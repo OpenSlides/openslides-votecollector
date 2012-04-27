@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 """
     votecollector.views
-    ~~~~~~~~~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~~~~~
 
     Views for the VoteCollector Plugin.
 
-    :copyright: 2011 by Oskar Hahn.
+    :copyright: 2012 by Oskar Hahn.
     :license: GNU GPL, see LICENSE for more details.
 """
 

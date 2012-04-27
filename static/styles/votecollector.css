@@ -1,3 +1,10 @@
+/**
+ * VoteCollector Plugin CSS.
+ *
+ * :copyright: 2012 by Oskar Hahn.
+ * :license: GNU GPL, see LICENSE for more details.
+ */
+
 a.status_link.active span {
     background-image: url(/static/images/icons/user-online.png);
     background-repeat: no-repeat;

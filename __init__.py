@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 """
     votecollector
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~
 
     VoteCollector Plugin.
 
-    :copyright: 2011 by Oskar Hahn.
+    :copyright: 2012 by Oskar Hahn.
     :license: GNU GPL, see LICENSE for more details.
 """
 

@@ -1,3 +1,10 @@
+/**
+ * JavaScript functions for VoteCollector Plugin.
+ *
+ * :copyright: 2012 by Oskar Hahn.
+ * :license: GNU GPL, see LICENSE for more details.
+ */
+
 starting = false;
 active_keypads = 0;
 
