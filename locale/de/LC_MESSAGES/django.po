@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VoteCollector Plugin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-04-26 18:10+0200\n"
+"POT-Creation-Date: 2012-05-08 13:15+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Oskar Hahn\n"
 "Language: German \n"
@@ -171,13 +171,13 @@ msgstr "Abstimmung beendet.<br>Danke für Ihre Stimme."
 
 #: views.py:402
 msgid "All keypads"
-msgstr "Neues Keypad"
+msgstr "Alle Keypads"
 
-#: views.py:408
+#: views.py:408 templates/votecollector/edit.html:9
 msgid "New keypad"
 msgstr "Neues Keypad"
 
-#: views.py:413 templates/votecollector/edit.html:9
+#: views.py:413 templates/votecollector/new_multi.html:6
 msgid "New keypad range"
 msgstr "Neuer Keypad-Bereich"
 
@@ -211,6 +211,11 @@ msgstr "Speichern"
 msgid "Cancel"
 msgstr "Abbrechen"
 
+#: templates/votecollector/config.html:24 templates/votecollector/edit.html:25
+#: templates/votecollector/new_multi.html:18
+msgid "required"
+msgstr "erforderlich"
+
 #: templates/votecollector/edit.html:7
 msgid "Edit keypad"
 msgstr "Keypad bearbeiten"
@@ -218,15 +223,6 @@ msgstr "Keypad bearbeiten"
 #: templates/votecollector/edit.html:19
 msgid "Apply"
 msgstr "Übernehmen"
-
-#: templates/votecollector/edit.html:25
-#: templates/votecollector/new_multi.html:18
-msgid "required"
-msgstr "erforderlich"
-
-#: templates/votecollector/new_multi.html:6
-msgid "Neue Keypads"
-msgstr "Neue Keypads"
 
 #: templates/votecollector/overview.html:6
 msgid "Keypads"
@@ -273,3 +269,6 @@ msgstr "Status bearbeiten (aktiv/inactiv)"
 #: templates/votecollector/overview.html:43
 msgid "No Keypads available."
 msgstr "Keine Keypads vorhanden."
+
+#~ msgid "Neue Keypads"
+#~ msgstr "Neue Keypads"

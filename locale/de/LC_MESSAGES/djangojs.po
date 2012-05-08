@@ -16,7 +16,7 @@ msgstr ""
 
 #: static/javascript/votecollect.js:17
 msgid "Stop Polling"
-msgstr "Umfrage stoppen"
+msgstr "Abstimmung stoppen"
 
 #: static/javascript/votecollect.js:24
 #, c-format
@@ -35,15 +35,15 @@ msgstr "%s von %s Stimmen abgegeben."
 
 #: static/javascript/votecollect.js:29
 msgid "Start Polling"
-msgstr "Umfrage starten"
+msgstr "Abstimmung starten"
 
 #: static/javascript/votecollect.js:60
 msgid "start voting..."
-msgstr "Umfrage wird gestartet..."
+msgstr "Abstimmung wird gestartet..."
 
 #: static/javascript/votecollect.js:85
 msgid "stop voting..."
-msgstr "Umfrage wird beendet..."
+msgstr "Abstimmung wird beendet..."
 
 #: static/javascript/votecollect.js:97
 #, c-format
@@ -51,5 +51,5 @@ msgid ""
 "The vote is over. %s out of %s votes collected. Do you want to save this "
 "values?"
 msgstr ""
-"Die Umfrage ist beendet. %s von %s stimmen abgegeben. Sollen die Werte "
+"Die Abstimmung ist beendet. %s von %s Stimmen wurden abgegeben. Sollen die Werte "
 "gespeichert werden?"
