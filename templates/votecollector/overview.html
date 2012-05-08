@@ -30,8 +30,8 @@
             <td>{{ keypad.keypad_id }}</td>
             <td>{% if keypad.user %}<a href="{{ keypad.user.get_absolute_url }}">{{ keypad.user }}</a>{% else %}{% trans "Anonym" %}{% endif %}</td>
             <td>
-                <a href="{% url votecollector_keypad_edit keypad.id %}"><img src="/static/images/icons/document-edit.png" title="{%trans 'Edit Keypad' %}"></a>
-                <a href="{% url votecollector_keypad_delete keypad.id %}"><img src="/static/images/icons/edit-delete.png" title="{%trans 'Delete Keypad' %}"></a>
+                <a href="{% url votecollector_keypad_edit keypad.id %}"><img src="/static/images/icons/edit.png" title="{%trans 'Edit Keypad' %}"></a>
+                <a href="{% url votecollector_keypad_delete keypad.id %}"><img src="/static/images/icons/delete.png" title="{%trans 'Delete Keypad' %}"></a>
                 <a class="status_link {% if keypad.active %}active{% else %}inactive{% endif %}"
                     href="{% if keypad.active %}{% url votecollector_keypad_deactivate keypad.id %}{% else %}{% url votecollector_keypad_activate keypad.id %}{% endif %}"
                     title="{%trans 'Change status (active/inactive)' %}">
