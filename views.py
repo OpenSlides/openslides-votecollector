@@ -27,7 +27,7 @@ from django.views.generic.detail import SingleObjectMixin
 
 # OpenSlides imports
 from openslides.utils.views import (ListView, UpdateView, CreateView, FormView,
-                                    AjaxView, DeleteView, RedirectView)
+    AjaxView, DeleteView, RedirectView)
 from openslides.utils.template import Tab
 from openslides.utils.signals import template_manipulation
 from openslides.config.models import config
@@ -35,13 +35,13 @@ from openslides.config.signals import default_config_value
 from openslides.application.models import ApplicationPoll
 from openslides.projector.signals import projector_overlays
 from openslides.projector.api import projector_message_set
-from application.views import ViewPoll
+from openslides.application.views import ViewPoll
 
 # VoteCollector imports
-from models import Keypad
-from forms import KeypadForm, ConfigForm, KeypadMultiForm
-from api import (start_voting, stop_voting, get_voting_results,
-                 get_voting_status, VoteCollectorError, get_VoteCollector_status)
+from votecollector.models import Keypad
+from votecollector.forms import KeypadForm, ConfigForm, KeypadMultiForm
+from votecollector.api import (start_voting, stop_voting, get_voting_results,
+    get_voting_status, VoteCollectorError, get_VoteCollector_status)
 
 
 class Overview(ListView):

@@ -13,9 +13,9 @@
 from django.conf.urls.defaults import patterns, url
 from django.core.urlresolvers import reverse
 
-from views import (Overview, KeypadCreate, KeypadUpdate, StartVoting, StopVoting,
-                   GetVotingResults, GetVotingStatus, GetStatus,
-                   KeypadDelete, KeypadActivate, KeypadCreateMulti)
+from votecollector.views import (Overview, KeypadCreate, KeypadUpdate,
+    StartVoting, StopVoting, GetVotingResults, GetVotingStatus, GetStatus,
+    KeypadDelete, KeypadActivate, KeypadCreateMulti)
 
 urlpatterns = patterns('',
     url(r'^$',

@@ -11,8 +11,8 @@
 """
 
 from django.db import models
+from django.utils.translation import ugettext_lazy as _, ugettext_noop
 
-from openslides.utils.translation_ext import ugettext as _
 from openslides.participant.models import Profile
 
 
@@ -42,7 +42,7 @@ class Keypad(models.Model):
 
     class Meta:
         permissions = (
-            ('can_manage_votecollector', _('Can manage VoteCollector', fixstr=True)),
+            ('can_manage_votecollector', ugettext_noop('Can manage VoteCollector')),
         )
 
 

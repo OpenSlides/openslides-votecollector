@@ -11,11 +11,11 @@
 """
 
 from django import forms
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _
 
 from openslides.utils.forms import CssClassMixin
 
-from models import Keypad
+from votecollector.models import Keypad
 
 
 class KeypadForm(forms.ModelForm, CssClassMixin):

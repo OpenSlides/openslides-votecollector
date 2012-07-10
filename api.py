@@ -16,7 +16,7 @@ from django.utils.translation import ugettext as _
 
 from openslides.config.models import config
 
-from models import Keypad
+from votecollector.models import Keypad
 
 
 VOTECOLLECTOR_ERROR_MESSAGES = {
