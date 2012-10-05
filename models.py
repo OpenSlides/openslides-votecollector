@@ -13,12 +13,12 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _, ugettext_noop
 
-from openslides.participant.models import Profile
+from openslides.participant.models import User
 
 
 class Keypad(models.Model):
     user = models.ForeignKey(
-        Profile,
+        User,
         null=True,
         blank=True,
         unique=True,
