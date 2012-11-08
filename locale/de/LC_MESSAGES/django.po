@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VoteCollector Plugin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-05-08 13:15+0200\n"
+"POT-Creation-Date: 2012-11-08 08:55+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Oskar Hahn\n"
 "Language: German \n"
@@ -14,7 +14,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
-#: __init__.py:15 views.py:385 templates/votecollector/application_poll.html:5
+#: __init__.py:15 motion_poll.html:5 views.py:385
 #: templates/votecollector/base_votecollector.html:10
 #: templates/votecollector/base_votecollector.html:13
 msgid "VoteCollector"
@@ -123,6 +123,14 @@ msgstr "Keypad %d"
 msgid "Can manage VoteCollector"
 msgstr "Darf den VoteCollector verwalten"
 
+#: motion_poll.html:8
+msgid "Loading..."
+msgstr "Laden..."
+
+#: motion_poll.html:9
+msgid "VoteCollector config page"
+msgstr "Konfigurationsseite des VoteCollectors"
+
 #: views.py:143
 #, python-format
 msgid "Keypad %d is already in database."
@@ -180,14 +188,6 @@ msgstr "Neues Keypad"
 #: views.py:413 templates/votecollector/new_multi.html:6
 msgid "New keypad range"
 msgstr "Neuer Keypad-Bereich"
-
-#: templates/votecollector/application_poll.html:8
-msgid "Loading..."
-msgstr "Laden..."
-
-#: templates/votecollector/application_poll.html:9
-msgid "VoteCollector config page"
-msgstr "Konfigurationsseite des VoteCollectors"
 
 #: templates/votecollector/config.html:5
 msgid "Configuration"
