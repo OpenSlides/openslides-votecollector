@@ -32,10 +32,10 @@ from openslides.utils.template import Tab
 from openslides.utils.signals import template_manipulation
 from openslides.config.models import config
 from openslides.config.signals import default_config_value
-from openslides.application.models import ApplicationPoll
+from openslides.motion.models import MotionPoll
 from openslides.projector.signals import projector_overlays
 from openslides.projector.api import projector_message_set
-from openslides.application.views import ViewPoll
+from openslides.motion.views import ViewPoll
 
 # VoteCollector imports
 from votecollector.models import Keypad
@@ -185,8 +185,8 @@ class VotingView(AjaxView):
         Return the poll.
         """
         try:
-            return ApplicationPoll.objects.get(pk=self.kwargs['pk']);
-        except ApplicationPoll.DoesNotExist:
+            return MotionPoll.objects.get(pk=self.kwargs['pk']);
+        except MotionPoll.DoesNotExist:
             return None
 
     def test_poll(self):
@@ -202,8 +202,8 @@ class VotingView(AjaxView):
         elif config['votecollector_in_vote'] != self.poll.id and config['votecollector_in_vote']:
             try:
                 self.error = _('Another poll is running. <a href="%s">Jump to the active poll.</a>') % \
-                    ApplicationPoll.objects.get(pk=config['votecollector_in_vote']).get_absolute_url()
-            except ApplicationPoll.DoesNotExist:
+                    MotionPoll.objects.get(pk=config['votecollector_in_vote']).get_absolute_url()
+            except MotionPoll.DoesNotExist:
                 config['votecollector_in_vote'] = 0
                 self.error = _('Please reload.')
         else:
@@ -249,7 +249,7 @@ class StartVoting(VotingView):
             except VoteCollectorError, err:
                 self.error = err.value
             else:
-                sid = ApplicationPoll.objects.get(pk=poll.id).application.sid
+                sid = MotionPoll.objects.get(pk=poll.id).motion.sid
                 projector_message_set(config['votecollector_please_vote'], sid=sid)
         return super(StartVoting, self).get(request, *args, **kwargs)
 
@@ -265,7 +265,7 @@ class StopVoting(VotingView):
         if self.test_poll():
             poll = self.get_poll()
             self.result = stop_voting()
-            sid = ApplicationPoll.objects.get(pk=poll.id).application.sid
+            sid = MotionPoll.objects.get(pk=poll.id).motion.sid
             projector_message_set(config['votecollector_thank_for_vote'], sid=sid)
         return super(StopVoting, self).get(request, *args, **kwargs)
 
@@ -420,11 +420,11 @@ def set_submenu(sender, request, context, **kwargs):
     })
 
 
-@receiver(template_manipulation, sender=ViewPoll, dispatch_uid="votecollector_application_poll")
-def application_poll_template(sender, **kwargs):
+@receiver(template_manipulation, sender=ViewPoll, dispatch_uid="votecollector_motion_poll")
+def motion_poll_template(sender, **kwargs):
     """
-    Alter the application_poll template to insert the 'StartPolling' button.
+    Alter the motion_poll template to insert the 'StartPolling' button.
     """
     kwargs['context'].update({
-        'post_form': render_to_string('votecollector/application_poll.html'),
+        'post_form': render_to_string('votecollector/motion_poll.html'),
     })
