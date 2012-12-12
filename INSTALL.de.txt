@@ -2,41 +2,56 @@ Installationsanleitung für das VoteCollector-Plugin für OpenSlides
 ==================================================================
 
 
-1. OpenSlides installieren
+1. OpenSlides installieren und starten
 
    Download und Anleitung unter http://openslides.org/
 
-   Abschließend, wie beschrieben, das initiale Setup ausführen mit:
-     python start.py
 
-
-2. VoteCollectors installieren
+2. VoteCollectors installieren und starten
 
 
 3. VoteCollector-Plugin für OpenSlides installieren:
 
-    a) Das entpackte Pluginverzeichnis in 'votecollector' umbenennen 
-       und in das OpenSlides-Hauptverzeichnis (enthält das Start-Skript
-       und die Datenbank) verschieben.
+   a) Letzte veröffentlichte Plugin-Version herunterladen von:
+        https://github.com/OpenSlides/openslides-votecollector/tags
+    
+        oder
+         
+      Aktuelle Entwicklungsversion aus github repository clonen:
+        git clone git://github.com/OpenSlides/openslides-votecollector.git
+    
+   b) Den Inhalt des entpackten Pluginverzeichnisses ablegen...
+   
+        Unter Windows (portable Version):
+        '<pfad-zu-openslides-portable>/site-packages/votecollector/'
 
-    b) Datei '/openslides/settings.py' bearbeiten:
+        Unter Linux/MacOS:
+        '<pfad-zum-openslides-haupverzeichnis>/votecollector/'
 
-       'votecollector'-Zeile zu 'INSTALLED_PLUGINS' hinzufügen:
+   c) Die settings.py bearbeiten...
 
-         INSTALLED_PLUGINS = (
-             'votecollector',
-         )
+        Unter Windows (portable Version):
+        '<pfad-zu-openslides-portable>/openslides/settings.py'
+         
+        Unter Linux/MacOS:
+        '~/.config/openslides/settings.py'
+         
+      .. und unter 'INSTALLED_PLUGINS' den Pluginnamen 'votecollector' hinzufügen:
+
+        INSTALLED_PLUGINS = (
+            'votecollector',
+        )
 
 
 4. OpenSlides-Datenbank aktualisieren und OpenSlides starten
 
-     python start.py --syncdb
+     openslides.exe --syncdb
+   oder
+     openslides --syncdb
 
-   
-   Die Installation war erfolgreich, wenn ein neuer
-   'VoteCollector'-Tab in der OpenSlides-Hauptnavigation sichtbar 
-   wird.
+
+   Die Installation war erfolgreich, wenn sich der neue Menüpunkt
+   'VoteCollector' in der OpenSlides-Hauptnavigation öffnen lässt.
 
    Plugin-Einstellungen können unter 'Konfiguration > VoteCollector'
    vorgenommen werden.
-
