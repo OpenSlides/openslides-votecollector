@@ -1,0 +1,8 @@
+include INSTALL.de.txt
+include INSTALL.en.txt
+include LICENSE
+include THANKS
+
+recursive-include votecollector/static *
+recursive-include votecollector/templates *
+recursive-include openslides/locale *

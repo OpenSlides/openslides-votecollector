@@ -3,3 +3,8 @@
 *.swp
 *~
 .DS_Store
+
+build/*
+dist/*
+versiontools*
+openslides_votecollector.egg-info
