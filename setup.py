@@ -6,7 +6,7 @@
     :copyright: by Oskar Hahn
     :license: GNU GPL, see LICENSE for more details.
 """
-version = '1.0.3'
+version = '1.0.4a1'
 # for python 2.5 support
 ## from __future__ import with_statement
 
