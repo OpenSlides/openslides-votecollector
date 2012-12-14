@@ -104,9 +104,9 @@ II. Installation on GNU/Linux and MacOSX
      )
 
 
-7. Run OpenSlides once again:
+7. Update the OpenSlides database and start OpenSlides once again:
 
-     $ openslides
+     $ openslides --syncdb
 
 
 Your plugin installation was successfully if you can open the
