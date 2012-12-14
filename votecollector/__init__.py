@@ -13,4 +13,4 @@
 from django.utils.translation import ugettext as _
 
 NAME = _('VoteCollector')
-VERSION = (1, 0, 1, 'final', 1)
+VERSION = (1, 0, 3, 'final', 1)
