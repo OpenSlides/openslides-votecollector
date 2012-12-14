@@ -16,6 +16,14 @@ I. Installation on Windows (with OpenSlides portable version)
 
 1. Install and run VoteCollector
 
+   Download from http://www.keypaddepot.de/de/Wahlen/VoteCollector-App-nur-Plug-In-zu-OpenSlides.html
+   (via tab "Medien").
+   To use VoteCollector in simulation mode (no keypads required)
+   please run from command line:
+     VoteCollector.exe -s
+
+   Note: You have to buy a license key for VoteCollector to use more than 5 keypads.
+
 
 2. Get latest VoteCollector plugin release from:
      https://github.com/OpenSlides/openslides-votecollector/tags
@@ -26,7 +34,7 @@ I. Installation on Windows (with OpenSlides portable version)
      git clone git://github.com/OpenSlides/openslides-votecollector.git
 
 
-3. Move all files from extracted plugin directory to:
+3. Move the (extracted) subdirectory 'votecollector' to:
      '<path-to-openslides-portable>/site-packages/votecollector/'
 
 
@@ -61,6 +69,14 @@ II. Installation on GNU/Linux and MacOSX
 
 1. Install and run VoteCollector (on Windows only, e.g. in a VirtualBox machine)
 
+   Download from http://www.keypaddepot.de/de/Wahlen/VoteCollector-App-nur-Plug-In-zu-OpenSlides.html
+   (via tab "Medien").
+   To use VoteCollector in simulation mode (no keypads required)
+   please run from command line:
+     VoteCollector.exe -s
+
+   Note: You have to buy a license key for VoteCollector to use more than 5 keypads.
+
 
 2. Get latest VoteCollector plugin release from:
      https://github.com/OpenSlides/openslides-votecollector/tags
@@ -82,7 +98,7 @@ II. Installation on GNU/Linux and MacOSX
      $ source .venv/bin/activate
 
 
-4. Install OpenSlides and VoteCollector plugin (run within plugin directory):
+4. Install OpenSlides and VoteCollector plugin (run from plugin directory):
 
      $ python setup.py install
 
