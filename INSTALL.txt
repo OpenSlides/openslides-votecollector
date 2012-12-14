@@ -1,0 +1,115 @@
+Installation Instructions for OpenSlides' VoteCollector Plugin
+==============================================================
+
+Content
+-------
+
+I.  Installation on Windows (with OpenSlides portable version)
+II. Installation on GNU/Linux and MacOSX
+
+If you need help ask on OpenSlides users mailing list.
+See http://openslides.org for more information.
+
+
+I. Installation on Windows (with OpenSlides portable version)
+-------------------------------------------------------------
+
+1. Install and run VoteCollector
+
+
+2. Get latest VoteCollector plugin release from:
+     https://github.com/OpenSlides/openslides-votecollector/tags
+
+   or
+
+   Clone development version from github repository:
+     git clone git://github.com/OpenSlides/openslides-votecollector.git
+
+
+3. Move all files from extracted plugin directory to:
+     '<path-to-openslides-portable>/site-packages/votecollector/'
+
+
+4. If required: Run openslides.exe first time to setup database and settings.py:
+
+   Stop OpenSlides.
+
+
+5. Edit '<path-to-openslides-portable>/openslides/settings.py' and
+   add the plugin name 'votecollector' under 'INSTALLED_PLUGINS':
+
+     INSTALLED_PLUGINS = (
+         'votecollector',
+     )
+
+
+6. Update the OpenSlides database and start OpenSlides from command line
+   (within portable directory):
+
+     openslides.exe --syncdb
+
+
+Your plugin installation was successfully if you can open the
+new menu item 'VoteCollector' in the main navigation of OpenSlides.
+
+Change settings of plugin under 'Configuration > VoteCollector'.
+
+
+
+II. Installation on GNU/Linux and MacOSX
+----------------------------------------
+
+1. Install and run VoteCollector (on Windows only, e.g. in a VirtualBox machine)
+
+
+2. Get latest VoteCollector plugin release from:
+     https://github.com/OpenSlides/openslides-votecollector/tags
+
+   or
+
+   Clone development version from github repository:
+     git clone git://github.com/OpenSlides/openslides-votecollector.git
+
+
+3. Setup a virtual environment with virtualenv (optional):
+
+   You can setup a virtual environment to install OpenSlides and the
+   plugin as non-root user.
+
+   Change to plugin directory and run:
+
+     $ virtualenv .venv
+     $ source .venv/bin/activate
+
+
+4. Install OpenSlides and VoteCollector plugin (run within plugin directory):
+
+     $ python setup.py install
+
+   OpenSlides and all required python packages will be installed.
+
+
+5. Run OpenSlides first time to setup database and settings.py:
+
+     $ openslides
+
+   Stop OpenSlides.
+
+
+6. Edit '~/.config/openslides/settings.py' and add the plugin
+   name 'votecollector' under 'INSTALLED_PLUGINS':
+
+     INSTALLED_PLUGINS = (
+         'votecollector',
+     )
+
+
+7. Run OpenSlides once again:
+
+     $ openslides
+
+
+Your plugin installation was successfully if you can open the
+new menu item 'VoteCollector' in the main navigation of OpenSlides.
+
+Change settings of plugin under 'Configuration > VoteCollector'.
