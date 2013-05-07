@@ -1,0 +1,19 @@
+{% extends "votecollector/base_votecollector.html" %}
+
+{% load i18n %}
+
+{% block title %}{{ block.super }} – {% trans "Status" %}{% endblock %}
+
+{% block content %}
+    <h1>
+        {% trans "VoteCollector status" %}
+        <small class="pull-right">
+            <a href="{% url 'votecollector_overview' %}" class="btn btn-mini"><i class="icon-chevron-left"></i> {% trans "Back to overview" %}</a>
+        </small>
+    </h1>
+    {% trans "Status" %}:
+    <code>
+        {{ votecollector_status }}
+        {% if votecollector_message %}({{ votecollector_message }}){% endif %}
+    </code>
+{% endblock %}

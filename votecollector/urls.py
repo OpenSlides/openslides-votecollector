@@ -6,16 +6,16 @@
 
     URLs list for the VoteCollector Plugin.
 
-    :copyright: 2012 by Oskar Hahn.
+    :copyright: 2012-2013 by Oskar Hahn, Emanuel Schütze
     :license: GNU GPL, see LICENSE for more details.
 """
 
-from django.conf.urls.defaults import patterns, url
+from django.conf.urls import patterns, url
 from django.core.urlresolvers import reverse
 
-from votecollector.views import (Overview, KeypadCreate, KeypadUpdate,
+from .views import (Overview, KeypadCreate, KeypadUpdate, StatusView,
     StartVoting, StopVoting, GetVotingResults, GetVotingStatus, GetStatus,
-    KeypadDelete, KeypadActivate, KeypadCreateMulti)
+    KeypadDelete, KeypadSetStatusView, KeypadCreateMulti)
 
 urlpatterns = patterns('',
     url(r'^$',
@@ -43,18 +43,28 @@ urlpatterns = patterns('',
         name="votecollector_keypad_delete",
     ),
 
+    url(r'^(?P<pk>\d+)/toggle/$',
+        KeypadSetStatusView.as_view(),
+        {'action': 'toggle'},
+        name='votecollector_keypad_status_toggle',
+    ),
+
     url(r'^(?P<pk>\d+)/activate/',
-        KeypadActivate.as_view(),
-        {'activate': True },
+        KeypadSetStatusView.as_view(),
+        {'action': 'activate' },
         name="votecollector_keypad_activate",
     ),
 
     url(r'^(?P<pk>\d+)/deactivate/',
-        KeypadActivate.as_view(),
-        {'activate': False },
+        KeypadSetStatusView.as_view(),
+        {'action': 'deactivate' },
         name="votecollector_keypad_deactivate",
     ),
 
+    url(r'^status/$',
+        StatusView.as_view(),
+        name="votecollector_status",
+    ),
 
     url(r'^start/(?P<pk>\d+)/$',
         StartVoting.as_view(),
@@ -66,18 +76,18 @@ urlpatterns = patterns('',
         name="votecollector_voting_stop",
     ),
 
-    url(r'^status/$',
+    url(r'^votingstatus/$',
         GetStatus.as_view(),
         name="votecollector_voting_status",
     ),
 
-    url(r'^status/(?P<pk>\d+)/$',
+    url(r'^votingstatus/(?P<pk>\d+)/$',
         GetVotingStatus.as_view(),
         name="votecollector_voting_status",
     ),
 
 
-    url(r'^results/$',
+    url(r'^votingresults/$',
         GetVotingResults.as_view(),
         name="votecollector_voting_results",
     ),

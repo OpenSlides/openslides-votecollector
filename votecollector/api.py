@@ -6,7 +6,7 @@
 
     Api for the VoteCollector Plugin.
 
-    :copyright: 2012 by Oskar Hahn.
+    :copyright: 2012-2013 by Oskar Hahn, Emanuel Schütze
     :license: GNU GPL, see LICENSE for more details.
 """
 
@@ -14,9 +14,8 @@ from xmlrpclib import ServerProxy
 
 from django.utils.translation import ugettext as _
 
-from openslides.config.models import config
-
-from votecollector.models import Keypad
+from openslides.config.api import config
+from .models import Keypad
 
 
 VOTECOLLECTOR_ERROR_MESSAGES = {

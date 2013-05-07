@@ -3,7 +3,14 @@
 {% load i18n %}
 
 {% block content %}
-    <h1>{% trans "Keypads" %}</h1>
+    <h1>
+        {% trans "Keypads" %}
+        <small class="pull-right">
+            <a href="{% url 'votecollector_keypad_new' %}" class="btn btn-mini btn-primary" rel="tooltip" data-original-title="{% trans 'New Keypad' %}"><i class="icon-plus icon-white"></i> {% trans 'New' %}</a>
+            <a href="{% url 'votecollector_keypad_new_multi' %}" class="btn btn-mini" rel="tooltip" data-original-title="{% trans 'New Keypad range' %}"><i class="icon-plus"></i> {% trans 'New range' %}</a>
+            <a href="{% url 'votecollector_status' %}" class="btn btn-mini" rel="tooltip" data-original-title="{% trans 'Check connection status of VoteCollector' %}"><i class="icon-signal"></i> {% trans 'Connection status' %}</a>
+        </small>
+    </h1>
     <p>
         <form action="{{ request.url }}" name="filter" method="post">{% csrf_token %}
             {% trans "Filter" %}:
@@ -19,7 +26,7 @@
             </select>
         </form>
     </p>
-    <table>
+    <table class="table table-striped table-bordered">
         <tr>
             <th><a href="?sort=keypad_id&reverse={% if 'keypad_id' in sortfilter.sort and 'reverse' not in sortfilter %}1{% else %}0{%endif%}">{% trans "Keypad ID" %}</a></th>
             <th><a href="?sort=user&reverse={% if 'user' in sortfilter.sort and 'reverse' not in sortfilter %}1{% else %}0{%endif%}">{%trans "User" %}</th>
@@ -30,12 +37,16 @@
             <td>{{ keypad.keypad_id }}</td>
             <td>{% if keypad.user %}<a href="{{ keypad.user.get_absolute_url }}">{{ keypad.user }}</a>{% else %}{% trans "Anonym" %}{% endif %}</td>
             <td>
-                <a href="{% url votecollector_keypad_edit keypad.id %}"><img src="/static/images/icons/edit.png" title="{%trans 'Edit Keypad' %}"></a>
-                <a href="{% url votecollector_keypad_delete keypad.id %}"><img src="/static/images/icons/delete.png" title="{%trans 'Delete Keypad' %}"></a>
-                <a class="status_link {% if keypad.active %}active{% else %}inactive{% endif %}"
-                    href="{% if keypad.active %}{% url votecollector_keypad_deactivate keypad.id %}{% else %}{% url votecollector_keypad_activate keypad.id %}{% endif %}"
-                    title="{%trans 'Change status (active/inactive)' %}">
-                    <span></span>
+                <a href="{% url 'votecollector_keypad_edit' keypad.id %}" title="{% trans 'Edit' %}" class="btn btn-mini">
+                    <i class="icon-pencil"></i>
+                </a>
+                <a href="{% url 'votecollector_keypad_delete' keypad.id  %}" title="{% trans 'Delete' %}" class="btn btn-mini">
+                    <i class="icon-remove"></i>
+                </a>
+                <a href="{% url 'votecollector_keypad_status_toggle' keypad.id %}"
+                  class="status_link btn btn-mini {% if keypad.active %}btn-success{% endif %}"
+                  title="{% if keypad.active %}{% trans 'active' %}{% else %}{% trans 'inactive' %}{% endif %}">
+                    <i class="{% if keypad.active %}icon-on{% else %}icon-off{% endif %}"></i>
                 </a>
             </td>
         </tr>
