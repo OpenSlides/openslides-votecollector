@@ -374,4 +374,4 @@ def motion_poll_template(sender, **kwargs):
     kwargs['context'].update({
         'post_form': render_to_string('votecollector/motion_poll.html'),
     })
-    kwargs['context']['extra_javascript'].append('javascript/votecollect.js')
+    kwargs['context']['extra_javascript'].append('javascript/votecollector.js')
