@@ -1,11 +1,11 @@
 # German Translation for the VoteCollector Plugin
-# Copyright (C) 2012 Oskar Hahn
+# Copyright (C) 2012-2013 Oskar Hahn
 # This file is distributed under GPL 2+.
 msgid ""
 msgstr ""
 "Project-Id-Version: VoteCollector Plugin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-04-20 10:47+0200\n"
+"POT-Creation-Date: 2013-05-13 22:01+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Oskar Hahn\n"
 "Language: German \n"
@@ -14,42 +14,42 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
-#: static/javascript/votecollect.js:17
+#: static/javascript/votecollector.js:24
 msgid "Stop Polling"
 msgstr "Abstimmung stoppen"
 
-#: static/javascript/votecollect.js:24
+#: static/javascript/votecollector.js:31
 #, c-format
 msgid "%s:%s min"
 msgstr "%s:%s min"
 
-#: static/javascript/votecollect.js:25
+#: static/javascript/votecollector.js:32
 #, c-format
 msgid "Poll is running since %s."
 msgstr "Die Abstimmung läuft seit %s."
 
-#: static/javascript/votecollect.js:25
+#: static/javascript/votecollector.js:32
 #, c-format
 msgid "%s of %s votes are cast."
 msgstr "%s von %s Stimmen abgegeben."
 
-#: static/javascript/votecollect.js:29
+#: static/javascript/votecollector.js:36
 msgid "Start Polling"
 msgstr "Abstimmung starten"
 
-#: static/javascript/votecollect.js:60
+#: static/javascript/votecollector.js:67
 msgid "start voting..."
 msgstr "Abstimmung wird gestartet..."
 
-#: static/javascript/votecollect.js:85
+#: static/javascript/votecollector.js:92
 msgid "stop voting..."
 msgstr "Abstimmung wird beendet..."
 
-#: static/javascript/votecollect.js:97
+#: static/javascript/votecollector.js:104
 #, c-format
 msgid ""
 "The vote is over. %s out of %s votes collected. Do you want to save this "
 "values?"
 msgstr ""
-"Die Abstimmung ist beendet. %s von %s Stimmen wurden abgegeben. Sollen die Werte "
-"gespeichert werden?"
+"Die Abstimmung ist beendet. %s von %s Stimmen wurden abgegeben. Sollen die "
+"Werte gespeichert werden?"
