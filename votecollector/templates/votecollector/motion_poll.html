@@ -1,12 +1,12 @@
 {% load staticfiles %}
 {% load i18n %}
 
-<fieldset style="width:285px;margin-top:10px">
+<fieldset>
     <legend>{% trans 'VoteCollector' %}</legend>
-    <button id="votecollector" class="button" type="button" style="display:none">
-    </button>
+    <p>
+        <a id="votecollector" class="btn btn-primary" style="display:none"></a>
+        <a href="{% url 'config_votecollector' %}" class="btn"><i class="icon icon-wrench"></i> {% trans 'Configure VoteCollector' %}</a>
+    </p>
     <span id="votecollector_status">{% trans 'Loading...' %}</span>
-    <div><a href="{% url config_votecollector %}">{% trans 'VoteCollector config page' %}</a></div>
 </fieldset>
-<script type="text/javascript" src="{% static 'javascript/votecollect.js' %}"></script>
-</fieldset>
+<hr>

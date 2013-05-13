@@ -1,7 +1,7 @@
 /**
  * JavaScript functions for VoteCollector Plugin.
  *
- * :copyright: 2012 by Oskar Hahn.
+ * :copyright: 2012-2013 by Oskar Hahn, Emanuel Schütze
  * :license: GNU GPL, see LICENSE for more details.
  */
 
@@ -11,7 +11,7 @@ active_keypads = 0;
 function vote_status() {
     $.ajax({
         type: 'GET',
-        url: '/votecollector/status/' + get_poll_id() + '/',
+        url: '/votecollector/votingstatus/' + get_poll_id() + '/',
         dataType: 'json',
         success: function(data) {
             if (data['error']) {
@@ -21,7 +21,7 @@ function vote_status() {
                 if (data['in_vote']) {
                     starting = false;
                     $('form input[name!="csrfmiddlewaretoken"]').attr('readonly', '1');
-                    $('#votecollector').show().addClass('in_vote').html(gettext('Stop Polling')).unbind().click(stop_voting);
+                    $('#votecollector').show().addClass('in_vote').html("<i class='icon icon-stop icon-white'></i> "+gettext('Stop Polling')).unbind().click(stop_voting);
                     var seconds = data['seconds'] % 60;
                     var minutes = (data['seconds'] - seconds)  / 60;
                     var time;
@@ -33,7 +33,7 @@ function vote_status() {
                     active_keypads = data['active_keypads'];
 
                 } else if (starting != true) {
-                    $('#votecollector').show().removeClass('in_vote').html(gettext('Start Polling')).unbind().click(start_voting);
+                    $('#votecollector').show().removeClass('in_vote').html("<i class='icon icon-play icon-white'></i> "+gettext('Start Polling')).unbind().click(start_voting);
                     set_status();
                 }
             }
@@ -98,7 +98,7 @@ function stop_voting() {
             vote_status();
             $.ajax({
                 type: 'GET',
-                url: '/votecollector/results/',
+                url: '/votecollector/votingresults/',
                 dataType: 'json',
                 success: function(data) {
                     new_message(interpolate(gettext('The vote is over. %s out of %s votes collected. Do you want to save this values?'),[data['voted'], active_keypads]), 'info');

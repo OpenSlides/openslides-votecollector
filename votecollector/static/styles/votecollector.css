@@ -1,23 +1,15 @@
 /**
  * VoteCollector Plugin CSS.
  *
- * :copyright: 2012 by Oskar Hahn.
+ * :copyright: 2012-2013 by Oskar Hahn, Emanuel Schütze.
  * :license: GNU GPL, see LICENSE for more details.
  */
 
-a.status_link.active span {
-    background-image: url(/static/images/icons/on.png);
-    background-repeat: no-repeat;
-    background-position: center;
-    width: 16px;
-    height: 16px;
-    display: inline-block;
+/* main navigation icon */
+.icon-votecollector {
+    background-position: 0;
+    background-image: url("../img/glyphicons_046_router.png");
 }
-a.status_link.inactive span {
-    background-image: url(/static/images/icons/off.png);
-    background-repeat: no-repeat;
-    background-position: center;
-    width: 16px;
-    height: 16px;
-    display: inline-block;
+.leftmenu ul li.active a span.ico i.icon-votecollector {
+    background-image: url("../img/glyphicons_046_router_white.png");
 }

@@ -8,12 +8,3 @@
 {% endblock %}
 
 {% block title %}{{ block.super }} – {%trans "VoteCollector" %}{% endblock %}
-
-{% block submenu %}
-    <h4 class="sectiontitle">{%trans "VoteCollector" %}</h4>
-    <ul>
-        {% for menu_link in menu_links %}
-            <li{% if menu_link.2 %} class="selected"{% endif %}><a href="{{ menu_link.0 }}">{{ menu_link.1 }}</a></li>
-        {% endfor %}
-    </ul>
-{% endblock %}
