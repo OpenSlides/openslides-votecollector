@@ -19,6 +19,7 @@ except ImportError: # python <= 2.5
 # Django imports
 from django.core.urlresolvers import reverse
 from django.db import IntegrityError
+from django.db.models.signals import post_save
 from django.utils.translation import ugettext as _, ugettext_lazy, ugettext_noop
 from django.dispatch import receiver
 from django.contrib import messages
@@ -32,8 +33,7 @@ from openslides.utils.template import Tab
 from openslides.utils.signals import template_manipulation
 from openslides.config.api import config
 from openslides.motion.models import MotionPoll
-#TODO: from openslides.projector.signals import projector_overlays
-#from openslides.projector.api import projector_message_set
+from openslides.projector.api import update_projector_overlay
 from openslides.motion.views import PollUpdateView
 
 # VoteCollector imports
@@ -279,8 +279,8 @@ class StartVoting(VotingView):
             except VoteCollectorError, err:
                 self.error = err.value
             else:
-                sid = MotionPoll.objects.get(pk=poll.id).motion.sid
-                #TODO: projector_message_set(config['votecollector_please_vote'], sid=sid)
+                config['projector_message'] = config['votecollector_please_vote']
+                update_projector_overlay('projector_message')
         return super(StartVoting, self).get(request, *args, **kwargs)
 
     def no_error_context(self):
@@ -293,10 +293,9 @@ class StopVoting(VotingView):
     """
     def get(self, request, *args, **kwargs):
         if self.test_poll():
-            poll = self.get_poll()
             self.result = stop_voting()
-            sid = MotionPoll.objects.get(pk=poll.id).motion.sid
-            #TODO: projector_message_set(config['votecollector_thank_for_vote'], sid=sid)
+            config['projector_message'] = config['votecollector_thank_for_vote']
+            update_projector_overlay('projector_message')
         return super(StopVoting, self).get(request, *args, **kwargs)
 
 
@@ -364,6 +363,13 @@ def register_tab(request):
         permission=request.user.has_perm('votecollector.can_manage_votecollector'),
         selected=request.path.startswith('/votecollector/'),
     )
+
+
+def clear_projector_message(sender, **kw):
+    config['projector_message'] = ''
+    update_projector_overlay('projector_message')
+
+post_save.connect(clear_projector_message, sender=MotionPoll)
 
 
 @receiver(template_manipulation, sender=PollUpdateView, dispatch_uid="votecollector_motion_poll")

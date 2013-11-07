@@ -13,3 +13,7 @@
 .leftmenu ul li.active a span.ico i.icon-votecollector {
     background-image: url("../img/glyphicons_046_router_white.png");
 }
+#votecollector_button {
+    float: left;
+    margin-right: 25px;
+}

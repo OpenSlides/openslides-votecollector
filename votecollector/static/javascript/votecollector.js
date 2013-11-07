@@ -29,7 +29,7 @@ function vote_status() {
                         seconds = '0' + seconds;
                     }
                     time = interpolate(gettext("%s:%s min"), [minutes, seconds]);
-                    set_status('<br>' + interpolate(gettext("Poll is running since %s."), [time]) + '<br>' + interpolate(gettext('%s of %s votes are cast.'), [data['count'], data['active_keypads']]));
+                    set_status(interpolate(gettext("Poll is running since %s."), [time]) + '<br>' + interpolate(gettext('%s of %s votes are cast.'), [data['count'], data['active_keypads']]));
                     active_keypads = data['active_keypads'];
 
                 } else if (starting != true) {
@@ -85,7 +85,7 @@ function get_poll_id() {
 }
 
 function get_option_id() {
-    return $('form input[name!="csrfmiddlewaretoken"]').attr('id').split('-')[1];
+    return $("input[id^='id_option']").attr('id').split('-')[1];
 }
 
 function stop_voting() {
@@ -101,7 +101,11 @@ function stop_voting() {
                 url: '/votecollector/votingresults/',
                 dataType: 'json',
                 success: function(data) {
-                    new_message(interpolate(gettext('The vote is over. %s out of %s votes collected. Do you want to save this values?'),[data['voted'], active_keypads]), 'info');
+                    var text = interpolate(gettext('The vote is over. %s out of %s votes collected. Do you want to save this values?'),[data['voted'], active_keypads])
+                    var message = $('#dummy-notification').clone(true);
+                    $(message).removeAttr('id').addClass('alert alert-info').append(text);
+                    $('#notifications').append(message);
+                    message.slideDown('fast');
                     set_form(data['yes'], data['no'], data['abstain'], 0, data['voted']);
                 }
             });

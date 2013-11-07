@@ -1,12 +1,10 @@
 {% load staticfiles %}
 {% load i18n %}
 
-<fieldset>
-    <legend>{% trans 'VoteCollector' %}</legend>
-    <p>
+<div class="clearfix">
+    <div id="votecollector_button">
         <a id="votecollector" class="btn btn-primary" style="display:none"></a>
-        <a href="{% url 'config_votecollector' %}" class="btn"><i class="icon icon-wrench"></i> {% trans 'Configure VoteCollector' %}</a>
-    </p>
-    <span id="votecollector_status">{% trans 'Loading...' %}</span>
-</fieldset>
+    </div>
+    <div id="votecollector_status">{% trans 'Loading...' %}</div>
+</div>
 <hr>
