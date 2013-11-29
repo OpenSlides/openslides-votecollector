@@ -1,17 +1,14 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""
-    votecollector
-    ~~~~~~~~~~~~~
+from . import signals  # noqa
 
-    VoteCollector Plugin.
 
-    :copyright: 2012-2013 by Oskar Hahn, Emanuel Schütze
-    :license: GNU GPL, see LICENSE for more details.
-"""
+NAME = 'openslides-votecollector'
+VERSION = '1.0.4-dev'
+DESCRIPTION = 'VoteCollector Plugin for OpenSlides'
 
-from django.utils.translation import ugettext as _
-from . import signals
 
-NAME = _('VoteCollector')
-VERSION = (1, 0, 4, 'alpha', 1)
+def get_name():
+    """
+    Function for OpenSlides' version page.
+    """
+    return '%s (%s)' % (DESCRIPTION, NAME)

@@ -1,48 +1,40 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""
-    Setup script for votecollector.
 
-    :copyright: by Oskar Hahn
-    :license: GNU GPL, see LICENSE for more details.
-"""
-version = '1.0.4a1'
-# for python 2.5 support
-## from __future__ import with_statement
+from setuptools import find_packages, setup
 
-from setuptools import setup
-from setuptools import find_packages
+NAME = 'openslides-votecollector'
+VERSION = '1.0.4'
+DESCRIPTION = 'VoteCollector Plugin for OpenSlides'
 
 
-## with open('README.txt') as file:
-    ## long_description = file.read()
+with open('README.rst') as readme:
+    long_description = readme.read()
+
+
+with open('requirements_production.txt') as requirements_production:
+    install_requires = requirements_production.readlines()
+
 
 setup(
-    name='openslides-votecollector',
-    description='votecollector for OpenSlides',
-    ## long_description=long_description,
-    version=version,
+    name=NAME,
+    version=VERSION,
+    description=DESCRIPTION,
+    long_description=long_description,
+    author='VoteCollector Plugin team, see AUTHORS',
+    author_email='support@openslides.org',
     url='https://github.com/OpenSlides/openslides-votecollector',
-    author='Oskar Hahn',
-    author_email='mail@oshahn.de',
-    license='GPL2+',
-    packages=find_packages(),
-    include_package_data = True,
+    keywords='OpenSlides',
     classifiers = [
         # http://pypi.python.org/pypi?%3Aaction=list_classifiers
         'Development Status :: 5 - Production/Stable',
         'Environment :: Web Environment',
-        'Intended Audience :: Other Audience',
         'Framework :: Django',
-        'License :: OSI Approved :: GNU General Public License (GPL)',
+        'Intended Audience :: Other Audience',
+        'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
     ],
-    setup_requires=[
-        'versiontools >= 1.6',
-    ],
-    install_requires=[
-        'openslides==1.3',
-    ],
-    zip_safe=False,
-)
+    license='MIT',
+    packages=find_packages(),
+    include_package_data=True,
+    install_requires=install_requires)

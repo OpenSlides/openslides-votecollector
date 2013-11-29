@@ -1,11 +1,11 @@
 # German Translation for the VoteCollector Plugin
-# Copyright (C) 2012 Oskar Hahn
-# This file is distributed under GPL 2+.
+# Copyright (C) 2012-2013 by VoteCollector Plugin team, see AUTHORS.
+# This file is distributed under the same license as the plugin package.
 msgid ""
 msgstr ""
 "Project-Id-Version: VoteCollector Plugin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-05-13 22:00+0200\n"
+"POT-Creation-Date: 2013-11-29 12:33+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Oskar Hahn\n"
 "Language: German \n"
@@ -14,164 +14,158 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
-#: __init__.py:16 signals.py:64 views.py:360
-#: templates/votecollector/base_votecollector.html:10
-#: templates/votecollector/motion_poll.html:5
-msgid "VoteCollector"
-msgstr "VoteCollector"
-
-#: api.py:22
+#: api.py:13
 msgid "Unknown voting mode"
 msgstr "Unbekannter Abstimmungsmodus"
 
-#: api.py:23
+#: api.py:14
 msgid "Invalid keypad range"
 msgstr "Ungültiger Keypad-Bereich"
 
-#: api.py:24
+#: api.py:15
 msgid "Invalid keypad list"
 msgstr "Ungültige Keypad-Liste"
 
-#: api.py:25
+#: api.py:16
 msgid "No keypads authorized for voting"
 msgstr "Kein Keypad zur Abstimmung zugelassen"
 
-#: api.py:26
+#: api.py:17
 msgid "License not sufficient"
 msgstr "Lizenz ist nicht ausreichend"
 
-#: api.py:57
+#: api.py:48
 msgid "Server not found."
 msgstr "Server nicht gefunden."
 
-#: api.py:63
+#: api.py:54
 msgid "No connection to VoteCollector."
 msgstr "Keine Verbindung zum VoteCollector."
 
-#: api.py:98
+#: api.py:89
 msgid "No keypads selected."
 msgstr "Keine Keypads ausgewählt."
 
-#: forms.py:33
+#: forms.py:23
 msgid "From keypad ID"
 msgstr "Von Keypad ID"
 
-#: forms.py:34
+#: forms.py:24
 msgid "... to keypad ID"
 msgstr "... bis Keypad ID"
 
-#: forms.py:35 models.py:29 templates/votecollector/overview.html:23
+#: forms.py:25 models.py:19 templates/votecollector/overview.html:23
 #: templates/votecollector/overview.html:24
 msgid "Active"
 msgstr "Aktiv"
 
-#: models.py:25
+#: models.py:15
 msgid "Participant"
 msgstr "Teilnehmer/in"
 
-#: models.py:26
+#: models.py:16
 msgid "Leave this field blank for anonymous keypad."
 msgstr "Leer lassen für anonymes Keypad."
 
-#: models.py:28 templates/votecollector/overview.html:31
+#: models.py:18 templates/votecollector/overview.html:31
 msgid "Keypad ID"
 msgstr "Keypad ID"
 
-#: models.py:33
+#: models.py:23
 #, python-format
 msgid "Keypad from %s"
 msgstr "Keypad von %s"
 
-#: models.py:34
+#: models.py:24
 #, python-format
 msgid "Keypad %d"
 msgstr "Keypad %d"
 
-#: models.py:45
+#: models.py:35
 msgid "Can manage VoteCollector"
 msgstr "Darf den VoteCollector verwalten"
 
-#: signals.py:28
+#: signals.py:18
 msgid "both"
 msgstr "beide"
 
-#: signals.py:32
+#: signals.py:22
 msgid "Distribution method for keypads"
 msgstr "Keypadverteilungsmethode"
 
-#: signals.py:34
+#: signals.py:24
 msgid "Use anonymous keypads only"
 msgstr "Verwende nur anonyme Keypads"
 
-#: signals.py:35
+#: signals.py:25
 msgid "Use personalized keypads only"
 msgstr "Verwende nur personalisierte Keypads"
 
-#: signals.py:36
+#: signals.py:26
 msgid "Use ananymous and personalized keypads"
 msgstr "Verwende anonyme und personalisierte Keypads"
 
-#: signals.py:39
-msgid "http://localhost:8030"
-msgstr "http://localhost:8030"
-
-#: signals.py:41
+#: signals.py:31
 msgid "URL for VoteCollector"
 msgstr "URL des VoteCollectors"
 
-#: signals.py:42
-msgid "Example: http://localhost:8030"
-msgstr "Beispiel: http://localhost:8030"
+#: signals.py:32
+msgid "Example"
+msgstr "Beispiel"
 
-#: signals.py:45
+#: signals.py:35
 msgid "Please vote!<br>1: Yes | 2: No | 3: Abstain"
 msgstr "Bitte abstimmen!<br>1: Ja | 2: Nein | 3: Enthaltung"
 
-#: signals.py:48
-msgid "Overlay message 'Please vote'"
-msgstr "Einblendungsnachricht 'Bitte abstimmen'"
+#: signals.py:38
+msgid "Overlay message 'vote started'"
+msgstr "Einblendungsnachricht 'Abstimmung gestartet'"
 
-#: signals.py:51
-msgid "Voting finished.<br>Thank you for your vote."
-msgstr "Abstimmung beendet.<br>Danke für Ihre Stimme."
+#: signals.py:41
+msgid "Vote is closed."
+msgstr "Abstimmung beendet."
 
-#: signals.py:54
-msgid "Overlay message 'Thank you for your vote'"
-msgstr "Einblendungsnachricht 'Danke für Ihre Stimme'"
+#: signals.py:44
+msgid "Overlay message 'vote closed'"
+msgstr "Einblendungsnachricht 'Abstimmung beendet'"
 
-#: views.py:142
+#: views.py:129
 #, python-format
 msgid "Keypad %d is already in database."
 msgstr "Keypad %d war bereits in der Datenbank."
 
-#: views.py:200
+#: views.py:182
 msgid "No connection to the VoteCollector"
 msgstr "Keine Verbindung zum VoteCollector"
 
-#: views.py:203
+#: views.py:185
 msgid "Connected"
 msgstr "Verbunden"
 
-#: views.py:231 views.py:270
+#: views.py:213 views.py:252
 msgid "Unknown poll."
 msgstr "Unbekannte Umfrage."
 
-#: views.py:234
+#: views.py:216
 #, python-format
 msgid "Another poll is running. <a href=\"%s\">Jump to the active poll.</a>"
 msgstr "Eine andere Abstimmung läuft. <a href=\"%s\">Zur aktiven Umfrage</a>."
 
-#: views.py:238
+#: views.py:220
 msgid "Please reload."
 msgstr "Bitte neuladen."
 
-#: views.py:272
+#: views.py:254
 msgid "Poll already started."
 msgstr "Die Abstimmung läuft bereits."
 
-#: views.py:274
+#: views.py:256
 msgid "Another poll is running."
 msgstr "Eine andere Abstimmung läuft bereits."
+
+#: templates/votecollector/base_votecollector.html:10
+msgid "VoteCollector"
+msgstr "VoteCollector"
 
 #: templates/votecollector/edit.html:8
 msgid "Edit keypad"
@@ -198,10 +192,6 @@ msgid "required"
 msgstr "erforderlich"
 
 #: templates/votecollector/motion_poll.html:8
-msgid "Configure VoteCollector"
-msgstr "VoteCollector konfigurieren"
-
-#: templates/votecollector/motion_poll.html:10
 msgid "Loading..."
 msgstr "Laden..."
 
@@ -291,3 +281,4 @@ msgstr "Status"
 #: templates/votecollector/status.html:9
 msgid "VoteCollector status"
 msgstr "VoteCollector Status"
+

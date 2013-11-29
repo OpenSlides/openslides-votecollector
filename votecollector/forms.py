@@ -1,21 +1,11 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""
-    votecollector.forms
-    ~~~~~~~~~~~~~~~~~~~
-
-    Forms for the VoteCollector Plugin.
-
-    :copyright: 2012 by Oskar Hahn.
-    :license: GNU GPL, see LICENSE for more details.
-"""
 
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
 from openslides.utils.forms import CssClassMixin
 
-from votecollector.models import Keypad
+from .models import Keypad
 
 
 class KeypadForm(forms.ModelForm, CssClassMixin):

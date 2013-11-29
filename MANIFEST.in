@@ -1,7 +1,8 @@
-include INSTALL.txt
+include AUTHORS
 include LICENSE
-include THANKS
-
-recursive-include votecollector/static *
-recursive-include votecollector/templates *
-recursive-include votecollector/locale *
+include README.rst
+include requirements_production.txt
+recursive-include votecollector *.*
+recursive-exclude votecollector *.pyc
+recursive-exclude votecollector *.swp
+recursive-exclude votecollector *~

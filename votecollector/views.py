@@ -1,46 +1,33 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""
-    votecollector.views
-    ~~~~~~~~~~~~~~~~~~~
-
-    Views for the VoteCollector Plugin.
-
-    :copyright: 2012-2013 by Oskar Hahn, Emanuel Schütze
-    :license: GNU GPL, see LICENSE for more details.
-"""
 
 from urllib import urlencode
-try:
-    from urlparse import parse_qs
-except ImportError: # python <= 2.5
-    from cgi import parse_qs
+from urlparse import parse_qs
 
 # Django imports
+from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.db import IntegrityError
 from django.db.models.signals import post_save
-from django.utils.translation import ugettext as _, ugettext_lazy, ugettext_noop
 from django.dispatch import receiver
-from django.contrib import messages
 from django.template.loader import render_to_string
+from django.utils.translation import ugettext as _
 from django.views.generic.detail import SingleObjectMixin
 
 # OpenSlides imports
-from openslides.utils.views import (TemplateView, ListView, UpdateView, CreateView,
-    FormView, AjaxView, DeleteView, RedirectView)
-from openslides.utils.template import Tab
-from openslides.utils.signals import template_manipulation
 from openslides.config.api import config
 from openslides.motion.models import MotionPoll
-from openslides.projector.api import update_projector_overlay
 from openslides.motion.views import PollUpdateView
+from openslides.projector.api import update_projector_overlay
+from openslides.utils.signals import template_manipulation
+from openslides.utils.template import Tab
+from openslides.utils.views import (TemplateView, ListView, UpdateView, CreateView,
+                                    FormView, AjaxView, DeleteView, RedirectView)
 
 # VoteCollector imports
-from votecollector.models import Keypad
-from votecollector.forms import KeypadForm, KeypadMultiForm
-from votecollector.api import (start_voting, stop_voting, get_voting_results,
-    get_voting_status, VoteCollectorError, get_VoteCollector_status)
+from .api import (start_voting, stop_voting, get_voting_results,
+                  get_voting_status, VoteCollectorError, get_VoteCollector_status)
+from .forms import KeypadForm, KeypadMultiForm
+from .models import Keypad
 
 
 class Overview(ListView):
@@ -110,6 +97,7 @@ class KeypadUpdate(UpdateView):
     context_object_name = 'keypad'
     form_class = KeypadForm
     success_url_name = 'votecollector_overview'
+    url_name_args = ''
 
 
 class KeypadCreate(CreateView):
@@ -122,6 +110,7 @@ class KeypadCreate(CreateView):
     context_object_name = 'keypad'
     form_class = KeypadForm
     success_url_name = 'votecollector_overview'
+    url_name_args = ''
     apply_url = 'votecollector_keypad_edit'
 
 
@@ -157,10 +146,8 @@ class KeypadSetStatusView(SingleObjectMixin, RedirectView):
     Activate or deactivate a keypad.
     """
     permission_required = 'votecollector.can_manage_votecollector'
-    # TODO for utils/view.py: use url_name in RedirectView without
-    # 'args=self.get_url_name_args()' in reverse(..);
-    # workaround: use get_redirect_url instead
-    # url_name = 'votecollector_overview'
+    url_name = 'votecollector_overview'
+    url_name_args = ''
     allow_ajax = True
     model = Keypad
 
@@ -172,12 +159,9 @@ class KeypadSetStatusView(SingleObjectMixin, RedirectView):
         elif action == 'deactivate':
             self.object.active = False
         elif action == 'toggle':
-             self.object.active = not self.object.active
+            self.object.active = not self.object.active
         self.object.save()
         return super(KeypadSetStatusView, self).pre_redirect(request, *args, **kwargs)
-
-    def get_redirect_url(self, **kwargs):
-        return reverse('votecollector_overview')
 
     def get_ajax_context(self, **kwargs):
         context = super(KeypadSetStatusView, self).get_ajax_context(**kwargs)
@@ -215,7 +199,7 @@ class VotingView(AjaxView):
         Return the poll.
         """
         try:
-            return MotionPoll.objects.get(pk=self.kwargs['pk']);
+            return MotionPoll.objects.get(pk=self.kwargs['pk'])
         except MotionPoll.DoesNotExist:
             return None
 
@@ -279,7 +263,7 @@ class StartVoting(VotingView):
             except VoteCollectorError, err:
                 self.error = err.value
             else:
-                config['projector_message'] = config['votecollector_please_vote']
+                config['projector_message'] = config['votecollector_vote_started_msg']
                 update_projector_overlay('projector_message')
         return super(StartVoting, self).get(request, *args, **kwargs)
 
@@ -294,7 +278,7 @@ class StopVoting(VotingView):
     def get(self, request, *args, **kwargs):
         if self.test_poll():
             self.result = stop_voting()
-            config['projector_message'] = config['votecollector_thank_for_vote']
+            config['projector_message'] = config['votecollector_vote_closed_msg']
             update_projector_overlay('projector_message')
         return super(StopVoting, self).get(request, *args, **kwargs)
 
@@ -348,7 +332,6 @@ class GetVotingResults(VotingView):
             'abstain': self.result[1],
             'voted': config['votecollector_active_keypads'] - self.result[3],
         }
-        return context
 
 
 def register_tab(request):
@@ -356,7 +339,7 @@ def register_tab(request):
     Set the VoteCollector Tab in OpenSlides
     """
     return Tab(
-        title=_('VoteCollector'),
+        title='VoteCollector',
         app='votecollector',
         url=reverse('votecollector_overview'),
         stylefile='styles/votecollector.css',
@@ -365,11 +348,11 @@ def register_tab(request):
     )
 
 
+@receiver(post_save, sender=MotionPoll)
 def clear_projector_message(sender, **kw):
-    config['projector_message'] = ''
-    update_projector_overlay('projector_message')
-
-post_save.connect(clear_projector_message, sender=MotionPoll)
+    if config['projector_message'] == config['votecollector_vote_closed_msg']:
+        config['projector_message'] = ''
+        update_projector_overlay('projector_message')
 
 
 @receiver(template_manipulation, sender=PollUpdateView, dispatch_uid="votecollector_motion_poll")

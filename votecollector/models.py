@@ -1,14 +1,4 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""
-    votecollector.models
-    ~~~~~~~~~~~~~~~~~~~~
-
-    Models for the VoteCollector Plugin.
-
-    :copyright: 2012 by Oskar Hahn
-    :license: GNU GPL, see LICENSE for more details.
-"""
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _, ugettext_noop
@@ -44,6 +34,3 @@ class Keypad(models.Model):
         permissions = (
             ('can_manage_votecollector', ugettext_noop('Can manage VoteCollector')),
         )
-
-
-

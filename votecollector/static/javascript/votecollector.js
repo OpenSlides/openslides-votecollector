@@ -1,8 +1,6 @@
 /**
- * JavaScript functions for VoteCollector Plugin.
+ * JavaScript functions for VoteCollector plugin.
  *
- * :copyright: 2012-2013 by Oskar Hahn, Emanuel Schütze
- * :license: GNU GPL, see LICENSE for more details.
  */
 
 starting = false;
