@@ -3,7 +3,7 @@ from . import signals  # noqa
 
 
 NAME = 'openslides-votecollector'
-VERSION = '1.0.4'
+VERSION = '1.0.5-dev'
 DESCRIPTION = 'VoteCollector Plugin for OpenSlides'
 
 
