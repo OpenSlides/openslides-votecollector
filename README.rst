@@ -133,7 +133,7 @@ This plugin is released under the MIT License, see LICENSE file.
 Changelog
 =========
 
-Version 1.0.4 (unreleased)
+Version 1.0.4 (2013-12-04)
 --------------------------
 * Updated to OpenSlides 1.5.x.
 * Added README and requirements.txt.
