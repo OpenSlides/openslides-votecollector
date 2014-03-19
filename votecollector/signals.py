@@ -32,7 +32,7 @@ def setup_votecollector_config_page(sender, **kwargs):
             help_text='%s: http://localhost:8030' % ugettext_lazy('Example')))
     votecollector_vote_started_msg = ConfigVariable(
         name='votecollector_vote_started_msg',
-        default_value=_('Please vote!<br>1: Yes | 2: No | 3: Abstain'),
+        default_value=_('Please vote now!'),
         form_field=forms.CharField(
             required=False,
             label=ugettext_lazy("Overlay message 'vote started'")))

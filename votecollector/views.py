@@ -263,7 +263,12 @@ class StartVoting(VotingView):
             except VoteCollectorError, err:
                 self.error = err.value
             else:
-                config['projector_message'] = config['votecollector_vote_started_msg']
+                key_yes = "<span class='nobr'><img src='/static/img/button-yes.png'> %s</span>" % _('Yes')
+                key_no = "<span class='nobr'><img src='/static/img/button-no.png'> %s</span>" % _('No')
+                key_abstain = "<span class='nobr'><img src='/static/img/button-abstain.png'> %s</span>" % _('Abstain')
+                config['projector_message'] = "%s <br> %s &nbsp; %s &nbsp; %s " % (
+                    config['votecollector_vote_started_msg'],
+                    key_yes, key_no, key_abstain)
                 update_projector_overlay('projector_message')
         return super(StartVoting, self).get(request, *args, **kwargs)
 
@@ -328,8 +333,8 @@ class GetVotingResults(VotingView):
     def no_error_context(self):
         return {
             'yes': self.result[0],
-            'no': self.result[2],
-            'abstain': self.result[1],
+            'no': self.result[1],
+            'abstain': self.result[2],
             'voted': config['votecollector_active_keypads'] - self.result[3],
         }
 

@@ -10,7 +10,7 @@ This plugin connects OpenSlides with the software "VoteCollector"
 to provide electronic voting for motions with Keypads from `Voteworks <http://www.voteworks.de>`_.
 
 The VoteCollector plugin for OpenSlides was contracted by the German
-company Voteworks. It was initially developed by the core authors of
+company Voteworks GmbH. It was initially developed by the core authors of
 OpenSlides, Oskar Hahn and Emanuel Schütze (`Intevation GmbH <http://www.intevation.de/>`_), in April 2012.
 
 

@@ -29,12 +29,17 @@ function vote_status() {
                     time = interpolate(gettext("%s:%s min"), [minutes, seconds]);
                     set_status(interpolate(gettext("Poll is running since %s."), [time]) + '<br>' + interpolate(gettext('%s of %s votes are cast.'), [data['count'], data['active_keypads']]));
                     active_keypads = data['active_keypads'];
-
                 } else if (starting != true) {
                     $('#votecollector').show().removeClass('in_vote').html("<i class='icon icon-play icon-white'></i> "+gettext('Start Polling')).unbind().click(start_voting);
                     set_status();
+                } else {
+                    $('#votecollector_status').html("No connection to VoteCollector.").show();
+
                 }
             }
+        },
+        error: function(){
+            $('#votecollector_status').html("No connection to VoteCollector.").show();
         }
     });
 }

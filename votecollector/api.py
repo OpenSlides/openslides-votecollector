@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from time import sleep
 from xmlrpclib import ServerProxy
 
 from django.utils.translation import ugettext as _
@@ -15,6 +16,9 @@ VOTECOLLECTOR_ERROR_MESSAGES = {
     -3: _('Invalid keypad list'),
     -4: _('No keypads authorized for voting'),
     -5: _('License not sufficient'),
+    -6: _('No voting device connected.'),
+    -7: _('Failed to set up voting device'),
+    -8: _('Voting device not ready'),
 }
 
 # For cert authentification see:
@@ -64,6 +68,7 @@ def get_VoteCollector_status():
 
     if not config['votecollector_in_vote']:
         server.voteCollector.autoConnect()
+        sleep(5)
 
     return server.voteCollector.getDeviceStatus()
 
@@ -88,8 +93,11 @@ def start_voting(poll_id):
     if not keypads.exists():
         raise VoteCollectorError(_('No keypads selected.'))
 
-    count = server.voteCollector.startVoting('YesNoAbstain', 0, 0, list(keypads))
+    count_prepare = server.voteCollector.prepareVoting('YesNoAbstain', 0, 0, list(keypads))
+    if count_prepare < 0:
+        raise VoteCollectorError(nr=count_prepare)
 
+    count = server.voteCollector.startVoting()
     if count < 0:
         raise VoteCollectorError(nr=count)
 
