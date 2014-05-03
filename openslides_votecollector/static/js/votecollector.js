@@ -19,7 +19,7 @@ function vote_status() {
                 if (data['in_vote']) {
                     starting = false;
                     $('form input[name!="csrfmiddlewaretoken"]').attr('readonly', '1');
-                    $('#votecollector').show().addClass('in_vote').html("<i class='icon icon-stop icon-white'></i> "+gettext('Stop Polling')).unbind().click(stop_voting);
+                    $('#votecollector').show().addClass('in_vote').html("<i class='icon icon-stop icon-white'></i> "+gettext('Stop voting')).unbind().click(stop_voting);
                     var seconds = data['seconds'] % 60;
                     var minutes = (data['seconds'] - seconds)  / 60;
                     var time;
@@ -30,7 +30,7 @@ function vote_status() {
                     set_status(interpolate(gettext("Poll is running since %s."), [time]) + '<br>' + interpolate(gettext('%s of %s votes are cast.'), [data['count'], data['active_keypads']]));
                     active_keypads = data['active_keypads'];
                 } else if (starting != true) {
-                    $('#votecollector').show().removeClass('in_vote').html("<i class='icon icon-play icon-white'></i> "+gettext('Start Polling')).unbind().click(start_voting);
+                    $('#votecollector').show().removeClass('in_vote').html("<i class='icon icon-play icon-white'></i> "+gettext('Start voting')).unbind().click(start_voting);
                     set_status();
                 } else {
                     $('#votecollector_status').html("No connection to VoteCollector.").show();
@@ -53,21 +53,22 @@ function set_status(status) {
 }
 
 function clear_form() {
-    set_form('', '', '', '', '');
+    set_form('', '', '', '', '', '');
 }
 
-function set_form(yes, no, contained, votesinvalid, votecast) {
+function set_form(yes, no, contained, votesvalid, votesinvalid, votecast) {
     option_id = get_option_id();
     $('#id_option-' + option_id + '-Yes').val(yes);
     $('#id_option-' + option_id + '-No').val(no);
     $('#id_option-' + option_id + '-Abstain').val(contained);
+    $('#id_pollform-votesvalid').val(votesvalid);
     $('#id_pollform-votesinvalid').val(votesinvalid);
     $('#id_pollform-votescast').val(votecast);
 }
 
 function start_voting() {
     starting = true;
-    set_status(gettext('start voting...'))
+    set_status(gettext('Start voting...'))
     clear_form();
     $.ajax({
         type: 'GET',
@@ -92,7 +93,7 @@ function get_option_id() {
 }
 
 function stop_voting() {
-    set_status(gettext('stop voting...'))
+    set_status(gettext('Stop voting...'))
     $.ajax({
         type: 'GET',
         url: '/votecollector/stop/' + get_poll_id() + '/',
@@ -109,7 +110,7 @@ function stop_voting() {
                     $(message).removeAttr('id').addClass('alert alert-info').append(text);
                     $('#notifications').append(message);
                     message.slideDown('fast');
-                    set_form(data['yes'], data['no'], data['abstain'], 0, data['voted']);
+                    set_form(data['yes'], data['no'], data['abstain'], data['voted'], 0, data['voted']);
                 }
             });
         }

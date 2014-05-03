@@ -17,7 +17,7 @@ OpenSlides, Oskar Hahn and Emanuel Schütze (`Intevation GmbH <http://www.inteva
 Requirements
 ============
 
-OpenSlides 1.5.x (http://openslides.org/)
+OpenSlides 1.6.x (http://openslides.org/)
 
 
 Install
@@ -42,25 +42,11 @@ I. Installation on Windows (with OpenSlides portable version)
 
    https://github.com/OpenSlides/openslides-votecollector/tags
 
-3. Move the (extracted) subdirectory 'votecollector' to::
+3. Move the (extracted) subdirectory 'openslides_votecollector' to::
 
-     '<path-to-openslides-portable>/site-packages/votecollector/'
+     '<path-to-openslides-portable>/openslides/plugins/'
 
-4. If required: Run openslides.exe first time to create database and settings.py
-   file. Then stop OpenSlides.
-
-5. Edit '<path-to-openslides-portable>/openslides/settings.py' and
-   add the plugin name 'votecollector' under 'INSTALLED_PLUGINS'::
-
-     INSTALLED_PLUGINS = (
-         'votecollector',
-     )
-
-6. Start openslides.exe again.
-
-7. Add VoteCollector permission to staff group:
-   Go to 'Participants > Groups' and edit the group 'Staff'.
-   Add the permission 'Can manage VoteCollector' and save the form.
+5. Start openslides.exe.
 
 
 Now the plugin installation is finished. You can open the new menu
@@ -92,30 +78,13 @@ II. Installation on GNU/Linux and MacOSX
 
 3. Install OpenSlides and VoteCollector plugin from the Python Package Index (PyPI)::
 
-    $ pip install openslides-votecollector
+    $ pip install openslides openslides-votecollector
 
     OpenSlides and all required python packages will be installed.
 
-4. Run OpenSlides first time to create database and settings.py file::
+4. Start OpenSlides::
 
     $ openslides
-
-   Stop OpenSlides with CTRL + C.
-
-5. Edit '~/.config/openslides/settings.py' and add the plugin
-   name 'votecollector' under 'INSTALLED_PLUGINS'::
-
-     INSTALLED_PLUGINS = (
-         'votecollector',
-     )
-
-6. Restart OpenSlides::
-
-    $ openslides
-
-7. Add VoteCollector permission to staff group:
-   Go to 'Participants > Groups' and edit the group 'Staff'.
-   Add the permission 'Can manage VoteCollector' and save the form.
 
 
 Now the plugin installation is finished. You can open the new menu
@@ -133,8 +102,10 @@ This plugin is released under the MIT License, see LICENSE file.
 Changelog
 =========
 
-Version 1.0.5 (unreleased)
---------------------------
+Version 1.1 (unreleased)
+------------------------
+* Updated to OpenSlides 1.6.x.
+* Updated for VoteCollector 1.2.2.
 
 Version 1.0.4 (2013-12-04)
 --------------------------

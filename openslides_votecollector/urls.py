@@ -8,62 +8,62 @@ from .views import (Overview, KeypadCreate, KeypadUpdate, StatusView,
 
 urlpatterns = patterns(
     '',
-    url(r'^$',
+    url(r'^votecollector/$',
         Overview.as_view(),
         name="votecollector_overview"),
 
-    url(r'^new/$',
+    url(r'^votecollector/new/$',
         KeypadCreate.as_view(),
         name="votecollector_keypad_new"),
 
-    url(r'^new/multi/$',
+    url(r'^votecollector/new/multi/$',
         KeypadCreateMulti.as_view(),
         name="votecollector_keypad_new_multi"),
 
-    url(r'^(?P<pk>\d+)/edit/',
+    url(r'^votecollector/(?P<pk>\d+)/edit/',
         KeypadUpdate.as_view(),
         name="votecollector_keypad_edit"),
 
-    url(r'^(?P<pk>\d+)/del/',
+    url(r'^votecollector/(?P<pk>\d+)/del/',
         KeypadDelete.as_view(),
         name="votecollector_keypad_delete"),
 
-    url(r'^(?P<pk>\d+)/toggle/$',
+    url(r'^votecollector/(?P<pk>\d+)/toggle/$',
         KeypadSetStatusView.as_view(),
         {'action': 'toggle'},
         name='votecollector_keypad_status_toggle'),
 
-    url(r'^(?P<pk>\d+)/activate/',
+    url(r'^votecollector/(?P<pk>\d+)/activate/',
         KeypadSetStatusView.as_view(),
         {'action': 'activate'},
         name="votecollector_keypad_activate"),
 
-    url(r'^(?P<pk>\d+)/deactivate/',
+    url(r'^votecollector/(?P<pk>\d+)/deactivate/',
         KeypadSetStatusView.as_view(),
         {'action': 'deactivate'},
         name="votecollector_keypad_deactivate"),
 
-    url(r'^status/$',
+    url(r'^votecollector/status/$',
         StatusView.as_view(),
         name="votecollector_status"),
 
-    url(r'^start/(?P<pk>\d+)/$',
+    url(r'^votecollector/start/(?P<pk>\d+)/$',
         StartVoting.as_view(),
         name="votecollector_voting_start"),
 
-    url(r'^stop/(?P<pk>\d+)/$',
+    url(r'^votecollector/stop/(?P<pk>\d+)/$',
         StopVoting.as_view(),
         name="votecollector_voting_stop"),
 
-    url(r'^votingstatus/$',
+    url(r'^votecollector/votingstatus/$',
         GetStatus.as_view(),
         name="votecollector_voting_status"),
 
-    url(r'^votingstatus/(?P<pk>\d+)/$',
+    url(r'^votecollector/votingstatus/(?P<pk>\d+)/$',
         GetVotingStatus.as_view(),
         name="votecollector_voting_status"),
 
-    url(r'^votingresults/$',
+    url(r'^votecollector/votingresults/$',
         GetVotingResults.as_view(),
         name="votecollector_voting_results"),
 )

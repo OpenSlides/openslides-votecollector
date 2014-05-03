@@ -1,11 +1,11 @@
 # German Translation for the VoteCollector Plugin
-# Copyright (C) 2012-2013 Oskar Hahn
+# Copyright (C) 2012-2014 Oskar Hahn
 # This file is distributed under GPL 2+.
 msgid ""
 msgstr ""
 "Project-Id-Version: VoteCollector Plugin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-05-13 22:01+0200\n"
+"POT-Creation-Date: 2014-06-02 22:39+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Oskar Hahn\n"
 "Language: German \n"
@@ -14,38 +14,38 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
-#: static/javascript/votecollector.js:24
-msgid "Stop Polling"
+#: static/js/votecollector.js:22
+msgid "Stop voting"
 msgstr "Abstimmung stoppen"
 
-#: static/javascript/votecollector.js:31
+#: static/js/votecollector.js:29
 #, c-format
 msgid "%s:%s min"
 msgstr "%s:%s min"
 
-#: static/javascript/votecollector.js:32
+#: static/js/votecollector.js:30
 #, c-format
 msgid "Poll is running since %s."
 msgstr "Die Abstimmung läuft seit %s."
 
-#: static/javascript/votecollector.js:32
+#: static/js/votecollector.js:30
 #, c-format
 msgid "%s of %s votes are cast."
 msgstr "%s von %s Stimmen abgegeben."
 
-#: static/javascript/votecollector.js:36
-msgid "Start Polling"
+#: static/js/votecollector.js:33
+msgid "Start voting"
 msgstr "Abstimmung starten"
 
-#: static/javascript/votecollector.js:67
-msgid "start voting..."
+#: static/js/votecollector.js:71
+msgid "Start voting..."
 msgstr "Abstimmung wird gestartet..."
 
-#: static/javascript/votecollector.js:92
-msgid "stop voting..."
+#: static/js/votecollector.js:96
+msgid "Stop voting..."
 msgstr "Abstimmung wird beendet..."
 
-#: static/javascript/votecollector.js:104
+#: static/js/votecollector.js:108
 #, c-format
 msgid ""
 "The vote is over. %s out of %s votes collected. Do you want to save this "

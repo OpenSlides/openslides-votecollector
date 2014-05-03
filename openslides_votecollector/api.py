@@ -66,10 +66,6 @@ def get_VoteCollector_status():
     """
     server = get_server()
 
-    if not config['votecollector_in_vote']:
-        server.voteCollector.autoConnect()
-        sleep(5)
-
     return server.voteCollector.getDeviceStatus()
 
 

@@ -1,11 +1,11 @@
 # German Translation for the VoteCollector Plugin
-# Copyright (C) 2012-2013 by VoteCollector Plugin team, see AUTHORS.
+# Copyright (C) 2012-2014 by VoteCollector Plugin team, see AUTHORS.
 # This file is distributed under the same license as the plugin package.
 msgid ""
 msgstr ""
 "Project-Id-Version: VoteCollector Plugin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-11-29 12:33+0100\n"
+"POT-Creation-Date: 2014-06-02 22:36+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Oskar Hahn\n"
 "Language: German \n"
@@ -14,48 +14,61 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
-#: api.py:13
+#: api.py:14
 msgid "Unknown voting mode"
 msgstr "Unbekannter Abstimmungsmodus"
 
-#: api.py:14
+#: api.py:15
 msgid "Invalid keypad range"
 msgstr "Ungültiger Keypad-Bereich"
 
-#: api.py:15
+#: api.py:16
 msgid "Invalid keypad list"
 msgstr "Ungültige Keypad-Liste"
 
-#: api.py:16
+#: api.py:17
 msgid "No keypads authorized for voting"
 msgstr "Kein Keypad zur Abstimmung zugelassen"
 
-#: api.py:17
+#: api.py:18
 msgid "License not sufficient"
 msgstr "Lizenz ist nicht ausreichend"
 
-#: api.py:48
+#: api.py:19
+msgid "No voting device connected."
+msgstr "Kein Abstimmungssystem verbunden."
+
+#: api.py:20
+msgid "Failed to set up voting device"
+msgstr "Fehler beim Einrichten des Abstimmungssystems"
+
+#: api.py:21
+msgid "Voting device not ready"
+msgstr "Abstimmungssystem nicht bereit"
+
+#: api.py:52
 msgid "Server not found."
 msgstr "Server nicht gefunden."
 
-#: api.py:54
+#: api.py:58
 msgid "No connection to VoteCollector."
 msgstr "Keine Verbindung zum VoteCollector."
 
-#: api.py:89
+#: api.py:95
 msgid "No keypads selected."
 msgstr "Keine Keypads ausgewählt."
 
 #: forms.py:23
 msgid "From keypad ID"
-msgstr "Von Keypad ID"
+msgstr "Von Keypad-ID"
 
 #: forms.py:24
 msgid "... to keypad ID"
-msgstr "... bis Keypad ID"
+msgstr "... bis Keypad-ID"
 
-#: forms.py:25 models.py:19 templates/votecollector/overview.html:23
-#: templates/votecollector/overview.html:24
+#: forms.py:25 models.py:19
+#: templates/openslides_votecollector/overview.html:23
+#: templates/openslides_votecollector/overview.html:24
 msgid "Active"
 msgstr "Aktiv"
 
@@ -67,9 +80,9 @@ msgstr "Teilnehmer/in"
 msgid "Leave this field blank for anonymous keypad."
 msgstr "Leer lassen für anonymes Keypad."
 
-#: models.py:18 templates/votecollector/overview.html:31
+#: models.py:18 templates/openslides_votecollector/overview.html:31
 msgid "Keypad ID"
-msgstr "Keypad ID"
+msgstr "Keypad-ID"
 
 #: models.py:23
 #, python-format
@@ -85,47 +98,47 @@ msgstr "Keypad %d"
 msgid "Can manage VoteCollector"
 msgstr "Darf den VoteCollector verwalten"
 
-#: signals.py:18
+#: signals.py:22
 msgid "both"
 msgstr "beide"
 
-#: signals.py:22
+#: signals.py:26
 msgid "Distribution method for keypads"
 msgstr "Keypadverteilungsmethode"
 
-#: signals.py:24
+#: signals.py:28
 msgid "Use anonymous keypads only"
 msgstr "Verwende nur anonyme Keypads"
 
-#: signals.py:25
+#: signals.py:29
 msgid "Use personalized keypads only"
 msgstr "Verwende nur personalisierte Keypads"
 
-#: signals.py:26
+#: signals.py:30
 msgid "Use ananymous and personalized keypads"
 msgstr "Verwende anonyme und personalisierte Keypads"
 
-#: signals.py:31
+#: signals.py:36
 msgid "URL for VoteCollector"
 msgstr "URL des VoteCollectors"
 
-#: signals.py:32
+#: signals.py:37
 msgid "Example"
 msgstr "Beispiel"
 
-#: signals.py:35
-msgid "Please vote!<br>1: Yes | 2: No | 3: Abstain"
-msgstr "Bitte abstimmen!<br>1: Ja | 2: Nein | 3: Enthaltung"
+#: signals.py:40
+msgid "Please vote now!"
+msgstr "Bitte stimmen Sie jetzt ab!"
 
-#: signals.py:38
+#: signals.py:43
 msgid "Overlay message 'vote started'"
 msgstr "Einblendungsnachricht 'Abstimmung gestartet'"
 
-#: signals.py:41
+#: signals.py:46
 msgid "Vote is closed."
 msgstr "Abstimmung beendet."
 
-#: signals.py:44
+#: signals.py:49
 msgid "Overlay message 'vote closed'"
 msgstr "Einblendungsnachricht 'Abstimmung beendet'"
 
@@ -163,122 +176,136 @@ msgstr "Die Abstimmung läuft bereits."
 msgid "Another poll is running."
 msgstr "Eine andere Abstimmung läuft bereits."
 
-#: templates/votecollector/base_votecollector.html:10
+#: views.py:264
+msgid "Yes"
+msgstr "Ja"
+
+#: views.py:265
+msgid "No"
+msgstr "Nein"
+
+#: views.py:266
+msgid "Abstention"
+msgstr "Enthaltung"
+
+#: templates/openslides_votecollector/base_votecollector.html:10
 msgid "VoteCollector"
 msgstr "VoteCollector"
 
-#: templates/votecollector/edit.html:8
+#: templates/openslides_votecollector/edit.html:8
 msgid "Edit keypad"
 msgstr "Keypad bearbeiten"
 
-#: templates/votecollector/edit.html:10
+#: templates/openslides_votecollector/edit.html:10
 msgid "New keypad"
 msgstr "Neues Keypad"
 
-#: templates/votecollector/edit.html:13
-#: templates/votecollector/new_multi.html:9
-#: templates/votecollector/status.html:11
+#: templates/openslides_votecollector/edit.html:13
+#: templates/openslides_votecollector/new_multi.html:9
+#: templates/openslides_votecollector/status.html:11
 msgid "Back to overview"
 msgstr "Zurück zur Übersicht"
 
-#: templates/votecollector/edit.html:21
-#: templates/votecollector/new_multi.html:17
+#: templates/openslides_votecollector/edit.html:21
+#: templates/openslides_votecollector/new_multi.html:17
 msgid "Cancel"
 msgstr "Abbrechen"
 
-#: templates/votecollector/edit.html:24
-#: templates/votecollector/new_multi.html:20
+#: templates/openslides_votecollector/edit.html:24
+#: templates/openslides_votecollector/new_multi.html:20
 msgid "required"
 msgstr "erforderlich"
 
-#: templates/votecollector/motion_poll.html:8
+#: templates/openslides_votecollector/motion_poll.html:8
 msgid "Loading..."
 msgstr "Laden..."
 
-#: templates/votecollector/new_multi.html:7
+#: templates/openslides_votecollector/new_multi.html:7
 msgid "New keypad range"
 msgstr "Neuer Keypad-Bereich"
 
-#: templates/votecollector/overview.html:7
+#: templates/openslides_votecollector/overview.html:7
 msgid "Keypads"
 msgstr "Keypads"
 
-#: templates/votecollector/overview.html:9
+#: templates/openslides_votecollector/overview.html:9
 msgid "New Keypad"
 msgstr "Neues Keypad"
 
-#: templates/votecollector/overview.html:9
+#: templates/openslides_votecollector/overview.html:9
 msgid "New"
 msgstr "Neu"
 
-#: templates/votecollector/overview.html:10
+#: templates/openslides_votecollector/overview.html:10
 msgid "New Keypad range"
 msgstr "Neuer Keypad-Bereich"
 
-#: templates/votecollector/overview.html:10
+#: templates/openslides_votecollector/overview.html:10
 msgid "New range"
 msgstr "Neuer Bereich"
 
-#: templates/votecollector/overview.html:11
+#: templates/openslides_votecollector/overview.html:11
 msgid "Check connection status of VoteCollector"
 msgstr "Verbindung zum VoteCollector prüfen"
 
-#: templates/votecollector/overview.html:11
+#: templates/openslides_votecollector/overview.html:11
 msgid "Connection status"
 msgstr "Verbindunsstatus"
 
-#: templates/votecollector/overview.html:16
+#: templates/openslides_votecollector/overview.html:16
 msgid "Filter"
 msgstr "Filter"
 
-#: templates/votecollector/overview.html:18
-#: templates/votecollector/overview.html:32
+#: templates/openslides_votecollector/overview.html:18
+#: templates/openslides_votecollector/overview.html:32
 msgid "User"
 msgstr "Benutzer"
 
-#: templates/votecollector/overview.html:19
-#: templates/votecollector/overview.html:38
+#: templates/openslides_votecollector/overview.html:19
+#: templates/openslides_votecollector/overview.html:38
 msgid "Anonym"
 msgstr "Anonym"
 
-#: templates/votecollector/overview.html:20
+#: templates/openslides_votecollector/overview.html:20
 msgid "Personalized"
 msgstr "Personalisiert"
 
-#: templates/votecollector/overview.html:25
+#: templates/openslides_votecollector/overview.html:25
 msgid "Inactive"
 msgstr "Inaktiv"
 
-#: templates/votecollector/overview.html:33
+#: templates/openslides_votecollector/overview.html:33
 msgid "Actions"
 msgstr "Aktionen"
 
-#: templates/votecollector/overview.html:40
+#: templates/openslides_votecollector/overview.html:40
 msgid "Edit"
 msgstr "Bearbeiten"
 
-#: templates/votecollector/overview.html:43
+#: templates/openslides_votecollector/overview.html:43
 msgid "Delete"
 msgstr "Löschen"
 
-#: templates/votecollector/overview.html:48
+#: templates/openslides_votecollector/overview.html:48
 msgid "active"
 msgstr "aktiv"
 
-#: templates/votecollector/overview.html:48
+#: templates/openslides_votecollector/overview.html:48
 msgid "inactive"
 msgstr "inaktiv"
 
-#: templates/votecollector/overview.html:54
+#: templates/openslides_votecollector/overview.html:54
 msgid "No Keypads available."
 msgstr "Keine Keypads vorhanden."
 
-#: templates/votecollector/status.html:5
-#: templates/votecollector/status.html:14
+#: templates/openslides_votecollector/status.html:5
+#: templates/openslides_votecollector/status.html:14
 msgid "Status"
 msgstr "Status"
 
-#: templates/votecollector/status.html:9
+#: templates/openslides_votecollector/status.html:9
 msgid "VoteCollector status"
 msgstr "VoteCollector Status"
 
+#~ msgid "Please vote!<br>1: Yes | 2: No | 3: Abstain"
+#~ msgstr "Bitte abstimmen!<br>1: Ja | 2: Nein | 3: Enthaltung"

@@ -5,7 +5,6 @@ from urlparse import parse_qs
 
 # Django imports
 from django.contrib import messages
-from django.core.urlresolvers import reverse
 from django.db import IntegrityError
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -19,7 +18,6 @@ from openslides.motion.models import MotionPoll
 from openslides.motion.views import PollUpdateView
 from openslides.projector.api import update_projector_overlay
 from openslides.utils.signals import template_manipulation
-from openslides.utils.template import Tab
 from openslides.utils.views import (TemplateView, ListView, UpdateView, CreateView,
                                     FormView, AjaxView, DeleteView, RedirectView)
 
@@ -34,8 +32,8 @@ class Overview(ListView):
     """
     List all keypads.
     """
-    permission_required = 'votecollector.can_manage_votecollector'
-    template_name = 'votecollector/overview.html'
+    required_permission = 'openslides_votecollector.can_manage_votecollector'
+    template_name = 'openslides_votecollector/overview.html'
     model = Keypad
     context_object_name = 'keypads'
 
@@ -91,8 +89,8 @@ class KeypadUpdate(UpdateView):
     """
     Updates a keypad.
     """
-    permission_required = 'votecollector.can_manage_votecollector'
-    template_name = 'votecollector/edit.html'
+    required_permission = 'openslides_votecollector.can_manage_votecollector'
+    template_name = 'openslides_votecollector/edit.html'
     model = Keypad
     context_object_name = 'keypad'
     form_class = KeypadForm
@@ -104,8 +102,8 @@ class KeypadCreate(CreateView):
     """
     Creates a new keypad.
     """
-    permission_required = 'votecollector.can_manage_votecollector'
-    template_name = 'votecollector/edit.html'
+    required_permission = 'openslides_votecollector.can_manage_votecollector'
+    template_name = 'openslides_votecollector/edit.html'
     model = Keypad
     context_object_name = 'keypad'
     form_class = KeypadForm
@@ -118,8 +116,8 @@ class KeypadCreateMulti(FormView):
     """
     Creates several keypads.
     """
-    permission_required = 'votecollector.can_manage_votecollector'
-    template_name = 'votecollector/new_multi.html'
+    required_permission = 'openslides_votecollector.can_manage_votecollector'
+    template_name = 'openslides_votecollector/new_multi.html'
     form_class = KeypadMultiForm
     success_url_name = 'votecollector_overview'
 
@@ -136,7 +134,7 @@ class KeypadDelete(DeleteView):
     """
     Deletes a keypad.
     """
-    permission_required = 'votecollector.can_manage_votecollector'
+    required_permission = 'openslides_votecollector.can_manage_votecollector'
     model = Keypad
     success_url_name = 'votecollector_overview'
 
@@ -145,7 +143,7 @@ class KeypadSetStatusView(SingleObjectMixin, RedirectView):
     """
     Activate or deactivate a keypad.
     """
-    permission_required = 'votecollector.can_manage_votecollector'
+    required_permission = 'openslides_votecollector.can_manage_votecollector'
     url_name = 'votecollector_overview'
     url_name_args = ''
     allow_ajax = True
@@ -173,8 +171,8 @@ class StatusView(TemplateView):
     """
     Show votecollector status.
     """
-    permission_required = 'votecollector.can_manage_votecollector'
-    template_name = 'votecollector/status.html'
+    required_permission = 'openslides_votecollector.can_manage_votecollector'
+    template_name = 'openslides_votecollector/status.html'
 
     def get_context_data(self, **kwargs):
         context = super(StatusView, self).get_context_data(**kwargs)
@@ -265,10 +263,10 @@ class StartVoting(VotingView):
             else:
                 key_yes = "<span class='nobr'><img src='/static/img/button-yes.png'> %s</span>" % _('Yes')
                 key_no = "<span class='nobr'><img src='/static/img/button-no.png'> %s</span>" % _('No')
-                key_abstain = "<span class='nobr'><img src='/static/img/button-abstain.png'> %s</span>" % _('Abstain')
+                key_abstention = "<span class='nobr'><img src='/static/img/button-abstention.png'> %s</span>" % _('Abstention')
                 config['projector_message'] = "%s <br> %s &nbsp; %s &nbsp; %s " % (
                     config['votecollector_vote_started_msg'],
-                    key_yes, key_no, key_abstain)
+                    key_yes, key_no, key_abstention)
                 update_projector_overlay('projector_message')
         return super(StartVoting, self).get(request, *args, **kwargs)
 
@@ -339,20 +337,6 @@ class GetVotingResults(VotingView):
         }
 
 
-def register_tab(request):
-    """
-    Set the VoteCollector Tab in OpenSlides
-    """
-    return Tab(
-        title='VoteCollector',
-        app='votecollector',
-        url=reverse('votecollector_overview'),
-        stylefile='styles/votecollector.css',
-        permission=request.user.has_perm('votecollector.can_manage_votecollector'),
-        selected=request.path.startswith('/votecollector/'),
-    )
-
-
 @receiver(post_save, sender=MotionPoll)
 def clear_projector_message(sender, **kw):
     if config['projector_message'] == config['votecollector_vote_closed_msg']:
@@ -366,6 +350,6 @@ def motion_poll_template(sender, **kwargs):
     Alter the motion_poll template to insert the 'StartPolling' button.
     """
     kwargs['context'].update({
-        'post_form': render_to_string('votecollector/motion_poll.html'),
+        'post_form': render_to_string('openslides_votecollector/motion_poll.html'),
     })
-    kwargs['context']['extra_javascript'].append('javascript/votecollector.js')
+    kwargs['context']['extra_javascript'].append('js/votecollector.js')
