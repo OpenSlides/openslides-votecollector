@@ -28,7 +28,7 @@ SECRET_KEY = 'secred'
 
 # Add OpenSlides plugins to this list (see example entry in comment)
 INSTALLED_PLUGINS = (
-    'votecollector',
+    'openslides_votecollector',
 )
 
 INSTALLED_APPS += INSTALLED_PLUGINS

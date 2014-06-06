@@ -8,10 +8,9 @@ from fabric.contrib import django
 
 def check():
     """
-    Checks for PEP 8 and other errors in the directories votecollector and tests.
+    Checks for PEP 8 and other errors in the directories openslides_votecollector and tests.
     """
-    local('flake8 --max-line-length=150 --statistics votecollector')
-    local('flake8 --max-line-length=150 --statistics tests')
+    local('flake8 --max-line-length=150 --statistics openslides_votecollector tests')
 
 
 def test(module='tests'):
