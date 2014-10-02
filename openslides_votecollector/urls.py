@@ -4,7 +4,8 @@ from django.conf.urls import patterns, url
 
 from .views import (Overview, KeypadCreate, KeypadUpdate, StatusView,
                     StartVoting, StopVoting, GetVotingResults, GetVotingStatus,
-                    GetStatus, KeypadDelete, KeypadSetStatusView, KeypadCreateMulti)
+                    GetStatus, KeypadDelete, KeypadSetStatusView, KeypadCreateMulti,
+                    MotionDetailView, MotionPollDetailView)
 
 urlpatterns = patterns(
     '',
@@ -57,13 +58,21 @@ urlpatterns = patterns(
 
     url(r'^votecollector/votingstatus/$',
         GetStatus.as_view(),
-        name="votecollector_voting_status"),
+        name="votecollector_voting_status"),  # TODO
 
     url(r'^votecollector/votingstatus/(?P<pk>\d+)/$',
         GetVotingStatus.as_view(),
-        name="votecollector_voting_status"),
+        name="votecollector_voting_status"),  # TODO
 
     url(r'^votecollector/votingresults/$',
         GetVotingResults.as_view(),
         name="votecollector_voting_results"),
+
+    # Motion
+    url(r'^motion/(?P<pk>\d+)/$',
+        MotionDetailView.as_view(),
+        name='motion_detail'),
+    url(r'^motion/(?P<pk>\d+)/poll/(?P<poll_number>\d+)/$',
+        MotionPollDetailView.as_view(),
+        name="motionpoll_detail")
 )

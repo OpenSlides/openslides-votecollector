@@ -1,2 +1,1 @@
-# Requirements for VoteCollector Plugin for OpenSlides in production
-openslides>=1.6,<1.7
+openslides>=1.6.1,<1.7

@@ -1,0 +1,144 @@
+{% load humanize %}
+{% load i18n %}
+{% load staticfiles %}
+{% load tags %}
+
+<style>
+    table.result-and-plan, table.result-and-plan th, table.result-and-plan td {
+        border:none;}
+    table.result-and-plan td {
+        background-color:#ffffff;}
+    table.seating-plan {
+        border-collapse:separate;
+        border-spacing:1em;
+        border:none;}
+    table.seating-plan th.podium {
+        height:1em;
+        border: 1px solid black;}
+    table.seating-plan td {
+        max-width:1.2em;
+        min-width:1.2em;
+        max-height:1.2em;
+        min-height:1.2em;
+        border:none;}
+    table.seating-plan td.seat {
+        border: 1px solid black;
+        line-height:120%;
+        text-align:center;}
+    table.seating-plan td.seat-red {
+        background-color:#ff201c;}
+    table.seating-plan td.seat-green {
+        background-color:#008f2a;}
+    table.seating-plan td.seat-yellow {
+        background-color:#f1d300;}
+</style>
+
+<h1>
+    {{ poll.motion.active_version.title }}
+    <br>
+    <small>
+        {% trans 'Motion' %} {{ poll.motion.identifier|default:'' }}
+        {% if poll.motion.get_active_version.version_number > 1 %} | {% trans 'Version' %} {{ poll.motion.active_version.version_number }}{% endif %}
+        {% if poll.poll_number > 1 %}| {{ poll.poll_number|ordinal|safe }} {% trans 'vote' %}{% endif %}
+    </small>
+</h1>
+
+{% if 'votecollector_live_voting'|get_config or poll.has_votes %}
+    {% if 'votecollector_in_vote'|get_config == poll.id %}
+        <div>
+            <h2>{{ 'votecollector_vote_started_msg'|get_config }}</h2>
+        </div>
+    {% endif %}
+    {% if all_keypad_votes or 'votecollector_live_voting'|get_config %}
+        {% if votes_with_seat %}
+            <p>
+            <table class="result-and-plan">
+                <tr>
+                    <th style="min-width:15em;">{% trans 'All votes' %}</th>
+                    <th style="min-width:{{ seating_plan.width }};">{% trans 'Seating plan' %}</th>
+                </tr>
+                <tr>
+                    <td style="vertical-align:top;">
+                        <p><img src="{% static 'img/voting-yes.png' %}"> {{ all_keypad_votes.Y }} {% trans 'Yes' %}</p>
+                        <p><img src="{% static 'img/voting-no.png' %}"> {{ all_keypad_votes.N }} {% trans 'No' %}</p>
+                        <p><img src="{% static 'img/voting-abstention.png' %}"> {{ all_keypad_votes.A }} {% trans 'Abstention' %}</p>
+                        <p><img src="{% static 'img/voting-total.png' %}"> {{ all_keypad_votes.votes_cast }} {% trans 'Votes cast' %}</p>
+                        {% if votes_without_seat %}
+                            <small>{{ votes_without_seat }} {% trans 'Votes without seat' %}</small>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <table class="seating-plan">
+                            {% for row in seating_plan.rows %}
+                                <tr>
+                                    {% for place in row %}
+                                        <td class="{{ place.css }}"><span>{{ place.number }}</span></td>
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </td>
+                </tr>
+            </table>
+            </p>
+        {% else %}
+            <p>
+                <table class="well result big">
+                    <tr>
+                        <td><img src="{% static 'img/voting-yes.png' %}"> {% trans 'Yes' %}:</td>
+                        <td class="bold">{{ all_keypad_votes.Y|default:'0' }}</td>
+                    </tr>
+                    <tr>
+                        <td><img src="{% static 'img/voting-no.png' %}"> {% trans 'No' %}:</td>
+                        <td class="bold">{{ all_keypad_votes.N|default:'0' }}</td>
+                    </tr>
+                    <tr>
+                        <td><img src="{% static 'img/voting-abstention.png' %}"> {% trans 'Abstention' %}:</td>
+                        <td class="bold">{{ all_keypad_votes.A|default:'0' }}</td>
+                    </tr>
+                    <tr class="total">
+                        <td><img src="{% static 'img/voting-total.png' %}"> {% trans 'Votes cast' %}:</td>
+                        <td class="bold">{{ all_keypad_votes.votes_cast|default:'0' }}</td>
+                    </tr>
+                </table>
+            </p>
+        {% endif %}
+    {% else %}
+        {% with poll.get_options.0 as option %}
+            <p>
+                <table class="well result big">
+                    <tr>
+                        <td><img src="{% static 'img/voting-yes.png' %}"> {% trans 'Yes' %}:</td>
+                        <td class="bold">{{ option.Yes }}</td>
+                    </tr>
+                    <tr>
+                        <td><img src="{% static 'img/voting-no.png' %}"> {% trans 'No' %}:</td>
+                        <td class="bold">{{ option.No }}</td>
+                    </tr>
+                    <tr>
+                        <td><img src="{% static 'img/voting-abstention.png' %}"> {% trans 'Abstention' %}:</td>
+                        <td class="bold">{{ option.Abstain }}</td>
+                    </tr>
+                    {% if poll.votesvalid != None %}
+                        <tr class="total">
+                            <td><img src="{% static 'img/voting-yes-grey.png' %}"> {% trans 'Valid votes' %}:</td>
+                            <td class="bold">{{ poll.print_votesvalid }}</td>
+                        </tr>
+                    {% endif %}
+                    {% if poll.votesinvalid != None %}
+                        <tr class="total">
+                            <td><img src="{% static 'img/voting-invalid.png' %}"> {% trans 'Invalid votes' %}:</td>
+                            <td class="bold">{{ poll.print_votesinvalid }}</td>
+                        </tr>
+                    {% endif %}
+                    {% if poll.votescast != None %}
+                        <tr class="total">
+                            <td><img src="{% static 'img/voting-total.png' %}"> {% trans 'Votes cast' %}:</td>
+                            <td class="bold">{{ poll.print_votescast }}</td>
+                        </tr>
+                    {% endif %}
+                </table>
+            </p>
+        {% endwith %}
+    {% endif %}
+{% endif %}

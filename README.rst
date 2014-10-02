@@ -1,7 +1,6 @@
-=====================================
- VoteCollector Plugin for OpenSlides
-=====================================
-
+=================================
+ OpenSlides VoteCollector Plugin
+=================================
 
 Overview
 ========
@@ -9,15 +8,16 @@ Overview
 This plugin connects OpenSlides with the software "VoteCollector"
 to provide electronic voting for motions with Keypads from `Voteworks <http://www.voteworks.de>`_.
 
-The VoteCollector plugin for OpenSlides was contracted by the German
-company Voteworks GmbH. It was initially developed by the core authors of
-OpenSlides, Oskar Hahn and Emanuel Schütze (`Intevation GmbH <http://www.intevation.de/>`_), in April 2012.
+The OpenSlides VoteCollector Plugin was contracted by the German company
+Voteworks GmbH. It was initially developed by the core authors of
+OpenSlides, Oskar Hahn and Emanuel Schütze (`Intevation GmbH
+<http://www.intevation.de/>`_), in April 2012.
 
 
 Requirements
 ============
 
-OpenSlides 1.6.x (http://openslides.org/)
+OpenSlides 1.6.1 (http://openslides.org/)
 
 
 Install
@@ -93,10 +93,18 @@ item 'VoteCollector' in the main navigation of OpenSlides.
 Change settings of plugin under 'Configuration > VoteCollector'.
 
 
-License
-=======
+Seating plan
+============
 
-This plugin is released under the MIT License, see LICENSE file.
+To change the seating plan edit ``openslides_votecollector/seating_plan.py``
+and change the creation of Seat objects in the setup_default_plan() function.
+
+
+License and authors
+===================
+
+This plugin is Free/Libre Open Source Software and distributed under the
+MIT License, see LICENSE file. The authors are mentioned in the AUTHORS file.
 
 
 Changelog
@@ -104,8 +112,11 @@ Changelog
 
 Version 1.1 (unreleased)
 ------------------------
-* Updated to OpenSlides 1.6.x.
+* Updated to OpenSlides 1.6.1.
 * Updated for VoteCollector 1.2.2.
+* Added personal and anonymous voting in live and non live mode.
+* Updated slide with seating plan.
+
 
 Version 1.0.4 (2013-12-04)
 --------------------------
@@ -114,19 +125,23 @@ Version 1.0.4 (2013-12-04)
 * Added fabfile and unit tests.
 * Changed license to MIT.
 
+
 Version 1.0.3 (2012-12-14)
 --------------------------
 * Updated INSTALL.txt.
 * Added setup.py for easier install.
 
+
 Version 1.0.2 (2012-12-12)
 --------------------------
 * Updated to OpenSlides 1.3.x.
+
 
 Version 1.0.1 (2012-07-25)
 --------------------------
 * Updated to OpenSlides 1.2.x.
 
+
 Version 1.0 (2012-05-21)
---------------------------
+------------------------
 * First release of this plugin for OpenSlides 1.1.x.

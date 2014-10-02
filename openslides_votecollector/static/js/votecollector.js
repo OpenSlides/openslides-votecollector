@@ -105,7 +105,7 @@ function stop_voting() {
                 url: '/votecollector/votingresults/',
                 dataType: 'json',
                 success: function(data) {
-                    var text = interpolate(gettext('The vote is over. %s out of %s votes collected. Do you want to save this values?'),[data['voted'], active_keypads])
+                    var text = interpolate(gettext('The poll is finished. %s out of %s votes collected. Do you want to save these values?'),[data['voted'], active_keypads])
                     var message = $('#dummy-notification').clone(true);
                     $(message).removeAttr('id').addClass('alert alert-info').append(text);
                     $('#notifications').append(message);

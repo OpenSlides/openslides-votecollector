@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
 
-from time import sleep
+import json
+
 from xmlrpclib import ServerProxy
 
+from django.db import transaction
 from django.utils.translation import ugettext as _
 
 from openslides.config.api import config
+from openslides.projector.api import update_projector
 
-from .models import Keypad
+from .models import Keypad, MotionPollKeypadConnection
 
 
 VOTECOLLECTOR_ERROR_MESSAGES = {
@@ -89,6 +92,7 @@ def start_voting(poll_id):
     if not keypads.exists():
         raise VoteCollectorError(_('No keypads selected.'))
 
+    # TODO: Check the api using a keypad list or arrays of ids, see VoteCollector 1.4.0 Changelog
     count_prepare = server.voteCollector.prepareVoting('YesNoAbstain', 0, 0, list(keypads))
     if count_prepare < 0:
         raise VoteCollectorError(nr=count_prepare)
@@ -132,3 +136,29 @@ def get_voting_results():
     """
     server = get_server()
     return server.voteCollector.getVotingResult()
+
+
+def update_personal_votes(poll):
+    """
+    Loads all personal vote results and saves them into the database.
+    """
+    server = get_server()
+    votelog_json = server.voteCollector.getVoteLog()
+    votelog = json.loads(votelog_json)
+    keypad_dict = {}
+    for keypad in Keypad.objects.all():
+        # Be careful: Don't mix up keypad.pk and keypad_id. It is tricky.
+        keypad_dict[keypad.keypad_id] = keypad.pk
+    with transaction.atomic():
+        MotionPollKeypadConnection.objects.filter(poll=poll).delete()
+        connection_objects = []
+        for item in votelog:
+            if item['value'] not in ('Y', 'N', 'A'):
+                raise VoteCollectorError(nr=-1)  # TODO: Check this.
+            connection_objects.append(MotionPollKeypadConnection(
+                poll=poll,
+                keypad_id=keypad_dict[int(item['id'])],
+                value=item['value'],
+                serial_number=item['sn']))
+        MotionPollKeypadConnection.objects.bulk_create(connection_objects)
+    update_projector()  # TODO: Only update when motion poll slide is active
