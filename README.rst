@@ -12,12 +12,14 @@ The OpenSlides VoteCollector Plugin was contracted by the German company
 Voteworks GmbH. It was initially developed by the core authors of
 OpenSlides, Oskar Hahn and Emanuel Schütze (`Intevation GmbH
 <http://www.intevation.de/>`_), in April 2012.
+Currently, it is maintained by Emanuel Schütze.
 
 
 Requirements
 ============
 
-OpenSlides 1.6.1 (http://openslides.org/)
+- OpenSlides 1.6.1 (http://openslides.org/)
+- VoteCollector 1.3.4
 
 
 Install
@@ -113,9 +115,11 @@ Changelog
 Version 1.1 (unreleased)
 ------------------------
 * Updated to OpenSlides 1.6.1.
-* Updated for VoteCollector 1.2.2.
-* Added personal and anonymous voting in live and non live mode.
-* Updated slide with seating plan.
+* Updated for VoteCollector 1.3.4.
+* Added personal and anonymous voting.
+* New config options for live mode and seating plan.
+* Show keypad serial number in list.
+* Updated motion poll slides.
 
 
 Version 1.0.4 (2013-12-04)

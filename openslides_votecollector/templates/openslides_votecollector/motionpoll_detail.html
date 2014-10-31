@@ -7,6 +7,18 @@
 {% block header %}
     {{ block.super }}
     <link href="{% static 'css/dataTables/dataTables.bootstrap.css' %}" type="text/css" rel="stylesheet">
+    <style type="text/css">
+        #total-result-table {
+            width: auto;
+        }
+        #total-result-table img {
+            width: 30px;
+        }
+        #total-result-table td.bold{
+            font-weight: bold;
+            text-align: right;
+        }
+    </style>
 {% endblock %}
 
 {% block javascript %}
@@ -41,53 +53,38 @@
         </small>
     </h1>
 
-    <h2>{% trans 'Voting result' %}</h2>
     {% with poll.get_options.0 as option %}
-        <table class="table table-bordered">
+        <table class="table table-bordered" id="total-result-table">
             <caption style="display:none">{% trans 'Voting result' %}</caption>
             <tr>
-                <td>{% trans 'Yes' %}</td>
-                <td>{{ option.Yes }}</td>
+                <td><img src='/static/img/button-yes.png'> {% trans 'Yes' %}</td>
+                <td class="bold">{{ option.Yes }}</td>
             </tr>
             <tr>
-                <td>{% trans 'No' %}</td>
-                <td>{{ option.No }}</td>
+                <td><img src='/static/img/button-no.png'> {% trans 'No' %}</td>
+                <td class="bold">{{ option.No }}</td>
             </tr>
             <tr>
-                <td>{% trans 'Abstention' %}</td>
-                <td>{{ option.Abstain }}</td>
+                <td><img src='/static/img/button-abstention.png'> {% trans 'Abstention' %}</td>
+                <td class="bold">{{ option.Abstain }}</td>
             </tr>
-            {% if poll.votesvalid != None or poll.votesinvalid != None %}
-                {% if poll.votesvalid != None %}
-                    <tr>
-                        <td>{% trans 'Valid votes' %}</td>
-                        <td>{{ poll.print_votesvalid }}</td>
-                    </tr>
-                {% endif %}
-                {% if poll.votesinvalid != None %}
-                    <tr>
-                        <td>{% trans 'Invalid Votes' %}</td>
-                        <td>{{ poll.print_votesinvalid }}</td>
-                    </tr>
-                {% endif %}
-            {% endif %}
-            {% if poll.votescast != None %}
+            {% if poll.votesvalid != None %}
                 <tr>
-                    <td>{% trans 'Votes cast' %}</td>
-                    <td>{{ poll.print_votescast }}</td>
+                    <td>{% trans 'Valid votes' %}</td>
+                    <td class="bold">{{ poll.print_votesvalid }}</td>
                 </tr>
             {% endif %}
         </table>
     {% endwith %}
 
-    <h2>{% trans 'All votes' %}</h2>
+    <h3>{% trans 'All single votes' %}</h3>
     <table id="dataTable" class="table table-striped table-bordered">
         <caption style="display:none">{% trans 'All votes' %}</caption>
         <thead>
             <tr>
                 <th>{% trans 'Name' %}</th>
                 <th class="optional">{% trans 'Structure level' %}</th>
-                <th class="optional">{% trans 'Keypad id or serial number' %}</th>
+                <th class="optional">{% trans 'Serial number' %}</th>
                 <th class="optional">{% trans 'Vote' %}</th>
             </tr>
         </thead>

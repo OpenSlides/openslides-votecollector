@@ -14,14 +14,14 @@ from .models import Keypad, MotionPollKeypadConnection
 
 
 VOTECOLLECTOR_ERROR_MESSAGES = {
-    -1: _('Unknown voting mode'),
-    -2: _('Invalid keypad range'),
-    -3: _('Invalid keypad list'),
-    -4: _('No keypads authorized for voting'),
-    -5: _('License not sufficient'),
+    -1: _('Unknown voting mode.'),
+    -2: _('Invalid keypad range.'),
+    -3: _('Invalid keypad list.'),
+    -4: _('No keypads authorized for voting.'),
+    -5: _('License not sufficient.'),
     -6: _('No voting device connected.'),
-    -7: _('Failed to set up voting device'),
-    -8: _('Voting device not ready'),
+    -7: _('Failed to set up voting device.'),
+    -8: _('Voting device not ready.'),
 }
 
 # For cert authentification see:

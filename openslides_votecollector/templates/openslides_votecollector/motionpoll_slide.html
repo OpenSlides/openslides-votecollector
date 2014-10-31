@@ -3,39 +3,108 @@
 {% load staticfiles %}
 {% load tags %}
 
-<style>
-    table.result-and-plan, table.result-and-plan th, table.result-and-plan td {
-        border:none;}
-    table.result-and-plan td {
-        background-color:#ffffff;}
-    table.seating-plan {
-        border-collapse:separate;
-        border-spacing:1em;
-        border:none;}
-    table.seating-plan th.podium {
-        height:1em;
-        border: 1px solid black;}
-    table.seating-plan td {
-        max-width:1.2em;
-        min-width:1.2em;
-        max-height:1.2em;
-        min-height:1.2em;
-        border:none;}
-    table.seating-plan td.seat {
+<style type="text/css">
+    {% if 'votecollector_seating_plan'|get_config %}
+        #content {
+            top: 110px;
+        }
+        #content h1 small {
+            display: inline;
+        }
+    {% endif %}
+    #overlay_votecollector_message_inner {
+        border-radius: 0 0 0.2em 0.2em;
+        font-size: 1.5em;
+        font-weight: bold;
+        text-align: center;
+        position: fixed;
+        padding: 0 0 5px 0;
+        margin: 0;
+        top: 0;
+        right: 40px;
+        left: 75px;
+        width: calc(100% - 115px);
+        min-height: 100px;
+        line-height: 160%;
+        opacity: 0.95;
+        z-index: 100;
+    }
+    #overlay_votecollector_message_inner img, .resultbox img {
+        width: 50px;
+    }
+    .resultbox {
+        font-size: 150%;
+        line-height: 40px;
+        margin: 0 20px 0 0;
+        font-weight: bold;
+    }
+    .resultbox td {
+        border: none;
+    }
+    .resultbox hr {
+        border-top: 1px solid;
+        margin: 5px 0;
+    }
+    .resultbox .vote, .resultbox .percentage {
+        text-align: right;
+    }
+    .resultbox .vote {
+        min-width: 30px;
+    }
+    .resultbox .progressbar {
+        width: 100px;
+    }
+    .resultbox .percentage {
+        font-weight: normal;
+        font-size: 70%;
+        min-width: 80px;
+    }
+    .resultbox .total {
+        text-align: right;
+        font-weight: normal;
+        /*font-size: 90%;*/
+    }
+    .resultbox .progress {
+        margin-bottom: 0;
+        border: 1px solid #999;
+    }
+    #seating-plan table {
+        border-collapse: separate;
+        border-spacing: 5px;
+        border: none;
+    }
+    #seating-plan table td {
+        background-color: #ffffff;
+    }
+    #seating-plan table td {
+        padding: 6px 0 6px 0;
+        font-size: 0.9em;
+        min-width: 27px;
+        border: none;
+    }
+    #seating-plan table td.seat {
         border: 1px solid black;
-        line-height:120%;
-        text-align:center;}
-    table.seating-plan td.seat-red {
-        background-color:#ff201c;}
-    table.seating-plan td.seat-green {
-        background-color:#008f2a;}
-    table.seating-plan td.seat-yellow {
-        background-color:#f1d300;}
+        line-height: 120%;
+        text-align: center;
+    }
+    #seating-plan table td.seat-red {
+        background-color: #ff201c;
+    }
+    #seating-plan table td.seat-green {
+        background-color: #008f2a;
+    }
+    #seating-plan table td.seat-yellow {
+        background-color: #f1d300;
+    }
+    #seating-plan small {
+        color: #999;
+        position: absolute;
+        right: 20px;
+    }
 </style>
 
 <h1>
     {{ poll.motion.active_version.title }}
-    <br>
     <small>
         {% trans 'Motion' %} {{ poll.motion.identifier|default:'' }}
         {% if poll.motion.get_active_version.version_number > 1 %} | {% trans 'Version' %} {{ poll.motion.active_version.version_number }}{% endif %}
@@ -43,102 +112,130 @@
     </small>
 </h1>
 
-{% if 'votecollector_live_voting'|get_config or poll.has_votes %}
-    {% if 'votecollector_in_vote'|get_config == poll.id %}
-        <div>
-            <h2>{{ 'votecollector_vote_started_msg'|get_config }}</h2>
-        </div>
-    {% endif %}
-    {% if all_keypad_votes or 'votecollector_live_voting'|get_config %}
-        {% if votes_with_seat %}
-            <p>
-            <table class="result-and-plan">
-                <tr>
-                    <th style="min-width:15em;">{% trans 'All votes' %}</th>
-                    <th style="min-width:{{ seating_plan.width }};">{% trans 'Seating plan' %}</th>
-                </tr>
-                <tr>
-                    <td style="vertical-align:top;">
-                        <p><img src="{% static 'img/voting-yes.png' %}"> {{ all_keypad_votes.Y }} {% trans 'Yes' %}</p>
-                        <p><img src="{% static 'img/voting-no.png' %}"> {{ all_keypad_votes.N }} {% trans 'No' %}</p>
-                        <p><img src="{% static 'img/voting-abstention.png' %}"> {{ all_keypad_votes.A }} {% trans 'Abstention' %}</p>
-                        <p><img src="{% static 'img/voting-total.png' %}"> {{ all_keypad_votes.votes_cast }} {% trans 'Votes cast' %}</p>
-                        {% if votes_without_seat %}
-                            <small>{{ votes_without_seat }} {% trans 'Votes without seat' %}</small>
-                        {% endif %}
-                    </td>
-                    <td>
-                        <table class="seating-plan">
-                            {% for row in seating_plan.rows %}
-                                <tr>
-                                    {% for place in row %}
-                                        <td class="{{ place.css }}"><span>{{ place.number }}</span></td>
-                                    {% endfor %}
-                                </tr>
-                            {% endfor %}
-                        </table>
-                    </td>
-                </tr>
+{% if all_keypad_votes %}  {# electronic voting with keypads #}
+    {% if 'votecollector_live_voting'|get_config or poll.has_votes %}
+        {% if 'votecollector_seating_plan'|get_config %}
+            <table class="well resultbox pull-left">
+            <tr>
+                <td><img src="{% static 'img/button-yes.png' %}"></td>
+                <td class="vote">{{ all_keypad_votes.Y|default:'0' }}</td>
+                <td class="percentage">{{ all_keypad_votes_percentage.Y|default:'0' }} %
+                    <div class="progress {% if 'votecollector_in_vote'|get_config %}progress-striped active{% endif %}">
+                        <div class="bar bar-success" style="width: {{ all_keypad_votes_percentage.Y_progress|default:'0' }}%;"></div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td><img src="{% static 'img/button-no.png' %}"></td>
+                <td class="vote">{{ all_keypad_votes.N|default:'0' }}</td>
+                <td class="percentage">{{ all_keypad_votes_percentage.N|default:'0' }} %
+                    <div class="progress {% if 'votecollector_in_vote'|get_config %}progress-striped active{% endif %}">
+                        <div class="bar bar-danger" style="width: {{ all_keypad_votes_percentage.N_progress|default:'0' }}%;"></div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td><img src="{% static 'img/button-abstention.png' %}"></td>
+                <td class="vote">{{ all_keypad_votes.A|default:'0' }}</td>
+                <td class="percentage">{{ all_keypad_votes_percentage.A|default:'0' }} %
+                    <div class="progress {% if 'votecollector_in_vote'|get_config %}progress-striped active{% endif %}">
+                        <div class="bar bar-warning" style="width: {{ all_keypad_votes_percentage.A_progress|default:'0' }}%;"></div>
+                    </div>
+                </td>
+            </tr>
+            <tr class="total">
+                <td></td>
+                <td>{{ all_keypad_votes.votes_cast|default:'0' }}</td>
+                <td class="percentage">{{ all_keypad_votes_percentage.votes_cast|default:'0' }} %</td>
+            </tr>
             </table>
-            </p>
+            <div id="seating-plan">
+                <table>
+                    {% for row in seating_plan.rows %}
+                        <tr>
+                            {% for place in row %}
+                                <td class="{{ place.css }}"><span>{{ place.number }}</span></td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </table>
+                {% if votes_without_seat %}
+                    <small>{{ votes_without_seat }} {% trans 'Votes without seat' %}</small>
+                {% endif %}
+            </div>
         {% else %}
-            <p>
-                <table class="well result big">
-                    <tr>
-                        <td><img src="{% static 'img/voting-yes.png' %}"> {% trans 'Yes' %}:</td>
-                        <td class="bold">{{ all_keypad_votes.Y|default:'0' }}</td>
-                    </tr>
-                    <tr>
-                        <td><img src="{% static 'img/voting-no.png' %}"> {% trans 'No' %}:</td>
-                        <td class="bold">{{ all_keypad_votes.N|default:'0' }}</td>
-                    </tr>
-                    <tr>
-                        <td><img src="{% static 'img/voting-abstention.png' %}"> {% trans 'Abstention' %}:</td>
-                        <td class="bold">{{ all_keypad_votes.A|default:'0' }}</td>
-                    </tr>
-                    <tr class="total">
-                        <td><img src="{% static 'img/voting-total.png' %}"> {% trans 'Votes cast' %}:</td>
-                        <td class="bold">{{ all_keypad_votes.votes_cast|default:'0' }}</td>
-                    </tr>
-                </table>
-            </p>
+            <table class="well resultbox">
+            <tr>
+                <td><img src="{% static 'img/button-yes.png' %}"> {% trans 'Yes' %}:</td>
+                <td class="vote">{{ all_keypad_votes.Y|default:'0' }}</td>
+                <td>
+                    <div class="progress {% if 'votecollector_in_vote'|get_config %}progress-striped active{% endif %}">
+                        <div class="bar bar-success" style="width: {{ all_keypad_votes_percentage.Y_progress|default:'0' }}%;"></div>
+                    </div>
+                </td>
+                <td class="percentage">{{ all_keypad_votes_percentage.Y|default:'0' }} %</td>
+            </tr>
+            <tr>
+                <td><img src="{% static 'img/button-no.png' %}"> {% trans 'No' %}:</td>
+                <td class="vote">{{ all_keypad_votes.N|default:'0' }}</td>
+                <td>
+                    <div class="progress {% if 'votecollector_in_vote'|get_config %}progress-striped active{% endif %}">
+                        <div class="bar bar-danger" style="width: {{ all_keypad_votes_percentage.N_progress|default:'0' }}%;"></div>
+                    </div>
+                <td class="percentage">{{ all_keypad_votes_percentage.N|default:'0' }} %</td>
+            </tr>
+            <tr>
+                <td><img src="{% static 'img/button-abstention.png' %}"> {% trans 'Abstention' %}:</td>
+                <td class="vote">{{ all_keypad_votes.A|default:'0' }}</td>
+                <td>
+                    <div class="progress {% if 'votecollector_in_vote'|get_config %}progress-striped active{% endif %}">
+                        <div class="bar bar-warning" style="width: {{ all_keypad_votes_percentage.A_progress|default:'0' }}%;"></div>
+                    </div>
+                </td>
+                <td class="percentage">{{ all_keypad_votes_percentage.A|default:'0' }} %</td>
+            </tr>
+            <tr class="total">
+                <td>{% trans 'Valid votes' %}:</td>
+                <td>{{ all_keypad_votes.votes_cast|default:'0' }}</td>
+                <td class="progressbar"></td>
+                <td class="percentage">{{ all_keypad_votes_percentage.votes_cast|default:'0' }} %</td>
+            </tr>
+            </table>
         {% endif %}
-    {% else %}
-        {% with poll.get_options.0 as option %}
-            <p>
-                <table class="well result big">
-                    <tr>
-                        <td><img src="{% static 'img/voting-yes.png' %}"> {% trans 'Yes' %}:</td>
-                        <td class="bold">{{ option.Yes }}</td>
-                    </tr>
-                    <tr>
-                        <td><img src="{% static 'img/voting-no.png' %}"> {% trans 'No' %}:</td>
-                        <td class="bold">{{ option.No }}</td>
-                    </tr>
-                    <tr>
-                        <td><img src="{% static 'img/voting-abstention.png' %}"> {% trans 'Abstention' %}:</td>
-                        <td class="bold">{{ option.Abstain }}</td>
-                    </tr>
-                    {% if poll.votesvalid != None %}
-                        <tr class="total">
-                            <td><img src="{% static 'img/voting-yes-grey.png' %}"> {% trans 'Valid votes' %}:</td>
-                            <td class="bold">{{ poll.print_votesvalid }}</td>
-                        </tr>
-                    {% endif %}
-                    {% if poll.votesinvalid != None %}
-                        <tr class="total">
-                            <td><img src="{% static 'img/voting-invalid.png' %}"> {% trans 'Invalid votes' %}:</td>
-                            <td class="bold">{{ poll.print_votesinvalid }}</td>
-                        </tr>
-                    {% endif %}
-                    {% if poll.votescast != None %}
-                        <tr class="total">
-                            <td><img src="{% static 'img/voting-total.png' %}"> {% trans 'Votes cast' %}:</td>
-                            <td class="bold">{{ poll.print_votescast }}</td>
-                        </tr>
-                    {% endif %}
-                </table>
-            </p>
-        {% endwith %}
     {% endif %}
+{% elif poll.has_votes %}  {# manual voting without keypads #}
+    {% with poll.get_options.0 as option %}
+        <table class="well resultbox">
+            <tr>
+                <td><img src="{% static 'img/button-yes.png' %}"> {% trans 'Yes' %}:</td>
+                <td class="right">{{ option.Yes }}</td>
+            </tr>
+            <tr>
+                <td><img src="{% static 'img/button-no.png' %}"> {% trans 'No' %}:</td>
+                <td class="right">{{ option.No }}</td>
+            </tr>
+            <tr>
+                <td><img src="{% static 'img/button-abstention.png' %}"> {% trans 'Abstention' %}:</td>
+                <td class="right">{{ option.Abstain }}</td>
+            </tr>
+            {% if poll.votesvalid != None %}
+                <tr class="total">
+                    <td>{% trans 'Valid votes' %}:</td>
+                    <td>{{ poll.print_votesvalid }}</td>
+                </tr>
+            {% endif %}
+            {% if poll.votesinvalid != None %}
+                <tr class="total">
+                    <td>{% trans 'Invalid votes' %}:</td>
+                    <td>{{ poll.print_votesinvalid }}</td>
+                </tr>
+            {% endif %}
+            {% if poll.votescast != None %}
+                <tr class="total">
+                    <td>{% trans 'Votes cast' %}:</td>
+                    <td>{{ poll.print_votescast }}</td>
+                </tr>
+            {% endif %}
+        </table>
+    {% endwith %}
 {% endif %}

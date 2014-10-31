@@ -11,5 +11,5 @@ def detail_button(poll):
     Returns True if the poll detail button should be shown.
     """
     return (poll.has_votes() and
-                (poll.keypad_data_list.exclude(keypad__user__exact=None).exists() or
-                 poll.keypad_data_list.exclude(serial_number__exact=None).exists()))
+            (poll.keypad_data_list.exclude(keypad__user__exact=None).exists() or
+            poll.keypad_data_list.exclude(serial_number__exact=None).exists()))

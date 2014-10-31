@@ -6,7 +6,6 @@ from urlparse import parse_qs
 # Django imports
 from django.contrib import messages
 from django.db import IntegrityError
-from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.http import Http404
 from django.template.loader import render_to_string
@@ -274,13 +273,8 @@ class StartVoting(VotingView):
             except VoteCollectorError, err:
                 self.error = err.value
             else:
-                if config['votecollector_live_voting']:
-                    # Do nothing special. The value self.result was set which
-                    # is enough for the live mode.
-                    pass
-                else:
-                    # Additionally refresh the message.
-                    update_projector_overlay('votecollector_message')
+                # Refresh the overlay message.
+                update_projector_overlay('votecollector_message')
         return super(StartVoting, self).get(request, *args, **kwargs)
 
     def no_error_context(self):
@@ -295,8 +289,7 @@ class StopVoting(VotingView):
         if self.test_poll():
             self.result = stop_voting()
             update_personal_votes(poll=self.poll)
-            # Update overlay in live mode and non live mode to ensure that the
-            # message disappears even if config changed in between.
+            # Reset overlay message
             update_projector_overlay('votecollector_message')
         return super(StopVoting, self).get(request, *args, **kwargs)
 

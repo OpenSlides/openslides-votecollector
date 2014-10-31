@@ -1,6 +1,7 @@
 {% extends "openslides_votecollector/base_votecollector.html" %}
 
 {% load i18n %}
+{% load tags %}
 
 {% block content %}
     <h1>
@@ -30,14 +31,18 @@
         <tr>
             <th><a href="?sort=keypad_id&reverse={% if 'keypad_id' in sortfilter.sort and 'reverse' not in sortfilter %}1{% else %}0{%endif%}">{% trans "Keypad ID" %}</a></th>
             <th><a href="?sort=user&reverse={% if 'user' in sortfilter.sort and 'reverse' not in sortfilter %}1{% else %}0{%endif%}">{% trans "User" %}</th>
-            <th>{% trans 'Seat' %}</th>
+            {% if 'votecollector_seating_plan'|get_config %}
+                <th>{% trans 'Seat' %}</th>
+            {% endif %}
             <th>{% trans "Actions" %}</th>
         </tr>
     {% for keypad in keypads %}
         <tr class="{% cycle 'odd' '' %}">
             <td>{{ keypad.keypad_id }}</td>
             <td>{% if keypad.user %}<a href="{{ keypad.user.get_absolute_url }}">{{ keypad.user }}</a>{% else %}{% trans "Anonym" %}{% endif %}</td>
-            <td>{{ keypad.seat|default_if_none:"–" }}</td>
+            {% if 'votecollector_seating_plan'|get_config %}
+                <td>{{ keypad.seat|default_if_none:"–" }}</td>
+            {% endif %}
             <td>
                 <a href="{% url 'votecollector_keypad_edit' keypad.id %}" title="{% trans 'Edit' %}" class="btn btn-mini">
                     <i class="icon-pencil"></i>

@@ -50,10 +50,18 @@ def setup_votecollector_config_page(sender, **kwargs):
             label=ugettext_lazy("Overlay message 'vote started'")))
     votecollector_live_voting = ConfigVariable(
         name='votecollector_live_voting',
-        default_value=False,
+        default_value=True,
         form_field=forms.BooleanField(
-            label=ugettext_lazy('Live voting'),
-            help_text=ugettext_lazy('If enabled, votes will be shown on the projector during running poll.'),
+            label=ugettext_lazy('Use live voting'),
+            help_text=ugettext_lazy('Incoming votes will be shown on projector during poll is running.'),
+            required=False),
+        on_change=update_projector)
+    votecollector_seating_plan = ConfigVariable(
+        name='votecollector_seating_plan',
+        default_value=True,
+        form_field=forms.BooleanField(
+            label=ugettext_lazy('Show seating plan'),
+            help_text=ugettext_lazy('Incoming votes will be shown in seating plan on projector if keypad is seated.'),
             required=False),
         on_change=update_projector)
     votecollector_in_vote = ConfigVariable(
@@ -72,6 +80,7 @@ def setup_votecollector_config_page(sender, **kwargs):
                                        votecollector_uri,
                                        votecollector_vote_started_msg,
                                        votecollector_live_voting,
+                                       votecollector_seating_plan,
                                        votecollector_in_vote,
                                        votecollector_active_keypads))
 
@@ -112,14 +121,14 @@ def overlay_message(sender, **kwargs):
         """
         Returns the html for the votecollector message on the projector.
         """
-        if not config['votecollector_live_voting'] and config['votecollector_in_vote']:
+        if config['votecollector_in_vote']:
             key_yes = "<span class='nobr'><img src='/static/img/button-yes.png'> %s</span>" % _('Yes')
             key_no = "<span class='nobr'><img src='/static/img/button-no.png'> %s</span>" % _('No')
             key_abstention = "<span class='nobr'><img src='/static/img/button-abstention.png'> %s</span>" % _('Abstention')
             message = "%s <br> %s &nbsp; %s &nbsp; %s " % (
                 config['votecollector_vote_started_msg'],
                 key_yes, key_no, key_abstention)
-            value = render_to_string('projector/overlay_message_projector.html', {'message': message})
+            value = render_to_string('openslides_votecollector/overlay_votecollector_projector.html', {'message': message})
         else:
             value = None
         return value

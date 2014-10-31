@@ -10,7 +10,7 @@ from openslides.participant.models import User
 KEYPAD_MAP = ({
     'Y': (ugettext_noop('Yes'), 'green'),
     'N': (ugettext_noop('No'), 'red'),
-    'A': (ugettext_noop('Abstain'), 'yellow')})
+    'A': (ugettext_noop('Abstention'), 'yellow')})
 
 
 class Seat(models.Model):
@@ -83,7 +83,7 @@ class MotionPollKeypadConnection(models.Model):
     poll = models.ForeignKey(MotionPoll, related_name='keypad_data_list')
     keypad = models.ForeignKey(Keypad)
     value = models.CharField(max_length=255)
-    serial_number =  models.CharField(null=True, max_length=255)
+    serial_number = models.CharField(null=True, max_length=255)
 
     def get_value(self):
         """

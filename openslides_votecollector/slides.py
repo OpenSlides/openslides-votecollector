@@ -68,16 +68,22 @@ def change_motionpoll_slide_template():
             # which means that nobody has use a keypad to vote.
             if votes_cast:
                 if config['motion_poll_100_percent_base'] == 'WITHOUT_INVALID':
+                    all_keypad_votes_percentage = {'Y': 0, 'N': 0, 'A': 0, 'votes_cast': 100}
                     locale.setlocale(locale.LC_ALL, '')
                     for item, votes in all_keypad_votes.items():
-                        all_keypad_votes[item] = '%d (%s %%)' % (
-                            votes, locale.format('%.1f', votes * 100 / float(votes_cast)))
+                        all_keypad_votes_percentage[item] = '%s' % locale.format('%.1f', votes * 100 / float(votes_cast))
+                        all_keypad_votes_percentage[item+"_progress"] = '%.1f' % (votes * 100 / float(votes_cast))
             else:
-                all_keypad_votes = None
+                if config['votecollector_in_vote']:
+                    all_keypad_votes = "{'Y': 0,  'N': 0, 'A': 0}"
+                else:
+                    all_keypad_votes = None
+                all_keypad_votes_percentage = None
 
             # Add all context data
             context['seating_plan'] = seating_plan
             context['all_keypad_votes'] = all_keypad_votes
+            context['all_keypad_votes_percentage'] = all_keypad_votes_percentage
             context['votes_with_seat'] = votes_with_seat
             context['votes_without_seat'] = votes_without_seat
 
