@@ -1,6 +1,19 @@
 {% extends "openslides_votecollector/base_votecollector.html" %}
 
 {% load i18n %}
+{% load tags %}
+
+{% block header %}
+    {% if not 'votecollector_seating_plan'|get_config %}
+        <style type="text/css">
+            .control-group label[for="id_seat"],
+            .control-group select#id_seat {
+                display: none;
+            }
+        </style>
+    {% endif %}
+{% endblock %}
+
 
 {% block content %}
     <h1>

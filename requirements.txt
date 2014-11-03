@@ -1,4 +1,4 @@
-# Requirements for VoteCollector Plugin for OpenSlides in production
+# Requirements for production
 -r requirements_production.txt
 
 # Requirements for development and tests in alphabetical order

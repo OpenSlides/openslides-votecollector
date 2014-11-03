@@ -1,0 +1,13 @@
+{% extends 'motion/motion_detail.html' %}
+
+{% load i18n %}
+{% load openslides_votecollector_template_tags %}
+
+{% block meta_box_poll_extras %}
+    {% if poll|detail_button %}
+        <p>
+            <a class="btn btn-mini btn-success"
+               href="{% url 'motionpoll_detail' motion.pk poll.poll_number %}">{% trans 'Single votes' %}</a>
+        </p>
+    {% endif %}
+{% endblock %}

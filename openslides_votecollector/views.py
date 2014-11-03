@@ -6,8 +6,8 @@ from urlparse import parse_qs
 # Django imports
 from django.contrib import messages
 from django.db import IntegrityError
-from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.http import Http404
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext as _
 from django.views.generic.detail import SingleObjectMixin
@@ -15,15 +15,15 @@ from django.views.generic.detail import SingleObjectMixin
 # OpenSlides imports
 from openslides.config.api import config
 from openslides.motion.models import MotionPoll
-from openslides.motion.views import PollUpdateView
+from openslides.motion.views import MotionDetailView as _MotionDetailView, PollMixin, PollUpdateView
 from openslides.projector.api import update_projector_overlay
 from openslides.utils.signals import template_manipulation
-from openslides.utils.views import (TemplateView, ListView, UpdateView, CreateView,
+from openslides.utils.views import (TemplateView, ListView, DetailView, UpdateView, CreateView,
                                     FormView, AjaxView, DeleteView, RedirectView)
 
 # VoteCollector imports
 from .api import (start_voting, stop_voting, get_voting_results,
-                  get_voting_status, VoteCollectorError, get_VoteCollector_status)
+                  get_voting_status, update_personal_votes, VoteCollectorError, get_VoteCollector_status)
 from .forms import KeypadForm, KeypadMultiForm
 from .models import Keypad
 
@@ -95,7 +95,14 @@ class KeypadUpdate(UpdateView):
     context_object_name = 'keypad'
     form_class = KeypadForm
     success_url_name = 'votecollector_overview'
-    url_name_args = ''
+    apply_url_name = 'votecollector_keypad_edit'
+
+    def get_url_name_args(self):
+        if 'apply' not in self.request.POST:
+            value = ''
+        else:
+            value = super(KeypadUpdate, self).get_url_name_args()
+        return value
 
 
 class KeypadCreate(CreateView):
@@ -108,8 +115,14 @@ class KeypadCreate(CreateView):
     context_object_name = 'keypad'
     form_class = KeypadForm
     success_url_name = 'votecollector_overview'
-    url_name_args = ''
-    apply_url = 'votecollector_keypad_edit'
+    apply_url_name = 'votecollector_keypad_edit'
+
+    def get_url_name_args(self):
+        if 'apply' not in self.request.POST:
+            value = ''
+        else:
+            value = super(KeypadCreate, self).get_url_name_args()
+        return value
 
 
 class KeypadCreateMulti(FormView):
@@ -243,11 +256,10 @@ class VotingView(AjaxView):
 
 class StartVoting(VotingView):
     """
-    Start a polling.
+    Start a poll.
     """
     def get(self, request, *args, **kwargs):
         poll = self.get_poll()
-
         if poll is None:
             self.error = _('Unknown poll.')
         elif config['votecollector_in_vote'] == poll.id:
@@ -261,28 +273,24 @@ class StartVoting(VotingView):
             except VoteCollectorError, err:
                 self.error = err.value
             else:
-                key_yes = "<span class='nobr'><img src='/static/img/button-yes.png'> %s</span>" % _('Yes')
-                key_no = "<span class='nobr'><img src='/static/img/button-no.png'> %s</span>" % _('No')
-                key_abstention = "<span class='nobr'><img src='/static/img/button-abstention.png'> %s</span>" % _('Abstention')
-                config['projector_message'] = "%s <br> %s &nbsp; %s &nbsp; %s " % (
-                    config['votecollector_vote_started_msg'],
-                    key_yes, key_no, key_abstention)
-                update_projector_overlay('projector_message')
+                # Refresh the overlay message.
+                update_projector_overlay('votecollector_message')
         return super(StartVoting, self).get(request, *args, **kwargs)
 
     def no_error_context(self):
-            return {'count': self.result}
+        return {'count': self.result}
 
 
 class StopVoting(VotingView):
     """
-    Stops a polling.
+    Stops a poll.
     """
     def get(self, request, *args, **kwargs):
         if self.test_poll():
             self.result = stop_voting()
-            config['projector_message'] = config['votecollector_vote_closed_msg']
-            update_projector_overlay('projector_message')
+            update_personal_votes(poll=self.poll)
+            # Reset overlay message
+            update_projector_overlay('votecollector_message')
         return super(StopVoting, self).get(request, *args, **kwargs)
 
 
@@ -294,6 +302,10 @@ class GetVotingStatus(VotingView):
         if self.test_poll() and config['votecollector_in_vote']:
             try:
                 self.result = get_voting_status()
+            except VoteCollectorError, err:
+                self.error = str(err.value)
+            try:
+                update_personal_votes(poll=self.poll)
             except VoteCollectorError, err:
                 self.error = str(err.value)
         else:
@@ -337,11 +349,37 @@ class GetVotingResults(VotingView):
         }
 
 
-@receiver(post_save, sender=MotionPoll)
-def clear_projector_message(sender, **kw):
-    if config['projector_message'] == config['votecollector_vote_closed_msg']:
-        config['projector_message'] = ''
-        update_projector_overlay('projector_message')
+class MotionDetailView(_MotionDetailView):
+    """
+    Overrides openslides.motion.views.MotionDetailView
+    """
+    template_name = 'openslides_votecollector/motion_detail.html'
+
+
+class MotionPollDetailView(PollMixin, DetailView):
+    """
+    View for details of a motion poll. Useful for personal votings.
+    """
+    model = MotionPoll
+    required_permission = 'motion.can_see_motion'
+    template_name = 'openslides_votecollector/motionpoll_detail.html'
+
+    def get_context_data(self, **kwargs):
+        """
+        Returns the template context. Appends the motion object to the context.
+        The view is disabled if the poll has no votes.
+        """
+        context = super(MotionPollDetailView, self).get_context_data(**kwargs)
+        keypad_data_list = self.object.keypad_data_list.select_related('keypad__user')
+        if (not self.object.has_votes() or (
+                not keypad_data_list.exclude(keypad__user__exact=None).exists()
+                and not keypad_data_list.exclude(serial_number__exact=None).exists())):
+            raise Http404
+        context.update({
+            'motion': self.object.motion,
+            'poll': self.object,
+            'keypad_data_list': keypad_data_list})
+        return context
 
 
 @receiver(template_manipulation, sender=PollUpdateView, dispatch_uid="votecollector_motion_poll")

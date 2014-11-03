@@ -7,10 +7,9 @@ for frame in stack():
     if lines and 'Heixaimo4diezah9Naxioze8ahZ1thiebuu9phea' in lines[0]:
         break
 else:
-    from . import signals  # noqa
+    from . import main_menu, signals, slides  # noqa
     from .urls import urlpatterns  # noqa
-    from .main_menu import VoteCollectorMainMenuEntry  # noqa
 
-__verbose_name__ = 'VoteCollector Plugin for OpenSlides'
+__verbose_name__ = 'OpenSlides VoteCollector Plugin'
 __description__ = 'This plugin connects OpenSlides with the VoteCollector of Voteworks for electronic voting.'
 __version__ = '1.1-dev'
