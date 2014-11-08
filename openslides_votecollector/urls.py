@@ -5,7 +5,7 @@ from django.conf.urls import patterns, url
 from .views import (Overview, KeypadCreate, KeypadUpdate, StatusView,
                     StartVoting, StopVoting, GetVotingResults, GetVotingStatus,
                     GetStatus, KeypadDelete, KeypadSetStatusView, KeypadCreateMulti,
-                    MotionDetailView, MotionPollDetailView)
+                    MotionDetailView, MotionPollDetailView, MotionPollDetailPDFView)
 
 urlpatterns = patterns(
     '',
@@ -74,5 +74,8 @@ urlpatterns = patterns(
         name='motion_detail'),
     url(r'^motion/(?P<pk>\d+)/poll/(?P<poll_number>\d+)/$',
         MotionPollDetailView.as_view(),
-        name="motionpoll_detail")
+        name='motionpoll_detail'),
+    url(r'^motion/(?P<pk>\d+)/poll/(?P<poll_number>\d+)/resultpdf/$',
+        MotionPollDetailPDFView.as_view(),
+        name='motionpoll_detail_pdf')
 )

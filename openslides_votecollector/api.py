@@ -92,7 +92,7 @@ def start_voting(poll_id):
     if not keypads.exists():
         raise VoteCollectorError(_('No keypads selected.'))
 
-    # TODO: Check the api using a keypad list or arrays of ids, see VoteCollector 1.4.0 Changelog
+    # TODO: Check the api using a keypad list or arrays of ids, see VoteCollector 1.4.x Changelog
     count_prepare = server.voteCollector.prepareVoting('YesNoAbstain', 0, 0, list(keypads))
     if count_prepare < 0:
         raise VoteCollectorError(nr=count_prepare)

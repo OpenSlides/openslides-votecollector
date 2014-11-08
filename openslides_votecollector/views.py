@@ -19,13 +19,14 @@ from openslides.motion.views import MotionDetailView as _MotionDetailView, PollM
 from openslides.projector.api import update_projector_overlay
 from openslides.utils.signals import template_manipulation
 from openslides.utils.views import (TemplateView, ListView, DetailView, UpdateView, CreateView,
-                                    FormView, AjaxView, DeleteView, RedirectView)
+                                    FormView, AjaxView, DeleteView, RedirectView, PDFView)
 
 # VoteCollector imports
 from .api import (start_voting, stop_voting, get_voting_results,
                   get_voting_status, update_personal_votes, VoteCollectorError, get_VoteCollector_status)
 from .forms import KeypadForm, KeypadMultiForm
 from .models import Keypad
+from .pdf import motion_poll_to_pdf_result
 
 
 class Overview(ListView):
@@ -275,6 +276,8 @@ class StartVoting(VotingView):
             else:
                 # Refresh the overlay message.
                 update_projector_overlay('votecollector_message')
+                # Clear poll results (only Yes, No and Abstain are cleared, not VotesValid, VotsInvalid, VotesCast)
+                poll.get_votes().delete()
         return super(StartVoting, self).get(request, *args, **kwargs)
 
     def no_error_context(self):
@@ -380,6 +383,30 @@ class MotionPollDetailView(PollMixin, DetailView):
             'poll': self.object,
             'keypad_data_list': keypad_data_list})
         return context
+
+
+class MotionPollDetailPDFView(PollMixin, PDFView):
+    """
+    View to create a PDF with all results of a personal voting.
+    """
+    model = MotionPoll
+    required_permission = 'motion.can_see_motion'
+
+    def get(self, *args, **kwargs):
+        self.object = self.get_object()
+        return super(MotionPollDetailPDFView, self).get(*args, **kwargs)
+
+    def get_filename(self):
+        """
+        Return the filename for the PDF.
+        """
+        return u'%s%s_%s_%s' % (_('Motion'), str(self.object.poll_number), _('Poll'), _('Result'))
+
+    def append_to_pdf(self, pdf):
+        """
+        Append PDF objects.
+        """
+        motion_poll_to_pdf_result(pdf, self.object)
 
 
 @receiver(template_manipulation, sender=PollUpdateView, dispatch_uid="votecollector_motion_poll")
