@@ -137,7 +137,7 @@
                     {% for row in seating_plan.rows %}
                         <tr>
                             {% for place in row %}
-                                <td class="{{ place.css }}"><span>{{ place.number }}</span></td>
+                                <td class="{{ place.css }}"><span>{% if place.number %}{{ place.number }}{% endif %}</span></td>
                             {% endfor %}
                         </tr>
                     {% endfor %}

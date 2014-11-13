@@ -10,6 +10,7 @@ from django.dispatch import receiver
 from django.http import Http404
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy
 from django.views.generic.detail import SingleObjectMixin
 
 # OpenSlides imports
@@ -391,6 +392,7 @@ class MotionPollDetailPDFView(PollMixin, PDFView):
     """
     model = MotionPoll
     required_permission = 'motion.can_see_motion'
+    document_title = ugettext_lazy('Vote result')
 
     def get(self, *args, **kwargs):
         self.object = self.get_object()

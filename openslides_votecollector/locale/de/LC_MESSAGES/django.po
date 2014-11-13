@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VoteCollector Plugin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-11-03 16:21+0100\n"
+"POT-Creation-Date: 2014-11-13 22:13+0100\n"
 "PO-Revision-Date: 2014-10-31\n"
 "Last-Translator: Emanuel Schütze\n"
 "Language: German\n"
@@ -66,78 +66,110 @@ msgstr "Von Keypad-ID"
 msgid "... to keypad ID"
 msgstr "... bis Keypad-ID"
 
-#: forms.py:25 models.py:54
+#: forms.py:25 models.py:55
 #: templates/openslides_votecollector/overview.html:24
 #: templates/openslides_votecollector/overview.html:25
 msgid "Active"
 msgstr "Aktiv"
 
-#: models.py:11 signals.py:125
-#: templates/openslides_votecollector/motionpoll_detail.html:60
-#: templates/openslides_votecollector/motionpoll_slide.html:169
-#: templates/openslides_votecollector/motionpoll_slide.html:210
+#: models.py:11 pdf.py:30 signals.py:125
+#: templates/openslides_votecollector/motionpoll_detail.html:63
+#: templates/openslides_votecollector/motionpoll_slide.html:152
+#: templates/openslides_votecollector/motionpoll_slide.html:193
 msgid "Yes"
 msgstr "Ja"
 
-#: models.py:12 signals.py:126
-#: templates/openslides_votecollector/motionpoll_detail.html:64
-#: templates/openslides_votecollector/motionpoll_slide.html:179
-#: templates/openslides_votecollector/motionpoll_slide.html:214
+#: models.py:12 pdf.py:33 signals.py:126
+#: templates/openslides_votecollector/motionpoll_detail.html:67
+#: templates/openslides_votecollector/motionpoll_slide.html:162
+#: templates/openslides_votecollector/motionpoll_slide.html:197
 msgid "No"
 msgstr "Nein"
 
-#: models.py:13 signals.py:127
-#: templates/openslides_votecollector/motionpoll_detail.html:68
-#: templates/openslides_votecollector/motionpoll_slide.html:188
-#: templates/openslides_votecollector/motionpoll_slide.html:218
+#: models.py:13 pdf.py:36 signals.py:127
+#: templates/openslides_votecollector/motionpoll_detail.html:71
+#: templates/openslides_votecollector/motionpoll_slide.html:171
+#: templates/openslides_votecollector/motionpoll_slide.html:201
 msgid "Abstention"
 msgstr "Enthaltung"
 
-#: models.py:26
+#: models.py:27
 msgid "Seat number"
 msgstr "Sitznummer"
 
-#: models.py:27
+#: models.py:28
 msgid "You can use digits and also letters."
 msgstr "Sie können Zahlen und Buchstaben verwenden."
 
-#: models.py:29
+#: models.py:30
 msgid "X-axis position in the seating plan"
 msgstr "X-Achsen-Position im Sitzplan"
 
-#: models.py:31
+#: models.py:32
 msgid "Y-axis position in the seating plan"
 msgstr "Y-Achsen-Position im Sitzplan"
 
-#: models.py:50
+#: models.py:51
 msgid "Participant"
 msgstr "Teilnehmer/in"
 
-#: models.py:51
+#: models.py:52
 msgid "Leave this field blank for anonymous keypad."
 msgstr "Leer lassen für anonymes Keypad."
 
-#: models.py:53 templates/openslides_votecollector/overview.html:32
+#: models.py:54 templates/openslides_votecollector/overview.html:32
 msgid "Keypad ID"
 msgstr "Keypad-ID"
 
-#: models.py:59 templates/openslides_votecollector/overview.html:35
+#: models.py:60 templates/openslides_votecollector/overview.html:35
 msgid "Seat"
 msgstr "Sitz"
 
-#: models.py:63
+#: models.py:64
 #, python-format
 msgid "Keypad of %s"
 msgstr "Keypad von %s"
 
-#: models.py:64
+#: models.py:65
 #, python-format
 msgid "Keypad %d"
 msgstr "Keypad %d"
 
-#: models.py:75
+#: models.py:76
 msgid "Can manage VoteCollector"
 msgstr "Darf den VoteCollector verwalten"
+
+#: pdf.py:24 views.py:405
+#: templates/openslides_votecollector/motionpoll_detail.html:35
+#: templates/openslides_votecollector/motionpoll_slide.html:92
+msgid "Motion"
+msgstr "Antrag"
+
+#: pdf.py:39 templates/openslides_votecollector/motionpoll_detail.html:76
+#: templates/openslides_votecollector/motionpoll_slide.html:181
+#: templates/openslides_votecollector/motionpoll_slide.html:206
+msgid "Valid votes"
+msgstr "Gültige Stimmen"
+
+#: pdf.py:52 templates/openslides_votecollector/motionpoll_detail.html:83
+msgid "All single votes"
+msgstr "Alle Einzelstimmen"
+
+#: pdf.py:53 templates/openslides_votecollector/motionpoll_detail.html:88
+msgid "Name"
+msgstr "Name"
+
+#: pdf.py:53
+msgid "Keypad serial number"
+msgstr "Keypad Seriennummer"
+
+#: pdf.py:53 templates/openslides_votecollector/motionpoll_detail.html:91
+msgid "Vote"
+msgstr "Stimme"
+
+#: pdf.py:62 templates/openslides_votecollector/motionpoll_detail.html:108
+msgid "Anonymous"
+msgstr "Anonym"
 
 #: signals.py:33
 msgid "Distribution method for keypads"
@@ -189,41 +221,55 @@ msgstr "Sitzplan anzeigen"
 msgid ""
 "Incoming votes will be shown in seating plan on projector if keypad is "
 "seated."
-msgstr "Eingehende Stimmen werden im Sitzplan am Projektor angzeigt, wenn ein Keypad platziert ist."
+msgstr ""
+"Eingehende Stimmen werden im Sitzplan am Projektor angzeigt, wenn ein Keypad "
+"platziert ist."
 
-#: views.py:143
+#: views.py:144
 #, python-format
 msgid "Keypad %d is already in database."
 msgstr "Keypad %d war bereits in der Datenbank."
 
-#: views.py:196
+#: views.py:197
 msgid "No connection to the VoteCollector"
 msgstr "Keine Verbindung zum VoteCollector"
 
-#: views.py:199
+#: views.py:200
 msgid "Connected"
 msgstr "Verbunden"
 
-#: views.py:227 views.py:265
+#: views.py:228 views.py:266
 msgid "Unknown poll."
 msgstr "Unbekannte Abstimmung."
 
-#: views.py:230
+#: views.py:231
 #, python-format
 msgid "Another poll is running. <a href=\"%s\">Jump to the active poll.</a>"
 msgstr "Eine andere Abstimmung läuft. <a href=\"%s\">Zur aktiven Umfrage</a>."
 
-#: views.py:234
+#: views.py:235
 msgid "Please reload."
 msgstr "Bitte neuladen."
 
-#: views.py:267
+#: views.py:268
 msgid "Poll already started."
 msgstr "Die Abstimmung läuft bereits."
 
-#: views.py:269
+#: views.py:270
 msgid "Another poll is running."
 msgstr "Eine andere Abstimmung läuft bereits."
+
+#: views.py:395 templates/openslides_votecollector/motionpoll_detail.html:47
+msgid "Vote result"
+msgstr "Abstimmungsergebnis"
+
+#: views.py:405
+msgid "Poll"
+msgstr "Abstimmung"
+
+#: views.py:405
+msgid "Result"
+msgstr "Ergebnis"
 
 #: templates/openslides_votecollector/edit.html:21
 msgid "Edit keypad"
@@ -257,11 +303,6 @@ msgstr "Einzelstimmen"
 msgid "Loading..."
 msgstr "Laden..."
 
-#: templates/openslides_votecollector/motionpoll_detail.html:35
-#: templates/openslides_votecollector/motionpoll_slide.html:109
-msgid "Motion"
-msgstr "Antrag"
-
 #: templates/openslides_votecollector/motionpoll_detail.html:38
 msgid "Back to motion"
 msgstr "Zurück zum Antrag"
@@ -274,69 +315,47 @@ msgstr "Antrag projizieren"
 msgid "Show vote result"
 msgstr "Abstimmungsergebnis projizieren"
 
-#: templates/openslides_votecollector/motionpoll_detail.html:47
-msgid "Vote result"
-msgstr "Abstimmungsergebnis"
+#: templates/openslides_votecollector/motionpoll_detail.html:50
+msgid "PDF"
+msgstr "PDF"
 
-#: templates/openslides_votecollector/motionpoll_detail.html:51
+#: templates/openslides_votecollector/motionpoll_detail.html:54
 msgid "Delete Vote"
 msgstr "Abstimmung löschen"
 
-#: templates/openslides_votecollector/motionpoll_detail.html:58
+#: templates/openslides_votecollector/motionpoll_detail.html:61
 msgid "Voting result"
 msgstr "Abstimmungsergebnis"
 
-#: templates/openslides_votecollector/motionpoll_detail.html:73
-#: templates/openslides_votecollector/motionpoll_slide.html:198
-#: templates/openslides_votecollector/motionpoll_slide.html:223
-msgid "Valid votes"
-msgstr "Gültige Stimmen"
-
-#: templates/openslides_votecollector/motionpoll_detail.html:80
-msgid "All single votes"
-msgstr "Alle Einzelstimmen"
-
-#: templates/openslides_votecollector/motionpoll_detail.html:82
+#: templates/openslides_votecollector/motionpoll_detail.html:85
 msgid "All votes"
 msgstr "Alle Stimmen"
 
-#: templates/openslides_votecollector/motionpoll_detail.html:85
-msgid "Name"
-msgstr "Name"
-
-#: templates/openslides_votecollector/motionpoll_detail.html:86
+#: templates/openslides_votecollector/motionpoll_detail.html:89
 msgid "Structure level"
 msgstr "Gliederungsebene"
 
-#: templates/openslides_votecollector/motionpoll_detail.html:87
+#: templates/openslides_votecollector/motionpoll_detail.html:90
 msgid "Serial number"
 msgstr "Seriennummer"
 
-#: templates/openslides_votecollector/motionpoll_detail.html:88
-msgid "Vote"
-msgstr "Stimme"
-
-#: templates/openslides_votecollector/motionpoll_detail.html:105
-msgid "Anonymous"
-msgstr "Anonym"
-
-#: templates/openslides_votecollector/motionpoll_slide.html:110
+#: templates/openslides_votecollector/motionpoll_slide.html:93
 msgid "Version"
 msgstr "Version"
 
-#: templates/openslides_votecollector/motionpoll_slide.html:111
+#: templates/openslides_votecollector/motionpoll_slide.html:94
 msgid "vote"
 msgstr "Abstimmung"
 
-#: templates/openslides_votecollector/motionpoll_slide.html:163
+#: templates/openslides_votecollector/motionpoll_slide.html:146
 msgid "Votes without seat"
 msgstr "Stimmen ohne Sitz"
 
-#: templates/openslides_votecollector/motionpoll_slide.html:229
+#: templates/openslides_votecollector/motionpoll_slide.html:212
 msgid "Invalid votes"
 msgstr "Ungültige Stimmen"
 
-#: templates/openslides_votecollector/motionpoll_slide.html:235
+#: templates/openslides_votecollector/motionpoll_slide.html:218
 msgid "Votes cast"
 msgstr "Abgegebene Stimmen"
 
@@ -432,9 +451,6 @@ msgstr "VoteCollector Status"
 
 #~ msgid "Invalid Votes"
 #~ msgstr "Ungültige Stimmen"
-
-#~ msgid "Keypad id or serial number"
-#~ msgstr "Keypad ID oder Seriennummer"
 
 #~ msgid "Please vote!<br>1: Yes | 2: No | 3: Abstain"
 #~ msgstr "Bitte abstimmen!<br>1: Ja | 2: Nein | 3: Enthaltung"
