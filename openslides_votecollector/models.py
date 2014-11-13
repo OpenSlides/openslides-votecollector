@@ -23,6 +23,7 @@ class Seat(models.Model):
     number = models.CharField(
         max_length=255,
         unique=True,
+        null=True,
         verbose_name=ugettext_lazy('Seat number'),
         help_text=ugettext_lazy('You can use digits and also letters.'))
     seating_plan_x_axis = models.PositiveIntegerField(
