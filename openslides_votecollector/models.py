@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import ugettext as _, ugettext_lazy, ugettext_noop
 
@@ -22,8 +23,6 @@ class Seat(models.Model):
     """
     number = models.CharField(
         max_length=255,
-        unique=True,
-        null=True,
         verbose_name=ugettext_lazy('Seat number'),
         help_text=ugettext_lazy('You can use digits and also letters.'))
     seating_plan_x_axis = models.PositiveIntegerField(
@@ -37,6 +36,19 @@ class Seat(models.Model):
 
     def __unicode__(self):
         return self.number
+
+    def clean(self):
+        """
+        Ensures that a non empty seat number is unique.
+
+        Attention: This method is not uses by save() or bulk_create().
+        """
+        if self.number != '':
+            queryset = self.objects.filter(number=self.number)
+            if self.pk is not None:
+                queryset = queryset.exclude(pk=self.pk)
+            if queryset.exists():
+                raise ValidationError('Seat number must be unique or an empty string.')
 
 
 class Keypad(models.Model):
