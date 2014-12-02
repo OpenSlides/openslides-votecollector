@@ -5,13 +5,15 @@ from django.utils.translation import ugettext_lazy as _
 
 from openslides.utils.forms import CssClassMixin
 
-from .models import Keypad
+from .models import Keypad, Seat
 
 
 class KeypadForm(forms.ModelForm, CssClassMixin):
     """
     The Form to create and alter keypad.
     """
+    seat = forms.ModelChoiceField(queryset=Seat.objects.exclude(number=''))
+
     class Meta:
         model = Keypad
 
