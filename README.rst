@@ -18,7 +18,7 @@ Currently, it is maintained by Emanuel Schütze.
 Requirements
 ============
 
-- OpenSlides 1.6.1 (http://openslides.org/)
+- OpenSlides 1.7.x (or 1.6.x)
 - VoteCollector 1.3.4
 
 
@@ -30,8 +30,7 @@ I. Installation on Windows (with OpenSlides portable version)
 
 1. Install and run VoteCollector
 
-   Download VoteColletor from http://www.keypaddepot.de/de/Wahlen/VoteCollector-App-nur-Plug-In-zu-OpenSlides.html
-   (via tab "Medien").
+   Download VoteColletor from http://files.softwein.de/VoteCollector.zip
 
    To use VoteCollector in simulation mode (no keypads required)
    please run from command line::
@@ -39,6 +38,7 @@ I. Installation on Windows (with OpenSlides portable version)
      VoteCollector.exe -s
 
    Note: You have to buy a license key for VoteCollector to use more than 5 keypads.
+   See http://www.voteworks.de/TedSystem-Anwendungen/Mitgliederversammlungen/VoteCollector-OpenSlides.html
 
 2. Get latest VoteCollector plugin release from:
 
@@ -62,8 +62,7 @@ II. Installation on GNU/Linux and MacOSX
 
 1. Install and run VoteCollector (on Windows only, e.g. in a VirtualBox machine)
 
-   Download from http://www.keypaddepot.de/de/Wahlen/VoteCollector-App-nur-Plug-In-zu-OpenSlides.html
-   (via tab "Medien").
+   Download VoteColletor from http://files.softwein.de/VoteCollector.zip
 
    To use VoteCollector in simulation mode (no keypads required)
    please run from command line::
@@ -71,6 +70,7 @@ II. Installation on GNU/Linux and MacOSX
      VoteCollector.exe -s
 
    Note: You have to buy a license key for VoteCollector to use more than 5 keypads.
+   See http://www.voteworks.de/TedSystem-Anwendungen/Mitgliederversammlungen/VoteCollector-OpenSlides.html
 
 2. Setup and activate a virtual environment::
 
@@ -112,9 +112,9 @@ MIT License, see LICENSE file. The authors are mentioned in the AUTHORS file.
 Changelog
 =========
 
-Version 1.1 (unreleased)
+Version 1.1 (2015-01-23)
 ------------------------
-* Updated to OpenSlides 1.6.1.
+* Updated to OpenSlides 1.7.x/1.6.x.
 * Updated for VoteCollector 1.3.4.
 * Added personal and anonymous voting.
 * New config options for live mode and seating plan.
