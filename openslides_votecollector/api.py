@@ -81,7 +81,7 @@ def start_voting(poll_id):
     if config['votecollector_in_vote']:
         return None
     server = get_server()
-    keypads = Keypad.objects.filter(active=True) \
+    keypads = Keypad.objects.exclude(user__is_active=False) \
                     .values_list('keypad_id', flat=True).order_by('keypad_id')
 
     if config['votecollector_method'] == 'anonym':

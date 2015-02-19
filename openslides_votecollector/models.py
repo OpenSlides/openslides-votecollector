@@ -64,7 +64,6 @@ class Keypad(models.Model):
         help_text=ugettext_lazy('Leave this field blank for anonymous keypad.'),
     )
     keypad_id = models.IntegerField(unique=True, verbose_name=ugettext_lazy('Keypad ID'))
-    active = models.BooleanField(default=True, verbose_name=ugettext_lazy('Active'))
     seat = models.OneToOneField(
         Seat,
         null=True,
@@ -77,11 +76,23 @@ class Keypad(models.Model):
         return _('Keypad %d') % self.keypad_id
 
     @models.permalink
-    def get_absolute_url(self, link='edit'):
-        if link == 'edit':
+    def get_absolute_url(self, link='update'):
+        if link == 'update' or link == 'edit':
             return ('votecollector_keypad_edit', [str(self.id)])
         if link == 'delete':
             return ('votecollector_keypad_delete', [str(self.id)])
+
+    @property
+    def active(self):
+        # Attention: Not all the code uses this property to check whether a
+        #            keypad is active or not. Change everythin if you make
+        #            some changes here.
+        if self.user is not None:
+            active = self.user.is_active
+        else:
+            # Anonymous keypads are always active
+            active = True
+        return active
 
     class Meta:
         permissions = (

@@ -115,6 +115,9 @@ Changelog
 
 Next version (unreleased)
 -------------------------
+* Coupled keypad activation/deactivation with user's status. Anonymous keypads
+  are now always active.
+* Fixed bug in keypad form.
 
 
 Version 1.1 (2015-01-23)

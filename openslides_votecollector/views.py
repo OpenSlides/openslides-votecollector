@@ -70,9 +70,9 @@ class Overview(ListView):
                 context['keypads'] = context['keypads'].exclude(user=None)
         if 'active' in sortfilter:
             if sortfilter['active'] == 'active':
-                context['keypads'] = context['keypads'].filter(active=True)
+                context['keypads'] = context['keypads'].exclude(user__is_active=False)
             elif sortfilter['active'] == 'inactive':
-                context['keypads'] = context['keypads'].filter(active=False)
+                context['keypads'] = context['keypads'].exclude(user=None).filter(user__is_active=False)
 
         if 'sort' in sortfilter:
             context['keypads'] = context['keypads'].order_by(sortfilter['sort'])
@@ -139,7 +139,7 @@ class KeypadCreateMulti(FormView):
     def form_valid(self, form):
         for i in range(form.cleaned_data['from_id'], form.cleaned_data['to_id'] + 1):
             try:
-                Keypad(keypad_id=i, active=form.cleaned_data['active']).save()
+                Keypad(keypad_id=i).save()
             except IntegrityError:
                 messages.info(self.request, _('Keypad %d is already in database.') % i)
         return super(KeypadCreateMulti, self).form_valid(form)
@@ -152,34 +152,6 @@ class KeypadDelete(DeleteView):
     required_permission = 'openslides_votecollector.can_manage_votecollector'
     model = Keypad
     success_url_name = 'votecollector_overview'
-
-
-class KeypadSetStatusView(SingleObjectMixin, RedirectView):
-    """
-    Activate or deactivate a keypad.
-    """
-    required_permission = 'openslides_votecollector.can_manage_votecollector'
-    url_name = 'votecollector_overview'
-    url_name_args = ''
-    allow_ajax = True
-    model = Keypad
-
-    def pre_redirect(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        action = kwargs['action']
-        if action == 'activate':
-            self.object.active = True
-        elif action == 'deactivate':
-            self.object.active = False
-        elif action == 'toggle':
-            self.object.active = not self.object.active
-        self.object.save()
-        return super(KeypadSetStatusView, self).pre_redirect(request, *args, **kwargs)
-
-    def get_ajax_context(self, **kwargs):
-        context = super(KeypadSetStatusView, self).get_ajax_context(**kwargs)
-        context['active'] = self.object.active
-        return context
 
 
 class StatusView(TemplateView):

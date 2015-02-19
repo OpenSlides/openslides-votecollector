@@ -50,11 +50,7 @@
                 <a href="{% url 'votecollector_keypad_delete' keypad.id  %}" title="{% trans 'Delete' %}" class="btn btn-mini">
                     <i class="icon-remove"></i>
                 </a>
-                <a href="{% url 'votecollector_keypad_status_toggle' keypad.id %}"
-                  class="status_link btn btn-mini {% if keypad.active %}btn-success{% endif %}"
-                  title="{% if keypad.active %}{% trans 'active' %}{% else %}{% trans 'inactive' %}{% endif %}">
-                    <i class="{% if keypad.active %}icon-on{% else %}icon-off{% endif %}"></i>
-                </a>
+                {% if keypad.active %}active{% else %}inactive{% endif %}
             </td>
         </tr>
     {% empty %}
