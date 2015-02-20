@@ -115,6 +115,7 @@ Changelog
 
 Next version (unreleased)
 -------------------------
+* Added possibility to delete personal poll data to make polls anonymous.
 * Coupled keypad activation/deactivation with user's status. Anonymous keypads
   are now always active.
 * Fixed bug in keypad form.

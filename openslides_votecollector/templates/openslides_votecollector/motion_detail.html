@@ -9,5 +9,11 @@
             <a class="btn btn-mini btn-success"
                href="{% url 'motionpoll_detail' motion.pk poll.poll_number %}">{% trans 'Single votes' %}</a>
         </p>
+        {% if poll|make_anonymous_button %}
+            <p>
+                <a class="btn btn-mini btn-danger"
+                   href="{% url 'votecollector_make_anonymous' motion.pk poll.poll_number %}">{% trans 'Make anonymous' %}</a>
+            </p>
+        {% endif %}
     {% endif %}
 {% endblock %}

@@ -105,7 +105,9 @@ class MotionPollKeypadConnection(models.Model):
     Model to connect a poll of a motion with a keypad per personal voting.
     """
     poll = models.ForeignKey(MotionPoll, related_name='keypad_data_list')
-    keypad = models.ForeignKey(Keypad)
+    keypad = models.ForeignKey(
+        Keypad,
+        null=True)
     value = models.CharField(max_length=255)
     serial_number = models.CharField(null=True, max_length=255)
 

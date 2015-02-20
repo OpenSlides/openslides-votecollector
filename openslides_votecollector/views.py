@@ -17,10 +17,11 @@ from django.views.generic.detail import SingleObjectMixin
 from openslides.config.api import config
 from openslides.motion.models import MotionPoll
 from openslides.motion.views import MotionDetailView as _MotionDetailView, PollMixin, PollUpdateView
-from openslides.projector.api import update_projector_overlay
+from openslides.projector.api import update_projector, update_projector_overlay
 from openslides.utils.signals import template_manipulation
 from openslides.utils.views import (TemplateView, ListView, DetailView, UpdateView, CreateView,
-                                    FormView, AjaxView, DeleteView, RedirectView, PDFView)
+                                    FormView, AjaxView, DeleteView, RedirectView, PDFView,
+                                    QuestionView)
 
 # VoteCollector imports
 from .api import (start_voting, stop_voting, get_voting_results,
@@ -325,6 +326,20 @@ class GetVotingResults(VotingView):
         }
 
 
+class MakeAnonymousView(PollMixin, QuestionView):
+    """
+    View to make polls anonymous.
+    """
+    question_message = ugettext_lazy('Do you really want to make the poll anonymous?')
+    final_message = ugettext_lazy('Poll successfully made anonymous.')
+    question_url_name = 'motion_detail'
+    url_name = 'motion_detail'
+
+    def on_clicked_yes(self):
+        self.get_object().keypad_data_list.update(keypad=None)
+        update_projector()
+
+
 class MotionDetailView(_MotionDetailView):
     """
     Overrides openslides.motion.views.MotionDetailView
@@ -346,8 +361,8 @@ class MotionPollDetailView(PollMixin, DetailView):
         The view is disabled if the poll has no votes.
         """
         context = super(MotionPollDetailView, self).get_context_data(**kwargs)
-        keypad_data_list = self.object.keypad_data_list.select_related('keypad__user')
-        if (not self.object.has_votes() or (
+        keypad_data_list = self.get_object().keypad_data_list.select_related('keypad__user')
+        if (not self.get_object().has_votes() or (
                 not keypad_data_list.exclude(keypad__user__exact=None).exists()
                 and not keypad_data_list.exclude(serial_number__exact=None).exists())):
             raise Http404

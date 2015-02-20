@@ -55,7 +55,7 @@ def change_motionpoll_slide_template():
             votes_without_seat = 0
             for keypad_data in context['poll'].keypad_data_list.select_related('keypad__seat'):
                 all_keypad_votes[keypad_data.value] += 1
-                if keypad_data.keypad.seat:
+                if keypad_data.keypad is not None and keypad_data.keypad.seat:
                     x = keypad_data.keypad.seat.seating_plan_x_axis
                     y = keypad_data.keypad.seat.seating_plan_y_axis
                     seating_plan['rows'][y-1][x-1]['css'] += ' seat-%s' % keypad_data.get_css_value()
