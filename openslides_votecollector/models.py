@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import ugettext as _, ugettext_lazy, ugettext_noop
 
+from openslides.config.api import config
 from openslides.motion.models import MotionPoll
 from openslides.participant.models import User
 
@@ -121,4 +122,7 @@ class MotionPollKeypadConnection(models.Model):
         """
         Returns the value for the css class accordning to the value.
         """
-        return KEYPAD_MAP[self.value][1]
+        if config['votecollector_seats_grey']:
+            return 'grey'
+        else:
+            return KEYPAD_MAP[self.value][1]
