@@ -12,7 +12,9 @@ class KeypadForm(forms.ModelForm, CssClassMixin):
     """
     The Form to create and alter keypad.
     """
-    seat = forms.ModelChoiceField(queryset=Seat.objects.exclude(number=''))
+    seat = forms.ModelChoiceField(
+        required=False,
+        queryset=Seat.objects.exclude(number=''))
 
     class Meta:
         model = Keypad
@@ -24,4 +26,3 @@ class KeypadMultiForm(forms.Form, CssClassMixin):
     """
     from_id = forms.IntegerField(min_value=1, label=_('From keypad ID'))
     to_id = forms.IntegerField(label=_('... to keypad ID'))
-    active = forms.BooleanField(initial=True, required=False, label=_('Active'))

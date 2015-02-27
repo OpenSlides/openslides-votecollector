@@ -1,8 +1,8 @@
 # Patterns of intentionally untracked files that Git should ignore
 
 # Virtual Python Environment builder
-.venv/
 .virtualenv/
+.venv/
 
 # Python compiled files
 *.pyc

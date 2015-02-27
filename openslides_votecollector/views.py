@@ -17,10 +17,11 @@ from django.views.generic.detail import SingleObjectMixin
 from openslides.config.api import config
 from openslides.motion.models import MotionPoll
 from openslides.motion.views import MotionDetailView as _MotionDetailView, PollMixin, PollUpdateView
-from openslides.projector.api import update_projector_overlay
+from openslides.projector.api import update_projector, update_projector_overlay
 from openslides.utils.signals import template_manipulation
 from openslides.utils.views import (TemplateView, ListView, DetailView, UpdateView, CreateView,
-                                    FormView, AjaxView, DeleteView, RedirectView, PDFView)
+                                    FormView, AjaxView, DeleteView, RedirectView, PDFView,
+                                    QuestionView)
 
 # VoteCollector imports
 from .api import (start_voting, stop_voting, get_voting_results,
@@ -70,9 +71,9 @@ class Overview(ListView):
                 context['keypads'] = context['keypads'].exclude(user=None)
         if 'active' in sortfilter:
             if sortfilter['active'] == 'active':
-                context['keypads'] = context['keypads'].filter(active=True)
+                context['keypads'] = context['keypads'].exclude(user__is_active=False)
             elif sortfilter['active'] == 'inactive':
-                context['keypads'] = context['keypads'].filter(active=False)
+                context['keypads'] = context['keypads'].exclude(user=None).filter(user__is_active=False)
 
         if 'sort' in sortfilter:
             context['keypads'] = context['keypads'].order_by(sortfilter['sort'])
@@ -139,7 +140,7 @@ class KeypadCreateMulti(FormView):
     def form_valid(self, form):
         for i in range(form.cleaned_data['from_id'], form.cleaned_data['to_id'] + 1):
             try:
-                Keypad(keypad_id=i, active=form.cleaned_data['active']).save()
+                Keypad(keypad_id=i).save()
             except IntegrityError:
                 messages.info(self.request, _('Keypad %d is already in database.') % i)
         return super(KeypadCreateMulti, self).form_valid(form)
@@ -152,34 +153,6 @@ class KeypadDelete(DeleteView):
     required_permission = 'openslides_votecollector.can_manage_votecollector'
     model = Keypad
     success_url_name = 'votecollector_overview'
-
-
-class KeypadSetStatusView(SingleObjectMixin, RedirectView):
-    """
-    Activate or deactivate a keypad.
-    """
-    required_permission = 'openslides_votecollector.can_manage_votecollector'
-    url_name = 'votecollector_overview'
-    url_name_args = ''
-    allow_ajax = True
-    model = Keypad
-
-    def pre_redirect(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        action = kwargs['action']
-        if action == 'activate':
-            self.object.active = True
-        elif action == 'deactivate':
-            self.object.active = False
-        elif action == 'toggle':
-            self.object.active = not self.object.active
-        self.object.save()
-        return super(KeypadSetStatusView, self).pre_redirect(request, *args, **kwargs)
-
-    def get_ajax_context(self, **kwargs):
-        context = super(KeypadSetStatusView, self).get_ajax_context(**kwargs)
-        context['active'] = self.object.active
-        return context
 
 
 class StatusView(TemplateView):
@@ -353,6 +326,20 @@ class GetVotingResults(VotingView):
         }
 
 
+class MakeAnonymousView(PollMixin, QuestionView):
+    """
+    View to make polls anonymous.
+    """
+    question_message = ugettext_lazy('Do you really want to make the poll anonymous?')
+    final_message = ugettext_lazy('Poll successfully made anonymous.')
+    question_url_name = 'motion_detail'
+    url_name = 'motion_detail'
+
+    def on_clicked_yes(self):
+        self.get_object().keypad_data_list.update(keypad=None)
+        update_projector()
+
+
 class MotionDetailView(_MotionDetailView):
     """
     Overrides openslides.motion.views.MotionDetailView
@@ -374,8 +361,8 @@ class MotionPollDetailView(PollMixin, DetailView):
         The view is disabled if the poll has no votes.
         """
         context = super(MotionPollDetailView, self).get_context_data(**kwargs)
-        keypad_data_list = self.object.keypad_data_list.select_related('keypad__user')
-        if (not self.object.has_votes() or (
+        keypad_data_list = self.get_object().keypad_data_list.select_related('keypad__user')
+        if (not self.get_object().has_votes() or (
                 not keypad_data_list.exclude(keypad__user__exact=None).exists()
                 and not keypad_data_list.exclude(serial_number__exact=None).exists())):
             raise Http404

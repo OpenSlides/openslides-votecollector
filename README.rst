@@ -5,20 +5,21 @@
 Overview
 ========
 
-This plugin connects OpenSlides with the software "VoteCollector"
-to provide electronic voting for motions with Keypads from `Voteworks <http://www.voteworks.de>`_.
+This plugin connects OpenSlides with the software "VoteCollector" to
+provide electronic voting for motions with Keypads from `Voteworks
+<http://www.voteworks.de>`_.
 
 The OpenSlides VoteCollector Plugin was contracted by the German company
 Voteworks GmbH. It was initially developed by the core authors of
 OpenSlides, Oskar Hahn and Emanuel Schütze (`Intevation GmbH
-<http://www.intevation.de/>`_), in April 2012.
-Currently, it is maintained by Emanuel Schütze.
+<http://www.intevation.de/>`_), in April 2012. Currently, it is maintained
+by Emanuel Schütze.
 
 
 Requirements
 ============
 
-- OpenSlides 1.7.x (or 1.6.x)
+- OpenSlides 1.7.x
 - VoteCollector 1.3.4
 
 
@@ -111,6 +112,14 @@ MIT License, see LICENSE file. The authors are mentioned in the AUTHORS file.
 
 Changelog
 =========
+
+Next version (unreleased)
+-------------------------
+* Added possibility to delete personal poll data to make polls anonymous.
+* Coupled keypad activation/deactivation with user's status. Anonymous keypads
+  are now always active.
+* Fixed bug in keypad form.
+
 
 Version 1.1 (2015-01-23)
 ------------------------

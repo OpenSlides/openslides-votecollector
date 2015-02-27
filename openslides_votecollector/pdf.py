@@ -56,7 +56,7 @@ def motion_poll_to_pdf_result(pdf, poll):
         counter += 1
         line = []
         line.append(Paragraph(str(counter), stylesheet['Tablecell']))
-        if keypad_data.keypad.user:
+        if keypad_data.keypad is not None and keypad_data.keypad.user:
             line.append(Paragraph(str(keypad_data.keypad.user), stylesheet['Tablecell']))
         else:
             line.append(Paragraph(_('Anonymous'), stylesheet['Tablecell']))
