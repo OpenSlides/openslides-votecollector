@@ -7,13 +7,15 @@
     {% if poll|detail_button %}
         <p>
             <a class="btn btn-mini btn-success"
-               href="{% url 'motionpoll_detail' motion.pk poll.poll_number %}">{% trans 'Single votes' %}</a>
-        </p>
-        {% if poll|make_anonymous_button %}
-            <p>
+                    href="{% url 'motionpoll_detail' motion.pk poll.poll_number %}">
+                {% trans 'Single votes' %}
+            </a>
+            {% if poll|make_anonymous_button %}
                 <a class="btn btn-mini btn-danger"
-                   href="{% url 'votecollector_make_anonymous' motion.pk poll.poll_number %}">{% trans 'Make anonymous' %}</a>
-            </p>
-        {% endif %}
+                        href="{% url 'votecollector_make_anonymous' motion.pk poll.poll_number %}">
+                    <i class="icon-warning-sign icon-white"></i> {% trans 'Make anonymous' %}
+                </a>
+            {% endif %}
+        </p>
     {% endif %}
 {% endblock %}

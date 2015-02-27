@@ -21,7 +21,7 @@
                 <option value="personalized" {% if 'personalized' in sortfilter.user %}selected{% endif %}>{% trans "Personalized" %}</option>
             </select>
             <select class="default-input" name="active" onchange="document.forms['filter'].submit()">
-                <option value="0">-- {% trans "Active" %} --</option>
+                <option value="0">-- {% trans "Status" %} --</option>
                 <option value="active" {% if 'active' in sortfilter.active %}selected{% endif %}>{% trans "Active" %}</option>
                 <option value="inactive" {% if 'inactive' in sortfilter.active %}selected{% endif %}>{% trans "Inactive" %}</option>
             </select>
@@ -31,6 +31,7 @@
         <tr>
             <th><a href="?sort=keypad_id&reverse={% if 'keypad_id' in sortfilter.sort and 'reverse' not in sortfilter %}1{% else %}0{%endif%}">{% trans "Keypad ID" %}</a></th>
             <th><a href="?sort=user&reverse={% if 'user' in sortfilter.sort and 'reverse' not in sortfilter %}1{% else %}0{%endif%}">{% trans "User" %}</th>
+            <th>{% trans "Status" %}</th>
             {% if 'votecollector_seating_plan'|get_config %}
                 <th>{% trans 'Seat' %}</th>
             {% endif %}
@@ -40,6 +41,12 @@
         <tr class="{% cycle 'odd' '' %}">
             <td>{{ keypad.keypad_id }}</td>
             <td>{% if keypad.user %}<a href="{{ keypad.user.get_absolute_url }}">{{ keypad.user }}</a>{% else %}{% trans "Anonym" %}{% endif %}</td>
+            <td>{% if keypad.active %}
+                    <span class="label label-success">{% trans 'active' %}</span>
+                {% else %}
+                    <span class="label label-warning">{% trans 'inactive' %}</span>
+                {% endif %}
+            </td>
             {% if 'votecollector_seating_plan'|get_config %}
                 <td>{{ keypad.seat|default_if_none:"–" }}</td>
             {% endif %}
@@ -50,7 +57,6 @@
                 <a href="{% url 'votecollector_keypad_delete' keypad.id  %}" title="{% trans 'Delete' %}" class="btn btn-mini">
                     <i class="icon-remove"></i>
                 </a>
-                {% if keypad.active %}active{% else %}inactive{% endif %}
             </td>
         </tr>
     {% empty %}
