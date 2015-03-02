@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VoteCollector Plugin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-27 15:22+0100\n"
+"POT-Creation-Date: 2015-02-27 16:12+0100\n"
 "PO-Revision-Date: 2014-10-31\n"
 "Last-Translator: Emanuel Schütze\n"
 "Language: German\n"
@@ -66,82 +66,82 @@ msgstr "Von Keypad-ID"
 msgid "... to keypad ID"
 msgstr "... bis Keypad-ID"
 
-#: models.py:12 pdf.py:30 signals.py:125
+#: models.py:13 pdf.py:30 signals.py:134
 #: templates/openslides_votecollector/motionpoll_detail.html:63
-#: templates/openslides_votecollector/motionpoll_slide.html:152
-#: templates/openslides_votecollector/motionpoll_slide.html:193
+#: templates/openslides_votecollector/motionpoll_slide.html:155
+#: templates/openslides_votecollector/motionpoll_slide.html:196
 msgid "Yes"
 msgstr "Ja"
 
-#: models.py:13 pdf.py:33 signals.py:126
+#: models.py:14 pdf.py:33 signals.py:135
 #: templates/openslides_votecollector/motionpoll_detail.html:67
-#: templates/openslides_votecollector/motionpoll_slide.html:162
-#: templates/openslides_votecollector/motionpoll_slide.html:197
+#: templates/openslides_votecollector/motionpoll_slide.html:165
+#: templates/openslides_votecollector/motionpoll_slide.html:200
 msgid "No"
 msgstr "Nein"
 
-#: models.py:14 pdf.py:36 signals.py:127
+#: models.py:15 pdf.py:36 signals.py:136
 #: templates/openslides_votecollector/motionpoll_detail.html:71
-#: templates/openslides_votecollector/motionpoll_slide.html:171
-#: templates/openslides_votecollector/motionpoll_slide.html:201
+#: templates/openslides_votecollector/motionpoll_slide.html:174
+#: templates/openslides_votecollector/motionpoll_slide.html:204
 msgid "Abstention"
 msgstr "Enthaltung"
 
-#: models.py:26
+#: models.py:27
 msgid "Seat number"
 msgstr "Sitznummer"
 
-#: models.py:27
+#: models.py:28
 msgid "You can use digits and also letters."
 msgstr "Sie können Zahlen und Buchstaben verwenden."
 
-#: models.py:29
+#: models.py:30
 msgid "X-axis position in the seating plan"
 msgstr "X-Achsen-Position im Sitzplan"
 
-#: models.py:31
+#: models.py:32
 msgid "Y-axis position in the seating plan"
 msgstr "Y-Achsen-Position im Sitzplan"
 
-#: models.py:63
+#: models.py:64
 msgid "Participant"
 msgstr "Teilnehmer/in"
 
-#: models.py:64
+#: models.py:65
 msgid "Leave this field blank for anonymous keypad."
 msgstr "Leer lassen für anonymes Keypad."
 
-#: models.py:66 templates/openslides_votecollector/overview.html:32
+#: models.py:67 templates/openslides_votecollector/overview.html:32
 msgid "Keypad ID"
 msgstr "Keypad-ID"
 
-#: models.py:71 templates/openslides_votecollector/overview.html:36
+#: models.py:72 templates/openslides_votecollector/overview.html:36
 msgid "Seat"
 msgstr "Sitz"
 
-#: models.py:75
+#: models.py:76
 #, python-format
 msgid "Keypad of %s"
 msgstr "Keypad von %s"
 
-#: models.py:76
+#: models.py:77
 #, python-format
 msgid "Keypad %d"
 msgstr "Keypad %d"
 
-#: models.py:99
+#: models.py:100
 msgid "Can manage VoteCollector"
 msgstr "Darf den VoteCollector verwalten"
 
 #: pdf.py:24 views.py:392
 #: templates/openslides_votecollector/motionpoll_detail.html:35
-#: templates/openslides_votecollector/motionpoll_slide.html:92
+#: templates/openslides_votecollector/motionpoll_slide.html:95
 msgid "Motion"
 msgstr "Antrag"
 
 #: pdf.py:39 templates/openslides_votecollector/motionpoll_detail.html:76
-#: templates/openslides_votecollector/motionpoll_slide.html:181
-#: templates/openslides_votecollector/motionpoll_slide.html:206
+#: templates/openslides_votecollector/motionpoll_slide.html:184
+#: templates/openslides_votecollector/motionpoll_slide.html:209
 msgid "Valid votes"
 msgstr "Gültige Stimmen"
 
@@ -219,6 +219,18 @@ msgstr ""
 "Eingehende Stimmen werden im Sitzplan am Projektor angzeigt, wenn ein Keypad "
 "platziert ist."
 
+#: signals.py:71
+msgid "Show grey seats on seating plan"
+msgstr "Nur graue Sitze auf dem Sitzplan anzeigen"
+
+#: signals.py:72
+msgid ""
+"Incoming votes will be shown in grey on seating plan. You can see only WHICH "
+"seat has voted but not HOW."
+msgstr ""
+"Eingehende Stimmen werden im Sitzplan grau angzeigt. Man erkennt "
+"WELCHER Sitz abgestimmt hat, aber nicht WIE."
+
 #: views.py:145
 #, python-format
 msgid "Keypad %d is already in database."
@@ -255,7 +267,9 @@ msgstr "Eine andere Abstimmung läuft bereits."
 
 #: views.py:333
 msgid "Do you really want to make the poll anonymous?"
-msgstr "Wollen Sie wirklich die Abstimmung anonymisieren? Alle Namenszuordnungen gehend dabei verloren."
+msgstr ""
+"Wollen Sie wirklich die Abstimmung anonymisieren? Alle Namenszuordnungen "
+"gehend dabei verloren."
 
 #: views.py:334
 msgid "Poll successfully made anonymous."
@@ -345,23 +359,23 @@ msgstr "Gliederungsebene"
 msgid "Serial number"
 msgstr "Seriennummer"
 
-#: templates/openslides_votecollector/motionpoll_slide.html:93
+#: templates/openslides_votecollector/motionpoll_slide.html:96
 msgid "Version"
 msgstr "Version"
 
-#: templates/openslides_votecollector/motionpoll_slide.html:94
+#: templates/openslides_votecollector/motionpoll_slide.html:97
 msgid "vote"
 msgstr "Abstimmung"
 
-#: templates/openslides_votecollector/motionpoll_slide.html:146
+#: templates/openslides_votecollector/motionpoll_slide.html:149
 msgid "Votes without seat"
 msgstr "Stimmen ohne Sitz"
 
-#: templates/openslides_votecollector/motionpoll_slide.html:212
+#: templates/openslides_votecollector/motionpoll_slide.html:215
 msgid "Invalid votes"
 msgstr "Ungültige Stimmen"
 
-#: templates/openslides_votecollector/motionpoll_slide.html:218
+#: templates/openslides_votecollector/motionpoll_slide.html:221
 msgid "Votes cast"
 msgstr "Abgegebene Stimmen"
 
@@ -457,4 +471,3 @@ msgstr "Keine Keypads vorhanden."
 #: templates/openslides_votecollector/status.html:9
 msgid "VoteCollector status"
 msgstr "VoteCollector Status"
-

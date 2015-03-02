@@ -64,6 +64,14 @@ def setup_votecollector_config_page(sender, **kwargs):
             help_text=ugettext_lazy('Incoming votes will be shown in seating plan on projector if keypad is seated.'),
             required=False),
         on_change=update_projector)
+    votecollector_seats_grey = ConfigVariable(
+        name='votecollector_seats_grey',
+        default_value=False,
+        form_field=forms.BooleanField(
+            label=ugettext_lazy('Show grey seats on seating plan'),
+            help_text=ugettext_lazy('Incoming votes will be shown in grey on seating plan. You can see only WHICH seat has voted but not HOW.'),
+            required=False),
+        on_change=update_projector)
     votecollector_in_vote = ConfigVariable(
         name='votecollector_in_vote',
         default_value=0,
@@ -81,6 +89,7 @@ def setup_votecollector_config_page(sender, **kwargs):
                                        votecollector_vote_started_msg,
                                        votecollector_live_voting,
                                        votecollector_seating_plan,
+                                       votecollector_seats_grey,
                                        votecollector_in_vote,
                                        votecollector_active_keypads))
 

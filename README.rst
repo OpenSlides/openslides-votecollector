@@ -113,12 +113,14 @@ MIT License, see LICENSE file. The authors are mentioned in the AUTHORS file.
 Changelog
 =========
 
-Next version (unreleased)
+Version 1.2 (unreleased)
 -------------------------
 * Added possibility to delete personal poll data to make polls anonymous.
 * Coupled keypad activation/deactivation with user's status. Anonymous keypads
   are now always active.
 * Fixed bug in keypad form.
+* Allow to set a config that all incoming votes on seating plan are
+  colored in grey only. So you can see which seat has voted but not how.
 
 
 Version 1.1 (2015-01-23)
