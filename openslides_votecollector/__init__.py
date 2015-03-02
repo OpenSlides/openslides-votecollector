@@ -12,4 +12,4 @@ else:
 
 __verbose_name__ = 'OpenSlides VoteCollector Plugin'
 __description__ = 'This plugin connects OpenSlides with the VoteCollector of Voteworks for electronic voting.'
-__version__ = '1.2'
+__version__ = '1.3-dev'
