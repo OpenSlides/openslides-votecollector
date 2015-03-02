@@ -20,7 +20,7 @@ Requirements
 ============
 
 - OpenSlides 1.7.x
-- VoteCollector 1.3.4
+- VoteCollector 1.3.x
 
 
 Install
@@ -113,8 +113,8 @@ MIT License, see LICENSE file. The authors are mentioned in the AUTHORS file.
 Changelog
 =========
 
-Version 1.2 (unreleased)
--------------------------
+Version 1.2 (2015-03-02)
+------------------------
 * Added possibility to delete personal poll data to make polls anonymous.
 * Coupled keypad activation/deactivation with user's status. Anonymous keypads
   are now always active.
