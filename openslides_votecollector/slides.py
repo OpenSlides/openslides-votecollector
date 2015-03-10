@@ -10,7 +10,7 @@ from openslides.motion.models import MotionPoll
 from openslides.projector.api import SlideError, register_slide, slide_callback
 from openslides.utils.exceptions import OpenSlidesError
 
-from .models import Seat
+from .models import Seat, Keypad
 
 
 def change_motionpoll_slide_template():
@@ -41,15 +41,24 @@ def change_motionpoll_slide_template():
             # Generate seating plan with empty seats
             seating_plan = {}
             seats = Seat.objects.all()
+            keypads = Keypad.objects.all()
             max_x_axis = seats.aggregate(Max('seating_plan_x_axis'))['seating_plan_x_axis__max']
             max_y_axis = seats.aggregate(Max('seating_plan_y_axis'))['seating_plan_y_axis__max']
             seating_plan['columns_number'] = max_x_axis
             seating_plan['width'] = '%dem' % (max_x_axis * 4)
             seating_plan['rows'] = [[None for j in range(max_x_axis)] for i in range(max_y_axis)]
             for seat in seats:
-                seating_plan['rows'][seat.seating_plan_y_axis-1][seat.seating_plan_x_axis-1] = {'css': 'seat', 'number': seat.number}
+                seat_is_active = False
+                for keypad in keypads:
+                    if seat == keypad.seat and keypad.active:
+                        seat_is_active = True
+                # show seat.number only for active keypads/seats
+                if seat_is_active:
+                    seating_plan['rows'][seat.seating_plan_y_axis-1][seat.seating_plan_x_axis-1] = {'css': 'seat', 'number': seat.number}
+                else:
+                    seating_plan['rows'][seat.seating_plan_y_axis-1][seat.seating_plan_x_axis-1] = {'css': 'seat', 'number': ''}
 
-            # Add votes to the seating plan and cummarize vote result
+            # Add votes to the seating plan and summarize vote result
             all_keypad_votes = {'Y': 0,  'N': 0, 'A': 0}
             votes_with_seat = 0
             votes_without_seat = 0

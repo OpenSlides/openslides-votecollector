@@ -60,9 +60,11 @@
         background-color: #ffffff;
     }
     #seating-plan table td {
-        padding: 6px 0 6px 0;
-        font-size: 0.9em;
-        min-width: 27px;
+        padding: 0;
+        font-size: 0.75em;
+        min-width: 1em;
+        width: 2em;
+        height: 2em;
         border: none;
     }
     #seating-plan table td.seat {
@@ -101,6 +103,7 @@
 {% if all_keypad_votes %}  {# electronic voting with keypads #}
     {% if 'votecollector_live_voting'|get_config or poll.has_votes %}
         {% if 'votecollector_seating_plan'|get_config %}
+            {% if 'votecollector_in_vote'|get_config == 0 %}  {# show resultbox only if voting is finished #}
             <table class="well resultbox pull-left">
             <tr>
                 <td><img src="{% static 'img/button-yes.png' %}"></td>
@@ -135,6 +138,7 @@
                 <td class="percentage">{{ all_keypad_votes_percentage.votes_cast|default:'0' }} %</td>
             </tr>
             </table>
+            {% endif %}
             <div id="seating-plan">
                 <table>
                     {% for row in seating_plan.rows %}
@@ -148,6 +152,12 @@
                 {% if votes_without_seat %}
                     <small>{{ votes_without_seat }} {% trans 'Votes without seat' %}</small>
                 {% endif %}
+                <br>
+                <small>
+                    {% trans "Votes cast" %}:
+                    {{ all_keypad_votes.votes_cast|default:'0' }} {% trans 'of' %}
+                    {{ 'votecollector_active_keypads'|get_config }}
+                </small>
             </div>
         {% else %}
             <table class="well resultbox">
@@ -187,6 +197,12 @@
                 <td class="percentage">{{ all_keypad_votes_percentage.votes_cast|default:'0' }} %</td>
             </tr>
             </table>
+            <br>
+            <small>
+                {% trans "Votes cast" %}:
+                {{ all_keypad_votes.votes_cast|default:'0' }} {% trans 'of' %}
+                {{ 'votecollector_active_keypads'|get_config }}
+            </small>
         {% endif %}
     {% endif %}
 {% elif poll.has_votes %}  {# manual voting without keypads #}
