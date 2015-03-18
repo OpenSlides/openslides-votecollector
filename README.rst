@@ -113,7 +113,7 @@ MIT License, see LICENSE file. The authors are mentioned in the AUTHORS file.
 Changelog
 =========
 
-Version 1.2.1 (unreleased)
+Version 1.2.1 (2015-03-18)
 --------------------------
 Improved seating plan voting modus:
 * Show seat number in seating plan only if keypad/seat is active.
