@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VoteCollector Plugin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-27 16:12+0100\n"
+"POT-Creation-Date: 2015-03-18 09:11+0100\n"
 "PO-Revision-Date: 2014-10-31\n"
 "Last-Translator: Emanuel Schütze\n"
 "Language: German\n"
@@ -68,22 +68,22 @@ msgstr "... bis Keypad-ID"
 
 #: models.py:13 pdf.py:30 signals.py:134
 #: templates/openslides_votecollector/motionpoll_detail.html:63
-#: templates/openslides_votecollector/motionpoll_slide.html:155
-#: templates/openslides_votecollector/motionpoll_slide.html:196
+#: templates/openslides_votecollector/motionpoll_slide.html:165
+#: templates/openslides_votecollector/motionpoll_slide.html:212
 msgid "Yes"
 msgstr "Ja"
 
 #: models.py:14 pdf.py:33 signals.py:135
 #: templates/openslides_votecollector/motionpoll_detail.html:67
-#: templates/openslides_votecollector/motionpoll_slide.html:165
-#: templates/openslides_votecollector/motionpoll_slide.html:200
+#: templates/openslides_votecollector/motionpoll_slide.html:175
+#: templates/openslides_votecollector/motionpoll_slide.html:216
 msgid "No"
 msgstr "Nein"
 
 #: models.py:15 pdf.py:36 signals.py:136
 #: templates/openslides_votecollector/motionpoll_detail.html:71
-#: templates/openslides_votecollector/motionpoll_slide.html:174
-#: templates/openslides_votecollector/motionpoll_slide.html:204
+#: templates/openslides_votecollector/motionpoll_slide.html:184
+#: templates/openslides_votecollector/motionpoll_slide.html:220
 msgid "Abstention"
 msgstr "Enthaltung"
 
@@ -135,13 +135,13 @@ msgstr "Darf den VoteCollector verwalten"
 
 #: pdf.py:24 views.py:392
 #: templates/openslides_votecollector/motionpoll_detail.html:35
-#: templates/openslides_votecollector/motionpoll_slide.html:95
+#: templates/openslides_votecollector/motionpoll_slide.html:97
 msgid "Motion"
 msgstr "Antrag"
 
 #: pdf.py:39 templates/openslides_votecollector/motionpoll_detail.html:76
-#: templates/openslides_votecollector/motionpoll_slide.html:184
-#: templates/openslides_votecollector/motionpoll_slide.html:209
+#: templates/openslides_votecollector/motionpoll_slide.html:194
+#: templates/openslides_votecollector/motionpoll_slide.html:225
 msgid "Valid votes"
 msgstr "Gültige Stimmen"
 
@@ -228,8 +228,8 @@ msgid ""
 "Incoming votes will be shown in grey on seating plan. You can see only WHICH "
 "seat has voted but not HOW."
 msgstr ""
-"Eingehende Stimmen werden im Sitzplan grau angzeigt. Man erkennt "
-"WELCHER Sitz abgestimmt hat, aber nicht WIE."
+"Eingehende Stimmen werden im Sitzplan grau angzeigt. Man erkennt WELCHER "
+"Sitz abgestimmt hat, aber nicht WIE."
 
 #: views.py:145
 #, python-format
@@ -359,25 +359,32 @@ msgstr "Gliederungsebene"
 msgid "Serial number"
 msgstr "Seriennummer"
 
-#: templates/openslides_votecollector/motionpoll_slide.html:96
+#: templates/openslides_votecollector/motionpoll_slide.html:98
 msgid "Version"
 msgstr "Version"
 
-#: templates/openslides_votecollector/motionpoll_slide.html:97
+#: templates/openslides_votecollector/motionpoll_slide.html:99
 msgid "vote"
 msgstr "Abstimmung"
 
-#: templates/openslides_votecollector/motionpoll_slide.html:149
+#: templates/openslides_votecollector/motionpoll_slide.html:153
 msgid "Votes without seat"
 msgstr "Stimmen ohne Sitz"
 
-#: templates/openslides_votecollector/motionpoll_slide.html:215
-msgid "Invalid votes"
-msgstr "Ungültige Stimmen"
-
-#: templates/openslides_votecollector/motionpoll_slide.html:221
+#: templates/openslides_votecollector/motionpoll_slide.html:157
+#: templates/openslides_votecollector/motionpoll_slide.html:202
+#: templates/openslides_votecollector/motionpoll_slide.html:237
 msgid "Votes cast"
 msgstr "Abgegebene Stimmen"
+
+#: templates/openslides_votecollector/motionpoll_slide.html:158
+#: templates/openslides_votecollector/motionpoll_slide.html:203
+msgid "of"
+msgstr "von"
+
+#: templates/openslides_votecollector/motionpoll_slide.html:231
+msgid "Invalid votes"
+msgstr "Ungültige Stimmen"
 
 #: templates/openslides_votecollector/new_multi.html:7
 msgid "New keypad range"

@@ -113,6 +113,16 @@ MIT License, see LICENSE file. The authors are mentioned in the AUTHORS file.
 Changelog
 =========
 
+Version 1.2.1 (unreleased)
+--------------------------
+Improved seating plan voting modus:
+* Show seat number in seating plan only if keypad/seat is active.
+* Seating plan and live mode: Show box with total result only if voting is finished.
+  While voting the seating plan is visible only.
+* Show votes cast (number of voted keypads) and number of active keypads on the poll slide.
+* Improved font size and seat box size.
+
+
 Version 1.2 (2015-03-02)
 ------------------------
 * Added possibility to delete personal poll data to make polls anonymous.
