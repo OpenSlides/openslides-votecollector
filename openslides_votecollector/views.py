@@ -1,215 +1,120 @@
-# -*- coding: utf-8 -*-
+import json
 
-from urllib import urlencode
-from urlparse import parse_qs
-
-# Django imports
-from django.contrib import messages
-from django.db import IntegrityError
-from django.dispatch import receiver
-from django.http import Http404
-from django.template.loader import render_to_string
+from django.core.exceptions import PermissionDenied
+from django.http import HttpResponse
 from django.utils.translation import ugettext as _
-from django.utils.translation import ugettext_lazy
-from django.views.generic.detail import SingleObjectMixin
 
-# OpenSlides imports
-from openslides.config.api import config
-from openslides.motion.models import MotionPoll
-from openslides.motion.views import MotionDetailView as _MotionDetailView, PollMixin, PollUpdateView
-from openslides.projector.api import update_projector, update_projector_overlay
-from openslides.utils.signals import template_manipulation
-from openslides.utils.views import (TemplateView, ListView, DetailView, UpdateView, CreateView,
-                                    FormView, AjaxView, DeleteView, RedirectView, PDFView,
-                                    QuestionView)
+from openslides.agenda.models import Item, Speaker
+from openslides.core.config import config
+from openslides.core.exceptions import OpenSlidesError
+from openslides.motions.models import MotionPoll
+from openslides.utils import views as utils_views
+from openslides.utils.rest_api import ModelViewSet
 
-# VoteCollector imports
-from .api import (start_voting, stop_voting, get_voting_results,
-                  get_voting_status, update_personal_votes, VoteCollectorError, get_VoteCollector_status)
-from .forms import KeypadForm, KeypadMultiForm
-from .models import Keypad
-from .pdf import motion_poll_to_pdf_result
+from .api import (
+    get_device_status,
+    get_voting_result,
+    get_voting_status,
+    start_voting,
+    stop_voting,
+    VoteCollectorError
+)
+from .access_permissions import KeypadAccessPermissions, SeatAccessPermissions
+from .models import Keypad, Seat, MotionPollKeypadConnection
 
 
-class Overview(ListView):
+class AjaxView(utils_views.View):
     """
-    List all keypads.
+    View for ajax requests.
     """
-    required_permission = 'openslides_votecollector.can_manage_votecollector'
-    template_name = 'openslides_votecollector/overview.html'
-    model = Keypad
-    context_object_name = 'keypads'
+    required_permission = None
+
+    def check_permission(self, request, *args, **kwargs):
+        """
+        Checks if the user has the required permission.
+        """
+        if self.required_permission is None:
+            return True
+        else:
+            return request.user.has_perm(self.required_permission)
+
+    def dispatch(self, request, *args, **kwargs):
+        """
+        Check if the user has the permission.
+
+        If the user is not logged in, redirect the user to the login page.
+        """
+        if not self.check_permission(request, *args, **kwargs):
+            raise PermissionDenied
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_ajax_context(self, **kwargs):
+        """
+        Returns a dictonary with the context for the ajax response.
+        """
+        return kwargs
+
+    def ajax_get(self, request, *args, **kwargs):
+        """
+        Returns the HttpResponse.
+        """
+        return HttpResponse(json.dumps(self.get_ajax_context()))
+
+    def get(self, request, *args, **kwargs):
+        # TODO: Raise an error, if the request is not an ajax-request
+        return self.ajax_get(request, *args, **kwargs)
 
     def post(self, *args, **kwargs):
         return self.get(*args, **kwargs)
 
-    def get_context_data(self, **kwargs):
-        context = super(Overview, self).get_context_data(**kwargs)
 
-        # Code for sorting and filtering the keypads
-        try:
-            sortfilter = parse_qs(self.request.COOKIES['votecollector_sortfilter'])
-            for value in sortfilter:
-                sortfilter[value] = sortfilter[value][0]
-        except KeyError:
-            sortfilter = {}
+class SeatViewSet(ModelViewSet):
+    access_permissions = SeatAccessPermissions
+    queryset = Seat.objects.all()
 
-        for value in [u'sort', u'reverse', u'user', u'active']:
-            if value in self.request.REQUEST:
-                if self.request.REQUEST[value] == '0':
-                    try:
-                        del sortfilter[value]
-                    except KeyError:
-                        pass
-                else:
-                    sortfilter[value] = self.request.REQUEST[value]
-
-        if 'user' in sortfilter:
-            if sortfilter['user'] == 'anonymous':
-                context['keypads'] = context['keypads'].filter(user=None)
-            elif sortfilter['user'] == 'personalized':
-                context['keypads'] = context['keypads'].exclude(user=None)
-        if 'active' in sortfilter:
-            if sortfilter['active'] == 'active':
-                context['keypads'] = context['keypads'].exclude(user__is_active=False)
-            elif sortfilter['active'] == 'inactive':
-                context['keypads'] = context['keypads'].exclude(user=None).filter(user__is_active=False)
-
-        if 'sort' in sortfilter:
-            context['keypads'] = context['keypads'].order_by(sortfilter['sort'])
-        else:
-            context['keypads'] = context['keypads'].order_by('keypad_id')
-        if 'reverse' in sortfilter:
-            context['keypads'] = context['keypads'].reverse()
-
-        context['sortfilter'] = sortfilter
-        context['cookie'] = ('votecollector_sortfilter', urlencode(sortfilter, doseq=True))
-
-        return context
+    def check_view_permissions(self):
+        return self.request.user.has_perm('openslides_votecollector.can_manage_votecollector')
 
 
-class KeypadUpdate(UpdateView):
-    """
-    Updates a keypad.
-    """
-    required_permission = 'openslides_votecollector.can_manage_votecollector'
-    template_name = 'openslides_votecollector/edit.html'
-    model = Keypad
-    context_object_name = 'keypad'
-    form_class = KeypadForm
-    success_url_name = 'votecollector_overview'
-    apply_url_name = 'votecollector_keypad_edit'
+class KeypadViewSet(ModelViewSet):
+    access_permissions = KeypadAccessPermissions()
+    queryset = Keypad.objects.all()
 
-    def get_url_name_args(self):
-        if 'apply' not in self.request.POST:
-            value = ''
-        else:
-            value = super(KeypadUpdate, self).get_url_name_args()
-        return value
-
-
-class KeypadCreate(CreateView):
-    """
-    Creates a new keypad.
-    """
-    required_permission = 'openslides_votecollector.can_manage_votecollector'
-    template_name = 'openslides_votecollector/edit.html'
-    model = Keypad
-    context_object_name = 'keypad'
-    form_class = KeypadForm
-    success_url_name = 'votecollector_overview'
-    apply_url_name = 'votecollector_keypad_edit'
-
-    def get_url_name_args(self):
-        if 'apply' not in self.request.POST:
-            value = ''
-        else:
-            value = super(KeypadCreate, self).get_url_name_args()
-        return value
-
-
-class KeypadCreateMulti(FormView):
-    """
-    Creates several keypads.
-    """
-    required_permission = 'openslides_votecollector.can_manage_votecollector'
-    template_name = 'openslides_votecollector/new_multi.html'
-    form_class = KeypadMultiForm
-    success_url_name = 'votecollector_overview'
-
-    def form_valid(self, form):
-        for i in range(form.cleaned_data['from_id'], form.cleaned_data['to_id'] + 1):
-            try:
-                Keypad(keypad_id=i).save()
-            except IntegrityError:
-                messages.info(self.request, _('Keypad %d is already in database.') % i)
-        return super(KeypadCreateMulti, self).form_valid(form)
-
-
-class KeypadDelete(DeleteView):
-    """
-    Deletes a keypad.
-    """
-    required_permission = 'openslides_votecollector.can_manage_votecollector'
-    model = Keypad
-    success_url_name = 'votecollector_overview'
-
-
-class StatusView(TemplateView):
-    """
-    Show votecollector status.
-    """
-    required_permission = 'openslides_votecollector.can_manage_votecollector'
-    template_name = 'openslides_votecollector/status.html'
-
-    def get_context_data(self, **kwargs):
-        context = super(StatusView, self).get_context_data(**kwargs)
-        try:
-            votecollector_message = get_VoteCollector_status()
-        except VoteCollectorError:
-            status = _('No connection to the VoteCollector')
-            votecollector_message = ''
-        else:
-            status = _('Connected')
-        context['votecollector_status'] = status
-        context['votecollector_message'] = votecollector_message
-        return context
+    def check_view_permissions(self):
+        return self.request.user.has_perm('openslides_votecollector.can_manage_votecollector')
 
 
 class VotingView(AjaxView):
     """
     An abstract view for the VoteCollector commands.
     """
-    def get_poll(self):
-        """
-        Return the poll.
-        """
-        try:
-            return MotionPoll.objects.get(pk=self.kwargs['pk'])
-        except MotionPoll.DoesNotExist:
-            return None
+    resource_path = '/votecollector'
 
-    def test_poll(self):
-        """
-        Test if there are any problems with the poll.
-
-        Sets self.poll.
-        """
-        self.poll = self.get_poll()
-
-        if self.poll is None:
-            self.error = _('Unknown poll.')
-        elif config['votecollector_in_vote'] != self.poll.id and config['votecollector_in_vote']:
-            try:
-                self.error = _('Another poll is running. <a href="%s">Jump to the active poll.</a>') % \
-                    MotionPoll.objects.get(pk=config['votecollector_in_vote']).get_absolute_url()
-            except MotionPoll.DoesNotExist:
-                config['votecollector_in_vote'] = 0
-                self.error = _('Please reload.')
+    def get_callback_url(self, request):
+        host = request.META['SERVER_NAME']
+        port = request.META.get('SERVER_PORT', 0)
+        if port:
+            return 'http://%s:%d%s' % (host, port, self.resource_path)
         else:
-            self.error = None
-            return True
-        return False
+            return 'http://%s%s' % (host, self.resource_path)
+
+    def get_poll_or_item(self):
+        obj = None
+        self.error = None
+        poll_id = self.kwargs.get('poll_id')
+        if poll_id:
+            try:
+                obj = MotionPoll.objects.get(id=poll_id)
+            except MotionPoll.DoesNotExist:
+                self.error = _('Unknown poll.')
+        else:
+            item_id = self.kwargs.get('item_id')
+            if item_id:
+                try:
+                    obj = Item.objects.get(id=self.kwargs['item_id'])
+                except Item.DoesNotExist:
+                    self.error = _('Unknown item.')
+        return obj
 
     def get_ajax_context(self, **kwargs):
         """
@@ -229,181 +134,263 @@ class VotingView(AjaxView):
         return {}
 
 
-class StartVoting(VotingView):
-    """
-    Start a poll.
-    """
+class DeviceStatus(VotingView):
     def get(self, request, *args, **kwargs):
-        poll = self.get_poll()
-        if poll is None:
-            self.error = _('Unknown poll.')
-        elif config['votecollector_in_vote'] == poll.id:
-            self.error = _('Poll already started.')
-        elif config['votecollector_in_vote']:
-            self.error = _('Another poll is running.')
-        else:
-            self.error = None
-            try:
-                self.result = start_voting(poll.id)
-            except VoteCollectorError, err:
-                self.error = err.value
+        self.error = None
+        try:
+            self.result = get_device_status()
+        except VoteCollectorError as e:
+            self.error = e.value
+        return super(DeviceStatus, self).get(request, *args, **kwargs)
+
+    def no_error_context(self):
+        return {'device': self.result[8:] if self.result.startswith('Device: ') else self.result}
+
+
+class StartVoting(VotingView):
+    def get(self, request, *args, **kwargs):
+        mode = kwargs['mode']
+        resource = kwargs['resource']
+        obj = self.get_poll_or_item()
+        if not self.error:
+            target = obj.id if obj else 0
+            if not config['votecollector_is_polling']:
+                url = self.get_callback_url(request) + resource
+                if target:
+                    url += str(target)
+                try:
+                    self.result = start_voting(mode, url, target)
+                except VoteCollectorError as e:
+                    self.error = e.value
+                else:
+                    self.on_start(obj)
+            elif config['votecollector_mode'] == mode and config['votecollector_target'] == target:
+                # Voting is already running.
+                self.result = config['votecollector_active_keypads']
             else:
-                # Refresh the overlay message.
-                update_projector_overlay('votecollector_message')
-                # Clear poll results (only Yes, No and Abstain are cleared, not VotesValid, VotsInvalid, VotesCast)
-                poll.get_votes().delete()
+                self.error = _('Another voting is active.')
+                # TODO: provide more information or link
         return super(StartVoting, self).get(request, *args, **kwargs)
+
+    def on_start(self, obj):
+        pass
 
     def no_error_context(self):
         return {'count': self.result}
 
 
+class StartYNA(StartVoting):
+    def on_start(self, poll):
+        # Clear poll results.
+        poll.get_votes().delete()
+        # poll.votesvalid = poll.votesinvalid = poll.votescast = None
+        # poll.save()
+
+
+class StartSpeakerList(StartVoting):
+    pass
+
+
+class StartPing(StartVoting):
+    def on_start(self, obj):
+        # Clear in_range and battery_level of all keypads.
+        # Cannot use Keypad.objects.all().update(in_range=False, battery_level=-1)
+        # since no post_save signals will be sent.
+        for keypad in Keypad.objects.all():
+            keypad.in_range = False
+            keypad.battery_level = -1
+            keypad.save()
+
+
 class StopVoting(VotingView):
-    """
-    Stops a poll.
-    """
     def get(self, request, *args, **kwargs):
-        if self.test_poll():
-            self.result = stop_voting()
-            update_personal_votes(poll=self.poll)
-            # Reset overlay message
-            update_projector_overlay('votecollector_message')
+        mode = kwargs['mode']
+        obj = self.get_poll_or_item()
+        if not self.error and config['votecollector_is_polling']:
+            target = obj.id if obj else 0
+            if config['votecollector_mode'] != mode or config['votecollector_target'] != target:
+                self.error = _('Another voting is active.')
+                # TODO: provide more information or link
+            else:
+                try:
+                    self.result = stop_voting()
+                except VoteCollectorError as e:
+                    self.error = e.value
         return super(StopVoting, self).get(request, *args, **kwargs)
 
 
-class GetVotingStatus(VotingView):
-    """
-    Returns the status of a vote.
-    """
+class StatusYNA(VotingView):
     def get(self, request, *args, **kwargs):
-        if self.test_poll() and config['votecollector_in_vote']:
-            try:
-                self.result = get_voting_status()
-            except VoteCollectorError, err:
-                self.error = str(err.value)
-            try:
-                update_personal_votes(poll=self.poll)
-            except VoteCollectorError, err:
-                self.error = str(err.value)
-        else:
-            self.result = [0, 0]
-        return super(GetVotingStatus, self).get(request, *args, **kwargs)
+        obj = self.get_poll_or_item()
+        if not self.error:
+            if not config['votecollector_is_polling']:
+                self.result = [0, 0]
+            elif config['votecollector_mode'] != 'YesNoAbstain' or config['votecollector_target'] != obj.id:
+                self.error = _('Another voting is active.')
+                # TODO: provide more information or link
+            else:
+                try:
+                    self.result = get_voting_status()
+                except VoteCollectorError as e:
+                    self.error = e.value
+        return super(StatusYNA, self).get(request, *args, **kwargs)
 
     def no_error_context(self):
+        import time
         return {
-            'count': self.result[1],
-            'seconds': self.result[0],
+            'elapsed': time.strftime('%M:%S', time.gmtime(self.result[0])),
+            'votes_received': self.result[1],
             'active_keypads': config['votecollector_active_keypads'],
-            'in_vote': config['votecollector_in_vote'] or False,
+            'is_polling': config['votecollector_is_polling']
         }
 
 
-class GetStatus(AjaxView):
-    """
-    Returns the id of the active poll.
-    """
-    def get_ajax_context(self, **kwargs):
-        context = super(GetStatus, self).get_ajax_context(**kwargs)
-        context['in_vote'] = config['votecollector_in_vote'] or False
-        return context
-
-
-class GetVotingResults(VotingView):
-    """
-    Returns the results of the last vote.
-    """
+class StatusSpeakerList(VotingView):
     def get(self, request, *args, **kwargs):
-        self.error = None
-        self.result = get_voting_results()
-        return super(GetVotingResults, self).get(request, *args, **kwargs)
+        obj = self.get_poll_or_item()
+        if not self.error:
+            if config['votecollector_is_polling']:
+                if config['votecollector_mode'] != 'SpeakerList' or config['votecollector_target'] != obj.id:
+                    self.error = _('Another voting is active.')
+        return super(StatusSpeakerList,self).get(request, *args, **kwargs)
+
+    def no_error_context(self):
+        return {
+            'is_polling': config['votecollector_is_polling']
+        }
+
+
+class ResultYNA(VotingView):
+    def get(self, request, *args, **kwargs):
+        poll = self.get_poll_or_item()
+        if not self.error:
+            if config['votecollector_mode'] != 'YesNoAbstain' or config['votecollector_target'] != poll.id:
+                self.error = _('Another voting is active.')
+                # TODO: provide more information or link
+            else:
+                try:
+                    self.result = get_voting_result()
+                except VoteCollectorError as e:
+                    self.error = e.value
+        return super(ResultYNA, self).get(request, *args, **kwargs)
 
     def no_error_context(self):
         return {
             'yes': self.result[0],
             'no': self.result[1],
             'abstain': self.result[2],
+            'not_voted': self.result[3],
             'voted': config['votecollector_active_keypads'] - self.result[3],
         }
 
 
-class MakeAnonymousView(PollMixin, QuestionView):
-    """
-    View to make polls anonymous.
-    """
-    question_message = ugettext_lazy('Do you really want to make the poll anonymous?')
-    final_message = ugettext_lazy('Poll successfully made anonymous.')
-    question_url_name = 'motion_detail'
-    url_name = 'motion_detail'
-
-    def on_clicked_yes(self):
-        self.get_object().keypad_data_list.update(keypad=None)
-        update_projector()
+class VotingCallbackView(utils_views.View):
+    http_method_names = ['post']
 
 
-class MotionDetailView(_MotionDetailView):
-    """
-    Overrides openslides.motion.views.MotionDetailView
-    """
-    template_name = 'openslides_votecollector/motion_detail.html'
+class VoteCallback(VotingCallbackView):
+    def post(self, request, poll_id, keypad_id):
+        # TODO: validate REMOTE_HOST to be VoteCollector or use other authentication method
+
+        # Validate vote value.
+        value = request.POST.get('value')
+        if value not in ('Y', 'N', 'A'):
+            return HttpResponse()
+
+        # Get motion poll.
+        try:
+            poll = MotionPoll.objects.get(id=poll_id)
+        except MotionPoll.DoesNotExist:
+            return HttpResponse()
+
+        # Get keypad.
+        try:
+            keypad = Keypad.objects.get(keypad_id=keypad_id)
+        except Keypad.DoesNotExist:
+            return HttpResponse()
+
+        # Mark keypad as in range and update battery level.
+        keypad.in_range = True
+        keypad.battery_level = request.POST.get('battery', -1)
+        keypad.save()
+
+        # Save vote.
+        conn, created = MotionPollKeypadConnection.objects.get_or_create(poll=poll, keypad=keypad)
+        conn.value = value
+        conn.serial_number = request.POST.get('sn')
+        conn.save()
+
+        # TODO: Save votes and elapsed in poll and signal client to eliminate StatusYNA polling
+        poll.votescast = request.POST.get('votes', 0)
+        poll.save()
+
+        return HttpResponse()
 
 
-class MotionPollDetailView(PollMixin, DetailView):
-    """
-    View for details of a motion poll. Useful for personal votings.
-    """
-    model = MotionPoll
-    required_permission = 'motion.can_see_motion'
-    template_name = 'openslides_votecollector/motionpoll_detail.html'
+class SpeakerCallback(VotingCallbackView):
 
-    def get_context_data(self, **kwargs):
-        """
-        Returns the template context. Appends the motion object to the context.
-        The view is disabled if the poll has no votes.
-        """
-        context = super(MotionPollDetailView, self).get_context_data(**kwargs)
-        keypad_data_list = self.get_object().keypad_data_list.select_related('keypad__user')
-        if (not self.get_object().has_votes() or (
-                not keypad_data_list.exclude(keypad__user__exact=None).exists()
-                and not keypad_data_list.exclude(serial_number__exact=None).exists())):
-            raise Http404
-        context.update({
-            'motion': self.object.motion,
-            'poll': self.object,
-            'keypad_data_list': keypad_data_list})
-        return context
+    def post(self, request, item_id, keypad_id):
+        # TODO: validate REMOTE_HOST to be VoteCollector or use other authentication method
+
+        # Get agenda item.
+        try:
+            item = Item.objects.get(id=item_id)
+        except MotionPoll.DoesNotExist:
+            return HttpResponse()
+
+        # TODO: use timestamp to prioritize speakers
+
+        # Get keypad.
+        try:
+            keypad = Keypad.objects.get(keypad_id=keypad_id)
+        except Keypad.DoesNotExist:
+            return HttpResponse(_('Not registered'))
+
+        # Mark keypad as in range and update battery level.
+        keypad.in_range = True
+        keypad.battery_level = request.POST.get('battery', -1)
+        keypad.save()
+
+        # Anonymous users cannot be added or removed from the speaker list.
+        if keypad.user is None:
+            return HttpResponse(_('Unknown'))
+
+        # Add keypad user to the speaker list.
+        value = request.POST.get('value')
+        if value == 'Y':
+            try:
+                Speaker.objects.add(keypad.user, item)
+            except OpenSlidesError:
+                # User is already on the speaker list.
+                pass
+            content = _('Speaking')
+        # Remove keypad user from the speaker list.
+        elif value == 'N':
+            try:
+                speaker = Speaker.objects.get(user=keypad.user, item=item)
+            except Speaker.DoesNotExist:
+                pass
+            else:
+                speaker.delete()
+            content = _('Not speaking')
+        else:
+            content = _('Invalid')
+        return HttpResponse(content)
 
 
-class MotionPollDetailPDFView(PollMixin, PDFView):
-    """
-    View to create a PDF with all results of a personal voting.
-    """
-    model = MotionPoll
-    required_permission = 'motion.can_see_motion'
-    document_title = ugettext_lazy('Vote result')
+class KeypadCallback(VotingCallbackView):
 
-    def get(self, *args, **kwargs):
-        self.object = self.get_object()
-        return super(MotionPollDetailPDFView, self).get(*args, **kwargs)
+    def post(self, request, keypad_id):
+        # TODO: validate REMOTE_HOST to be VoteCollector or use other authentication method
 
-    def get_filename(self):
-        """
-        Return the filename for the PDF.
-        """
-        return u'%s%s_%s_%s' % (_('Motion'), str(self.object.poll_number), _('Poll'), _('Result'))
+        # Get keypad.
+        try:
+            keypad = Keypad.objects.get(keypad_id=keypad_id)
+        except Keypad.DoesNotExist:
+            return HttpResponse()
 
-    def append_to_pdf(self, pdf):
-        """
-        Append PDF objects.
-        """
-        motion_poll_to_pdf_result(pdf, self.object)
-
-
-@receiver(template_manipulation, sender=PollUpdateView, dispatch_uid="votecollector_motion_poll")
-def motion_poll_template(sender, **kwargs):
-    """
-    Alter the motion_poll template to insert the 'StartPolling' button.
-    """
-    kwargs['context'].update({
-        'post_form': render_to_string('openslides_votecollector/motion_poll.html'),
-    })
-    kwargs['context']['extra_javascript'].append('js/votecollector.js')
+        # Mark keypad as in range and update battery level.
+        keypad.in_range = True
+        keypad.battery_level = request.POST.get('battery', -1)
+        keypad.save()
+        return HttpResponse()

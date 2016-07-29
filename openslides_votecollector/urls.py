@@ -1,69 +1,74 @@
-# -*- coding: utf-8 -*-
+from django.conf.urls import url
+from django.views.decorators.csrf import csrf_exempt
 
-from django.conf.urls import patterns, url
+from . import views
+from openslides_csv_export import views as _v
 
-from .views import (Overview, KeypadCreate, KeypadUpdate, StatusView,
-                    StartVoting, StopVoting, GetVotingResults, GetVotingStatus,
-                    GetStatus, KeypadDelete, KeypadCreateMulti, MakeAnonymousView,
-                    MotionDetailView, MotionPollDetailView, MotionPollDetailPDFView)
+urlpatterns = [
+    url(r'^votecollector/device/$',
+        views.DeviceStatus.as_view(),
+        name='votecollector_device'),
 
-urlpatterns = patterns(
-    '',
-    url(r'^votecollector/$',
-        Overview.as_view(),
-        name="votecollector_overview"),
+    url(r'^votecollector/start_yna/(?P<poll_id>\d+)/$',
+        views.StartYNA.as_view(), {
+            'mode': 'YesNoAbstain',
+            'resource': '/vote/'
+        },
+        name='votecollector_start_yna'),
 
-    url(r'^votecollector/new/$',
-        KeypadCreate.as_view(),
-        name="votecollector_keypad_new"),
+    url(r'^votecollector/stop_yna/(?P<poll_id>\d+)/$',
+        views.StopVoting.as_view(), {
+            'mode': 'YesNoAbstain'
+        },
+        name='votecollector_stop_yna'),
 
-    url(r'^votecollector/new/multi/$',
-        KeypadCreateMulti.as_view(),
-        name="votecollector_keypad_new_multi"),
+    url(r'^votecollector/status_yna/(?P<poll_id>\d+)/$',
+        views.StatusYNA.as_view(),
+        name='votecollector_status_yna'),
 
-    url(r'^votecollector/(?P<pk>\d+)/edit/',
-        KeypadUpdate.as_view(),
-        name="votecollector_keypad_edit"),
+    url(r'^votecollector/result_yna/(?P<poll_id>\d+)/$',
+        views.ResultYNA.as_view(),
+        name='votecollector_result_yna'),
 
-    url(r'^votecollector/(?P<pk>\d+)/del/',
-        KeypadDelete.as_view(),
-        name="votecollector_keypad_delete"),
+    url(r'^votecollector/start_speaker_list/(?P<item_id>\d+)/$',
+        views.StartSpeakerList.as_view(), {
+            'mode': 'SpeakerList',
+            'resource': '/speaker/'
+        },
+        name='votecollector_start_speaker_list'),
 
-    url(r'^votecollector/status/$',
-        StatusView.as_view(),
-        name="votecollector_status"),
+    url(r'^votecollector/stop_speaker_list/(?P<item_id>\d+)/$',
+        views.StopVoting.as_view(), {
+            'mode': 'SpeakerList'
+        },
+        name='votecollector_stop_speaker_list'),
 
-    url(r'^votecollector/start/(?P<pk>\d+)/$',
-        StartVoting.as_view(),
-        name="votecollector_voting_start"),
+    url(r'^votecollector/status_speaker_list/(?P<item_id>\d+)/$',
+        views.StatusSpeakerList.as_view(),
+        name='votecollector_status_speaker_list'),
 
-    url(r'^votecollector/stop/(?P<pk>\d+)/$',
-        StopVoting.as_view(),
-        name="votecollector_voting_stop"),
+    url(r'^votecollector/start_ping/$',
+        views.StartPing.as_view(), {
+            'mode': 'Ping',
+            'resource': '/keypad/'
+        },
+        name='votecollector_start_ping'),
 
-    url(r'^votecollector/votingstatus/$',
-        GetStatus.as_view(),
-        name="votecollector_voting_status"),  # TODO
+    url(r'^votecollector/stop_ping/$',
+        views.StopVoting.as_view(), {
+            'mode': 'Ping'
+        },
+        name='votecollector_stop_ping'),
 
-    url(r'^votecollector/votingstatus/(?P<pk>\d+)/$',
-        GetVotingStatus.as_view(),
-        name="votecollector_voting_status"),  # TODO
+    url(r'^votecollector/vote/(?P<poll_id>\d+)/(?P<keypad_id>\d+)/$',
+        csrf_exempt(views.VoteCallback.as_view()),
+        name='votecollector_vote'),
 
-    url(r'^votecollector/votingresults/$',
-        GetVotingResults.as_view(),
-        name="votecollector_voting_results"),
+    url(r'^votecollector/speaker/(?P<item_id>\d+)/(?P<keypad_id>\d+)/$',
+        csrf_exempt(views.SpeakerCallback.as_view()),
+        name='votecollector_speaker'),
 
-    # Motion
-    url(r'^motion/(?P<pk>\d+)/$',
-        MotionDetailView.as_view(),
-        name='motion_detail'),
-    url(r'^motion/(?P<pk>\d+)/poll/(?P<poll_number>\d+)/$',
-        MotionPollDetailView.as_view(),
-        name='motionpoll_detail'),
-    url(r'^motion/(?P<pk>\d+)/poll/(?P<poll_number>\d+)/resultpdf/$',
-        MotionPollDetailPDFView.as_view(),
-        name='motionpoll_detail_pdf'),
-    url(r'^motion/(?P<pk>\d+)/poll/(?P<poll_number>\d+)/make-anonymous/$',
-        MakeAnonymousView.as_view(),
-        name="votecollector_make_anonymous"),
-)
+    url(r'^votecollector/keypad/(?P<keypad_id>\d+)/$',
+        csrf_exempt(views.KeypadCallback.as_view()),
+        name='votecollector_speaker'),
+]
