@@ -75,6 +75,23 @@ angular.module('OpenSlidesApp.openslides_votecollector', ['OpenSlidesApp.users']
     }
 ])
 
+.factory('MotionPollKeypadConnection', [
+    'DS',
+    function (DS) {
+        return DS.defineResource({
+            name: 'openslides_votecollector/motionpollkeypadconnection',
+            relations: {
+                belongsTo: {
+                    'openslides_votecollector/keypad': {
+                        localField: 'keypad',
+                        localKey: 'keypad_id'
+                    },
+                }
+            }
+        });
+    }
+])
+
 .factory('Voting', [
     '$http',
     '$timeout',

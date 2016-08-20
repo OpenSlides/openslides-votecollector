@@ -2,7 +2,6 @@ from django.conf.urls import url
 from django.views.decorators.csrf import csrf_exempt
 
 from . import views
-from openslides_csv_export import views as _v
 
 urlpatterns = [
     url(r'^votecollector/device/$',

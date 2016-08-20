@@ -226,3 +226,42 @@
   </table>
 
 </div>
+
+<style>
+    #seating-plan table {
+        border-collapse: separate;
+        border-spacing: 5px;
+        border: none;
+    }
+    #seating-plan table td {
+        background-color: #ffffff;
+    }
+    #seating-plan table td {
+        padding: 0;
+        font-size: 0.75em;
+        min-width: 1em;
+        width: 2em;
+        height: 2em;
+        border: none;
+    }
+    #seating-plan table td.seat {
+        border: 1px solid black;
+        line-height: 120%;
+        text-align: center;
+    }
+</style>
+
+<div class="details" ng-if="config('votecollector_seating_plan')">
+  <div id="seating-plan">
+    <table>
+        <tr ng-repeat="row in seatingPlan.rows">
+          <td ng-repeat="seat in row" ng-class="seat.css">
+            <span ng-bootbox-prompt="{{ 'Change seat number' | translate }}"
+                  ng-bootbox-prompt-action="changeSeat(seat, result)">
+              {{ seat.number }}
+            </span>
+          </td>
+        </tr>
+    </table>
+  </div>
+</div>

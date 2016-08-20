@@ -19,7 +19,7 @@ by Emanuel Schütze.
 Requirements
 ============
 
-- OpenSlides 1.7.x
+- OpenSlides 2.0.x (https://openslides.org/)
 - VoteCollector 1.3.x
 
 
@@ -75,7 +75,7 @@ II. Installation on GNU/Linux and MacOSX
 
 2. Setup and activate a virtual environment::
 
-    $ virtualenv .virtualenv
+    $ python3 -m venv .virtualenv
 
     $ source .virtualenv/bin/activate
 
@@ -112,6 +112,12 @@ MIT License, see LICENSE file. The authors are mentioned in the AUTHORS file.
 
 Changelog
 =========
+
+Version 2.0.0 (unreleased)
+--------------------------
+* Added support for OpenSlides 2.x.
+* Added support for speaker list.
+
 
 Version 1.2.1 (2015-03-18)
 --------------------------

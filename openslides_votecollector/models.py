@@ -1,19 +1,23 @@
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.utils.translation import ugettext as _, ugettext_lazy, ugettext_noop
+from django.utils.translation import ugettext as _
 
 from openslides.core.config import config
 from openslides.motions.models import MotionPoll
 from openslides.users.models import User
 from openslides.utils.models import RESTModelMixin
 
-from .access_permissions import KeypadAccessPermissions
+from .access_permissions import (
+    KeypadAccessPermissions,
+    MotionPollKeypadConnectionAccessPermissions,
+    SeatAccessPermissions,
+)
 
 
 KEYPAD_MAP = ({
-    'Y': (ugettext_noop('Yes'), 'green'),
-    'N': (ugettext_noop('No'), 'red'),
-    'A': (ugettext_noop('Abstention'), 'yellow')})
+    'Y': ('Yes', 'green'),
+    'N': ('No', 'red'),
+    'A': ('Abstention', 'yellow')})
 
 
 class Seat(RESTModelMixin, models.Model):
@@ -23,7 +27,7 @@ class Seat(RESTModelMixin, models.Model):
 
     The seats are ordered according to their order in the database table.
     """
-    access_permissions = KeypadAccessPermissions
+    access_permissions = SeatAccessPermissions()
 
     number = models.CharField(max_length=255)
     seating_plan_x_axis = models.PositiveIntegerField()
@@ -41,8 +45,9 @@ class Seat(RESTModelMixin, models.Model):
         """
         Ensures that a non empty seat number is unique.
 
-        Attention: This method is not uses by save() or bulk_create().
+        Attention: This method is not used by save() or bulk_create().
         """
+        #TODO: Reactivate this method in SeatViewSet
         if self.number != '':
             queryset = self.objects.filter(number=self.number)
             if self.pk is not None:
@@ -55,17 +60,18 @@ class Keypad(RESTModelMixin, models.Model):
     """
     Model for keypads. Leave user field blank for anonymous keypads.
     """
-    access_permissions = KeypadAccessPermissions
+    access_permissions = KeypadAccessPermissions()
 
     user = models.OneToOneField(User, null=True, blank=True)
     keypad_id = models.IntegerField(unique=True)
     seat = models.OneToOneField(Seat, null=True, blank=True)
-    battery_level = models.SmallIntegerField(default=-1)  # -1 = unknown
+    battery_level = models.SmallIntegerField(default=-1)  # -1 = unknown # TODO Remove this redundant db field.
     in_range = models.BooleanField(default=False)
 
     class Meta:
+        default_permissions = ()
         permissions = (
-            ('can_manage_votecollector', ugettext_noop('Can manage VoteCollector')),
+            ('can_manage_votecollector', 'Can manage VoteCollector'),
         )
 
     def __str__(self):
@@ -78,12 +84,15 @@ class MotionPollKeypadConnection(RESTModelMixin, models.Model):
     """
     Model to connect a poll of a motion with a keypad per personal voting.
     """
-    access_permissions = KeypadAccessPermissions
+    access_permissions = MotionPollKeypadConnectionAccessPermissions()
 
     poll = models.ForeignKey(MotionPoll, related_name='keypad_data_list')
     keypad = models.ForeignKey(Keypad, null=True)
     value = models.CharField(max_length=255)
     serial_number = models.CharField(null=True, max_length=255)
+
+    class Meta:
+        default_permissions = ()
 
     def get_value(self):
         """

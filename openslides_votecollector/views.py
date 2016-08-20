@@ -9,7 +9,7 @@ from openslides.core.config import config
 from openslides.core.exceptions import OpenSlidesError
 from openslides.motions.models import MotionPoll
 from openslides.utils import views as utils_views
-from openslides.utils.rest_api import ModelViewSet
+from openslides.utils.rest_api import ModelViewSet, ReadOnlyModelViewSet
 
 from .api import (
     get_device_status,
@@ -19,8 +19,12 @@ from .api import (
     stop_voting,
     VoteCollectorError
 )
-from .access_permissions import KeypadAccessPermissions, SeatAccessPermissions
-from .models import Keypad, Seat, MotionPollKeypadConnection
+from .access_permissions import (
+    KeypadAccessPermissions,
+    MotionPollKeypadConnectionAccessPermissions,
+    SeatAccessPermissions,
+)
+from .models import Keypad, MotionPollKeypadConnection, Seat
 
 
 class AjaxView(utils_views.View):
@@ -69,11 +73,11 @@ class AjaxView(utils_views.View):
 
 
 class SeatViewSet(ModelViewSet):
-    access_permissions = SeatAccessPermissions
+    access_permissions = SeatAccessPermissions()
     queryset = Seat.objects.all()
 
     def check_view_permissions(self):
-        return self.request.user.has_perm('openslides_votecollector.can_manage_votecollector')
+        return self.get_access_permissions().can_retrieve(self.request.user)
 
 
 class KeypadViewSet(ModelViewSet):
@@ -81,7 +85,15 @@ class KeypadViewSet(ModelViewSet):
     queryset = Keypad.objects.all()
 
     def check_view_permissions(self):
-        return self.request.user.has_perm('openslides_votecollector.can_manage_votecollector')
+        return self.get_access_permissions().can_retrieve(self.request.user)
+
+
+class MotionPollKeypadConnectionViewSet(ReadOnlyModelViewSet):
+    access_permissions = MotionPollKeypadConnectionAccessPermissions()
+    queryset = MotionPollKeypadConnection.objects.all()
+
+    def check_view_permissions(self):
+        return self.get_access_permissions().can_retrieve(self.request.user)
 
 
 class VotingView(AjaxView):
@@ -291,6 +303,8 @@ class VotingCallbackView(utils_views.View):
 class VoteCallback(VotingCallbackView):
     def post(self, request, poll_id, keypad_id):
         # TODO: validate REMOTE_HOST to be VoteCollector or use other authentication method
+
+        # TODO: Use transaction here.
 
         # Validate vote value.
         value = request.POST.get('value')

@@ -1,6 +1,6 @@
 from openslides.utils.rest_api import ModelSerializer, RelatedField
 
-from .models import Keypad, Seat
+from .models import Keypad, MotionPollKeypadConnection, Seat
 
 
 class KeypadSerializer(ModelSerializer):
@@ -30,4 +30,19 @@ class SeatSerializer(ModelSerializer):
             'number',
             'seating_plan_x_axis',
             'seating_plan_y_axis',
+        )
+
+
+class MotionPollKeypadConnectionSerializer(ModelSerializer):
+    """
+    Serializer for openslides_votecollector.model.MotionPollKeypadConnection object.
+    """
+    class Meta:
+        model = MotionPollKeypadConnection
+        fields = (
+            'id',
+            'poll',
+            'keypad',
+            'value',
+            'serial_number',
         )

@@ -46,6 +46,33 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
                 }
             }
         })
+        .state('openslides_votecollector.motionpoll', {
+            abstract: true,
+            template: "<ui-view/>",
+        })
+        .state('openslides_votecollector.motionpoll.detail', {
+            url: '/motionpoll/:id',
+            controller: 'MotionPollDetailCtrl',
+            resolve: {
+                motions: function (Motion) {
+                    return Motion.findAll();
+                },
+                motionpollkeypadconnections: ['$q', 'MotionPollKeypadConnection', 'Keypad', function ($q, MotionPollKeypadConnection, Keypad) {
+                    // Load all MotionPollKeypadConnection objects and also respective Keypad and Seat objects.
+                    return MotionPollKeypadConnection.findAll().then(function (motionpollkeypadconnections) {
+                        var promises = motionpollkeypadconnections.map(function (motionpollkeypadconnection) {
+                            return MotionPollKeypadConnection.loadRelations(motionpollkeypadconnection, 'keypad').then(function (motionpollkeypadconnection) {
+                                return Keypad.loadRelations(motionpollkeypadconnection.keypad_id, 'seat');
+                            });
+                        });
+                        return $q.all(promises).then(function () {
+                            return motionpollkeypadconnections;
+                        });
+                    });
+
+                }]
+            }
+        })
     }
 ])
 
@@ -251,6 +278,37 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
                 }
             );
         };
+
+        // Generate seating plan with empty seats
+        $scope.seatingPlan = {};
+        //~ max_x_axis = seats.aggregate(Max('seating_plan_x_axis'))['seating_plan_x_axis__max']
+        //~ max_y_axis = seats.aggregate(Max('seating_plan_y_axis'))['seating_plan_y_axis__max']
+        //TODO calc max x and y axis
+        var maxXAxis = 20, maxYAxis = 8;
+        $scope.seatingPlan.rows = _.map(_.range(maxYAxis), function () {
+            return _.map(_.range(maxXAxis), function () {
+                return {};
+            });
+        });
+        angular.forEach(Seat.getAll(), function (seat) {
+            $scope.seatingPlan.rows[seat.seating_plan_y_axis-1][seat.seating_plan_x_axis-1] = {
+                'css': 'seat',
+                'number': seat.number,
+                'id': seat.id
+            };
+        });
+
+        $scope.changeSeat = function (seat, result) {
+            seat.number = result;
+            // Inject the changed seat object back into DS store.
+            Seat.inject(seat);
+            // Save change seat object on server.
+            Seat.save(seat).then(
+                function (success) {},
+                function (error) {}
+            );
+        }
+
     }
 ])
 
@@ -319,6 +377,8 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
     }
 ])
 
+
+// VotingCtrl at template hook motionPollFormButtons
 .run([
     'templateHooks',
     function (templateHooks) {
@@ -349,6 +409,72 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
     }
 ])
 
+
+// Button at template hook motionPollFormButtons
+.run([
+    'templateHooks',
+    function (templateHooks) {
+        templateHooks.registerHook({
+            Id: 'motionPollFormButtons',
+            template: '<div class="spacer"><p>' +
+                      '<a ui-sref="openslides_votecollector.motionpoll.detail({id: 1})" ' +
+                      'ng-click="closeThisDialog()">' +
+                      '<button class="btn btn-default" translate>Details</button>' +
+                      '</a></p></div>'
+        })
+    }
+])
+
+.controller('MotionPollDetailCtrl', [
+    '$scope',
+    '$stateParams',
+    'User',
+    'Keypad',
+    'Seat',
+    'motions',
+    'motionpollkeypadconnections',
+    function ($scope, $stateParams, User, Keypad, Seat, motions, motionpollkeypadconnections) {
+        // Find motion and poll from URL parameter (via $stateparams).
+        var i = -1;
+        while (++i < motions.length && !$scope.poll) {
+            $scope.poll = _.find(
+                motions[i].polls,
+                function (poll) {
+                    return poll.id == $stateParams.id;
+                }
+            );
+            if ($scope.poll) {
+                $scope.motion = motions[i];
+            }
+        }
+
+        // Create table for single votes
+        $scope.votesList = motionpollkeypadconnections.map(
+            function (motionpollkeypadconnection) {
+                if (motionpollkeypadconnection.poll_id == $scope.poll.id) {
+                    var keypad = Keypad.get(motionpollkeypadconnection.keypad_id);
+                    var user = null
+                    if (keypad.user_id) {
+                        user = User.get(keypad.user_id);
+                    }
+                    var seat = null;
+                    if (keypad.seat_id) {
+                        seat = Seat.get(keypad.seat_id);
+                    }
+                    return {
+                        motionpollkeypadconnection: motionpollkeypadconnection,
+                        keypad: keypad,
+                        user: user,
+                        seat: seat
+                    };
+                }
+            }
+        );
+    }
+])
+
+
+//SpeakerListCtrl at template hook itemDetailListOfSpeakersButtons
 .run([
     'templateHooks',
     function (templateHooks) {

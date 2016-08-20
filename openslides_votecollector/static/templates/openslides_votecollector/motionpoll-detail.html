@@ -1,0 +1,30 @@
+<div class="header">
+  <div class="title">
+    <div class="submenu">
+      <!-- Back to motion -->
+      <a ui-sref="motions.motion.detail({id: motion.id})" class="btn btn-sm btn-default">
+        <i class="fa fa-angle-double-left fa-lg"></i>
+        <translate>Back to motion</translate>
+      </a>
+      <!-- Project poll slide -->
+      <a os-perms="core.can_manage_projector" class="btn btn-default btn-sm"
+          ng-class="{ 'btn-primary': poll.isProjected() }"
+          ng-click="poll.project()"
+          title="{{ 'Project vote' | translate }}">
+        <i class="fa fa-video-camera"></i>
+      </a>
+    </div>
+    <h1 translate>Voting result</h1>
+    <h2><translate>Motion</translate> {{ motion.identifier }} | <translate translate-comment='ballot of a motion'>Vote</translate></h2>
+  </div>
+</div>
+
+<div class="details">
+    Yes: {{ poll.yes }} | No: {{ poll.no }} | Abstain: {{ poll.abstain }} | Votes valid: {{ poll.votesvalid }} | Votes invalid: {{ poll.votesinvalid }} | Votes cast: {{ poll.votescast }}
+</div>
+
+<div class="details">
+    <p ng-repeat="item in votesList">
+        {{ item.user.get_short_name() }} | {{ item.user.structure_level }} | {{ item.motionpollkeypadconnection.serial_number }} | {{ item.seat.number }} | {{ item.motionpollkeypadconnection.value }}
+    </p>
+</div>
