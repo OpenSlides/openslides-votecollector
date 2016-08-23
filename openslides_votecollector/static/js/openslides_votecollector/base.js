@@ -10,7 +10,8 @@ angular.module('OpenSlidesApp.openslides_votecollector', ['OpenSlidesApp.users']
     function (DS, jsDataModel) {
         var name = 'openslides_votecollector/keypad',
             powerLevel = ['', 'full', 'medium', 'low', 'empty'],
-            powerClass = ['none', 'success', 'success', 'warning', 'danger'];
+            powerCSSIcon = ['', 'full', 'half', 'quarter', 'empty'],
+            powerCSSColor = ['', '', '', 'danger', 'danger'];
 
         return DS.defineResource({
             name: name,
@@ -46,8 +47,11 @@ angular.module('OpenSlidesApp.openslides_votecollector', ['OpenSlidesApp.users']
                 power: function () {
                     return powerLevel[this.battery_level + 1];
                 },
-                powerClass: function () {
-                    return powerClass[this.battery_level + 1]
+                powerCSSIcon: function () {
+                    return powerCSSIcon[this.battery_level + 1]
+                },
+                powerCSSColor: function () {
+                    return powerCSSColor[this.battery_level + 1]
                 }
             },
             relations: {

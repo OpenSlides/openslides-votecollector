@@ -111,10 +111,6 @@
               ng-class="reverse ? 'fa-sort-desc' : 'fa-sort-asc'">
           </i>
 
-        <!-- status column -->
-        <th>
-          <translate>Status</translate>
-
         <!-- seat column -->
         <th class="optional">
           <translate>Seat</translate>
@@ -126,6 +122,9 @@
         <!-- battery column -->
         <th class="optional">
           <translate>Battery</translate>
+          <i class="fa fa-info-circle"
+            uib-tooltip="{{ 'Battery state is checked while each voting. Available states: full, medium, low, empty' | translate }}"></i>
+
     <tbody>
       <tr ng-repeat="keypad in keypadsFiltered = (keypads | osFilter:filter.search:getFilterString |
         filter:{active: activeFilter} | filter:{identified: userFilter} | orderBy:sortColumn:reverse)"
@@ -137,16 +136,12 @@
           <input type="checkbox" ng-model="keypad.selected">
 
         <!-- keypad id -->
-        <td ng-if="!keypad.quickEdit" ng-mouseover="keypad.hover=true" ng-mouseleave="keypad.hover=false">
+        <td ng-mouseover="keypad.hover=true" ng-mouseleave="keypad.hover=false">
             <strong>{{ keypad.keypad_id }}</strong>
+            &nbsp; <span ng-if="!keypad.isActive()" class="label label-warning"><translate>inactive</translate></span>
             <div class="hoverActions" ng-class="{'hiddenDiv': !keypad.hover}">
               <span>
-                <a href="" ng-click="openDialog(keypad)" translate>Edit</a>
-              </span>
-              <span>
-                | <a href="" ng-click="keypad.quickEdit=true" translate>QuickEdit</a> |
-              </span>
-              <span>
+                <a href="" ng-click="openDialog(keypad)" translate>Edit</a> |
                 <a href="" class="text-danger"
                   ng-bootbox-confirm="{{ 'Are you sure you want to delete this entry?' | translate }}<br>
                   <b>{{ keypad.getTitle() }}</b>"
@@ -155,76 +150,29 @@
             </div>
 
         <!-- user -->
-        <td ng-if="!keypad.quickEdit && keypad.user" class="optional">{{ keypad.user.get_short_name() }}
-        <td ng-if="!keypad.quickEdit && !keypad.user" class="optional"><translate>(Anonymous)</translate>
-
-        <!-- state -->
-        <td>
-          <span ng-if="!keypad.quickEdit && keypad.isActive()" class="label label-success"><translate>active</translate></span>
-          <span ng-if="!keypad.quickEdit && !keypad.isActive()" class="label label-warning"><translate>inactive</translate></span>
+        <td class="optional">
+          <span ng-if="keypad.user">
+            <i ng-show="!keypad.user.is_active" class="fa fa-ban"
+              title="{{ 'Is inactive' | translate }}"></i>
+            <a href="" ui-sref="users.user.detail({id: keypad.user.id})">{{ keypad.user.get_full_name() }}</a>
+          </span>
+          <span ng-if="!keypad.user">(<translate>Anonymous</translate>)</span>
 
         <!-- seat -->
-        <td ng-if="!keypad.quickEdit && keypad.seat" class="optional">{{ keypad.seat.number }}
-        <td ng-if="!keypad.quickEdit && !keypad.seat" class="optional">–
+        <td class="optional">
+          <span ng-if="keypad.seat">{{ keypad.seat.number }}</span>
+          <span ng-if="!keypad.seat">–</span>
 
         <!-- in range -->
         <td>
-          <span ng-if="!keypad.quickEdit && keypad.in_range" class="label label-success"><translate>yes</translate></span>
-          <span ng-if="!keypad.quickEdit && !keypad.in_range" class="label label-danger"><translate>no</translate></span>
+          <i ng-if="keypad.in_range" class="fa fa-check-square-o fa-lg" title="{{ 'Yes' | translate }}" aria-hidden="true"></i>
+          <i ng-if="!keypad.in_range" class="fa fa-ban fa-lg text-danger" title="{{ 'No' | translate }}" aria-hidden="true"></i></span>
 
         <!-- battery -->
         <td>
-          <span ng-if="!keypad.quickEdit" class="optional label label-{{ keypad.powerClass() }}">{{ keypad.power() }}</span>
-
-
-        <!-- quickEdit columns -->
-        <!-- TODO: fix this: quickEdit inserts an empty td, not sure why -->
-        <td ng-if="keypad.quickEdit" class="quickmode" colspan="4">
-          <h4>{{ keypad.getTitle() }} <span class="text-muted">&ndash; <translate>QuickEdit</translate></span></h4>
-            <uib-alert ng-show="alert.show" type="{{ alert.type }}" ng-click="alert={}" close="alert={}">
-              {{ alert.msg }}
-            </uib-alert>
-            <div class="row">
-              <div class="col-xs-4">
-                <label for="inputKeypad" translate>Keypad ID</label>
-                <input type="number" ng-model="keypad.keypad_id" class="form-control input-sm"
-                    id="inputKeypad">
-              </div>
-              <div class="col-xs-4">
-                <label for="selectUser" translate>Participant</label>
-                <select chosen
-                    ng-model="keypad.user_id"
-                    ng-options="user.id as user.full_name for user in users"
-                    search-contains="true"
-                    id="selectUser"
-                    class="form-control">
-                  <option value="" translate>(Anonymous)</option>
-                </select>
-              </div>
-              <div class="col-xs-4">
-                <label for="selectSeat" translate>Seat</label>
-                <select chosen
-                    ng-model="keypad.seat_id"
-                    ng-options="seat.id as seat.number for seat in seats"
-                    search-contains="true"
-                    id="selectSeat"
-                    class="form-control">
-                  <option value="">–</option>
-                </select>
-              </div>
-            </div>
-            <div class="spacer">
-              <button ng-click="cancelQuickEdit(keypad)" class="btn btn-default pull-left" translate>
-                Cancel
-              </button> &nbsp;
-              <button ng-click="save(keypad)" class="btn btn-primary" translate>
-                Update
-              </button>
-              <!-- <a href="" ng-click="openDialog(keypad)"
-                  class="pull-right" translate>Edit keypad ...</a> -->
-            </div>
+          <i class="fa fa-lg fa-battery-{{ keypad.powerCSSIcon() }} text-{{ keypad.powerCSSColor() }}"
+            title="{{ keypad.power() | translate }}" aria-hidden="true"></i>
   </table>
-
 </div>
 
 <style>
@@ -240,8 +188,8 @@
         padding: 0;
         font-size: 0.75em;
         min-width: 1em;
-        width: 2em;
-        height: 2em;
+        width: 3em;
+        height: 3em;
         border: none;
     }
     #seating-plan table td.seat {
@@ -252,11 +200,13 @@
 </style>
 
 <div class="details" ng-if="config('votecollector_seating_plan')">
+  <h2 translate>Seating plan</h2>
+  <p translate>Click on a seat to edit its label.</p>
   <div id="seating-plan">
     <table>
         <tr ng-repeat="row in seatingPlan.rows">
           <td ng-repeat="seat in row" ng-class="seat.css">
-            <span ng-bootbox-prompt="{{ 'Change seat number' | translate }}"
+            <span ng-bootbox-prompt="{{ 'Change seat label for' | translate }} '{{seat.number}}':"
                   ng-bootbox-prompt-action="changeSeat(seat, result)">
               {{ seat.number }}
             </span>

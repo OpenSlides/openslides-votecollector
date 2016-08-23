@@ -12,7 +12,7 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
     function (mainMenuProvider, gettext) {
         mainMenuProvider.register({
             'ui_sref': 'openslides_votecollector.keypad.list',
-            'img_class': 'download',
+            'img_class': 'wifi',
             'title': gettext('VoteCollector'),
             'weight': 700,
             'perm': 'openslides_votecollector.can_manage_votecollector',
@@ -57,20 +57,15 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
                 motions: function (Motion) {
                     return Motion.findAll();
                 },
-                motionpollkeypadconnections: ['$q', 'MotionPollKeypadConnection', 'Keypad', function ($q, MotionPollKeypadConnection, Keypad) {
-                    // Load all MotionPollKeypadConnection objects and also respective Keypad and Seat objects.
-                    return MotionPollKeypadConnection.findAll().then(function (motionpollkeypadconnections) {
-                        var promises = motionpollkeypadconnections.map(function (motionpollkeypadconnection) {
-                            return MotionPollKeypadConnection.loadRelations(motionpollkeypadconnection, 'keypad').then(function (motionpollkeypadconnection) {
-                                return Keypad.loadRelations(motionpollkeypadconnection.keypad_id, 'seat');
-                            });
-                        });
-                        return $q.all(promises).then(function () {
-                            return motionpollkeypadconnections;
-                        });
-                    });
-
-                }]
+                motionpollkeypadconnections: function (MotionPollKeypadConnection) {
+                    return MotionPollKeypadConnection.findAll();
+                },
+                keypads: function (Keypad) {
+                    return Keypad.findAll();
+                },
+                users: function (User) {
+                    return User.findAll();
+                },
             }
         })
     }
@@ -172,7 +167,7 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
                 seat = keypad.seat.number;
             }
             if (keypad.user) {
-                user = keypad.user.get_short_name();
+                user = keypad.user.get_full_name();
             }
             return [
                 keypad.keypad_id,
@@ -190,28 +185,6 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
             // TODO: ngDialog.open(KeypadRangeForm.getDialog());
         }
 
-        // cancel QuickEdit mode
-        $scope.cancelQuickEdit = function (keypad) {
-            // revert all changes by restore (refresh) original keypad object from server
-            Keypad.refresh(keypad);
-            keypad.quickEdit = false;
-        };
-
-        // save changed keypad
-        $scope.save = function (keypad) {
-            Keypad.save(keypad).then(
-                function (success) {
-                    keypad.quickEdit = false;
-                    $scope.alert.show = false;
-                },
-                function (error){
-                    var message = '';
-                    for (var e in error.data) {
-                        message += e + ': ' + error.data[e] + ' ';
-                    }
-                    $scope.alert = { type: 'danger', msg: message, show: true };
-                });
-        };
 
         // *** delete mode functions ***
         $scope.isDeleteMode = false;
@@ -415,12 +388,11 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
     'templateHooks',
     function (templateHooks) {
         templateHooks.registerHook({
-            Id: 'motionPollFormButtons',
-            template: '<div class="spacer"><p>' +
-                      '<a ui-sref="openslides_votecollector.motionpoll.detail({id: 1})" ' +
-                      'ng-click="closeThisDialog()">' +
-                      '<button class="btn btn-default" translate>Details</button>' +
-                      '</a></p></div>'
+            Id: 'motionPollSmallButtons',
+            template: '<div class="spacer">' +
+                      '<a ui-sref="openslides_votecollector.motionpoll.detail({id: poll.id})">' +
+                      '<button class="btn btn-xs btn-default" translate>Single votes</button>' +
+                      '</a></div>'
         })
     }
 ])
@@ -428,12 +400,11 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
 .controller('MotionPollDetailCtrl', [
     '$scope',
     '$stateParams',
-    'User',
     'Keypad',
-    'Seat',
+    'User',
     'motions',
     'motionpollkeypadconnections',
-    function ($scope, $stateParams, User, Keypad, Seat, motions, motionpollkeypadconnections) {
+    function ($scope, $stateParams, Keypad, User, motions, motionpollkeypadconnections) {
         // Find motion and poll from URL parameter (via $stateparams).
         var i = -1;
         while (++i < motions.length && !$scope.poll) {
@@ -447,29 +418,22 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
                 $scope.motion = motions[i];
             }
         }
-
         // Create table for single votes
-        $scope.votesList = motionpollkeypadconnections.map(
-            function (motionpollkeypadconnection) {
-                if (motionpollkeypadconnection.poll_id == $scope.poll.id) {
-                    var keypad = Keypad.get(motionpollkeypadconnection.keypad_id);
-                    var user = null
-                    if (keypad.user_id) {
-                        user = User.get(keypad.user_id);
-                    }
-                    var seat = null;
-                    if (keypad.seat_id) {
-                        seat = Seat.get(keypad.seat_id);
-                    }
-                    return {
-                        motionpollkeypadconnection: motionpollkeypadconnection,
-                        keypad: keypad,
-                        user: user,
-                        seat: seat
-                    };
+        $scope.votesList = [];
+        angular.forEach(motionpollkeypadconnections, function(motionpollkeypadconnection) {
+            if (motionpollkeypadconnection.poll_id == $scope.poll.id) {
+                var keypad = Keypad.get(motionpollkeypadconnection.keypad_id);
+                var user = null
+                if (keypad.user_id) {
+                    user = User.get(keypad.user_id);
                 }
+                $scope.votesList.push({
+                    motionpollkeypadconnection: motionpollkeypadconnection,
+                    keypad: keypad,
+                    user: user,
+                });
             }
-        );
+        });
     }
 ])
 
