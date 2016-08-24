@@ -17,7 +17,7 @@
       <!-- Back to motion -->
       <a ui-sref="motions.motion.detail({id: motion.id})" class="btn btn-sm btn-default">
         <i class="fa fa-angle-double-left fa-lg"></i>
-        <translate>Back to motion</translate>
+        <translate>Motion</translate>
       </a>
       <!-- Project poll slide -->
       <a os-perms="core.can_manage_projector" class="btn btn-default btn-sm"
@@ -50,7 +50,7 @@
 
     <!-- abstain -->
     <tr>
-      <td><img src='/static/img/button-abstention.png'> <translate>Abstain</translate>
+      <td><img src='/static/img/button-abstain.png'> <translate>Abstain</translate>
       <td ng-init="voteAbstain = poll.getVote(poll.abstain)" class="bold">
         {{ voteAbstain.value }} {{ voteAbstain.percentStr }}
 
@@ -72,7 +72,9 @@
       <th translate>Vote</th>
     </tr>
     <tr ng-repeat="vote in votesList ">
-      <td><a href="" ui-sref="users.user.detail({id: vote.user.id})">{{ vote.user.get_full_name() }}</a>
+      <td>
+        <a ng-if="vote.user" href="" ui-sref="users.user.detail({id: vote.user.id})">{{ vote.user.get_full_name() }}</a>
+        <span ng-if="!vote.user"><i><translate>Anonymous</translate></i></span>
       <td>{{ vote.motionpollkeypadconnection.serial_number }}
       <!-- TODO: use mapping for 'Y', 'N', 'A' -->
       <td>{{ vote.motionpollkeypadconnection.value }}

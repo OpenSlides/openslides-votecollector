@@ -157,7 +157,7 @@
               title="{{ 'Is inactive' | translate }}"></i>
             <a href="" ui-sref="users.user.detail({id: keypad.user.id})">{{ keypad.user.get_full_name() }}</a>
           </span>
-          <span ng-if="!keypad.user">(<translate>Anonymous</translate>)</span>
+          <span ng-if="!keypad.user"><i><translate>Anonymous</translate></i></span>
 
         <!-- seat -->
         <td class="optional">

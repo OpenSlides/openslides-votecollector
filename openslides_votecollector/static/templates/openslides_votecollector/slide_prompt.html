@@ -1,4 +1,26 @@
 <div ng-controller="SlidePromptCtrl">
-  <!-- FIXME: Adjust template -->
-  <h1 ng-if="visible" class="text-center">{{ message }}</h1>
+
+  <style type="text/css">
+    #votecollector_slide_message {
+        border-radius: 0 0 0.2em 0.2em;
+        font-size: 1.5em;
+        font-weight: bold;
+        text-align: center;
+        position: fixed;
+        padding: 0 0 5px 0;
+        margin: 0;
+        top: 0;
+        right: 50px;
+        left: 50px;
+        min-height: 100px;
+        line-height: 160%;
+        opacity: 0.95;
+        z-index: 100;
+    }
+    #votecollector_slide_message img {
+        width: 50px;
+    }
+  </style>
+
+  <div ng-if="visible" id="votecollector_slide_message" class="well" ng-bind-html="message"></div>
 </div>

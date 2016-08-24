@@ -14,7 +14,7 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
             'ui_sref': 'openslides_votecollector.keypad.list',
             'img_class': 'wifi',  // FIXME: use VC icon
             'title': gettext('VoteCollector'),
-            'weight': 700,	
+            'weight': 700,
             'perm': 'openslides_votecollector.can_manage_votecollector',
         });
     }
@@ -359,10 +359,11 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
     function (templateHooks) {
         templateHooks.registerHook({
             Id: 'motionPollSmallButtons',
-            template: '<div class="spacer">' +
+            template: '<div class="spacer" ng-if="poll.has_votes">' +
                       '<a ui-sref="openslides_votecollector.motionpoll.detail({id: poll.id})">' +
-                      '<button class="btn btn-xs btn-default" translate>Single votes</button>' +
-                      '</a></div>'
+                      '<button class="btn btn-xs btn-default">' +
+                      '<i class="fa fa-table" aria-hidden="true"></i> <translate>Single votes</translate>' +
+                      '</button></a></div>'
         })
     }
 ])
@@ -410,9 +411,9 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
 .controller('VotingCtrl', [
     '$scope',
     '$http',
-    'gettext',
+    'gettextCatalog',
     'VoteCollector',
-    function ($scope, $http, gettext, VoteCollector) {
+    function ($scope, $http,  gettextCatalog, VoteCollector) {
         VoteCollector.find(1);
         VoteCollector.bindOne(1, $scope, 'vc');
 
@@ -469,10 +470,10 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
                                     // Prompt user to save result.
                                     $scope.$parent.$parent.$parent.alert = {
                                         type: 'info',
-                                        msg: gettext(gettext(
-                                            'Voting has ended. ' +
-                                            $scope.vc.votes_received + ' of ' + $scope.vc.voters_count +
-                                            ' votes have been received. Do you want to save the result?')),
+                                        msg: gettextCatalog.getString('The voting was finished.') + ' ' +
+                                             gettextCatalog.getString('Received votes:') + ' ' +
+                                             $scope.vc.votes_received + ' / ' + $scope.vc.voters_count + '. ' +
+                                             gettextCatalog.getString('Save this result now!'),
                                         show: true
                                     };
                                 }
@@ -543,12 +544,16 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
             Id: 'motionPollFormButtons',
             template:
                 '<div ng-controller="VotingCtrl" class="spacer">' +
-                    '<p><button ng-if="vc.canStartVoting($parent.$parent.model)" ' +
+                    '<button ng-if="vc.canStartVoting($parent.$parent.model)" ' +
                         'ng-click="startVoting($parent.$parent.model)"' +
-                        'class="btn btn-default" translate>Start voting</button>' +
+                        'class="btn btn-default">' +
+                        '<i class="fa fa-wifi" aria-hidden="true"></i> '+
+                        '<translate>Start voting</translate></button>' +
                     '<button ng-if="vc.canStopVoting($parent.$parent.model)" ' +
                         'ng-click="stopVoting($parent.$parent.model)"' +
-                        'class="btn btn-primary" translate>Stop voting</button></p>' +
+                        'class="btn btn-primary">' +
+                        '<i class="fa fa-wifi" aria-hidden="true"></i> '+
+                        '<translate>Stop voting<translate></button>' +
                     '<p>{{ vc.getVotingStatus($parent.$parent.model) }}</p>' +
                 '</div>'
         })
@@ -565,10 +570,14 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
                 '<div ng-controller="SpeakerListCtrl" class="spacer">' +
                     '<button ng-if="vc.canStartSpeakerList($parent.$parent.item)" ' +
                         'ng-click="startSpeakerList($parent.$parent.item)"' +
-                        'class="btn btn-sm btn-default" translate>Start speaker list voting</button>' +
+                        'class="btn btn-sm btn-default">' +
+                        '<i class="fa fa-wifi" aria-hidden="true"></i> '+
+                        '<translate>Start speaker list voting</translate></button>' +
                     '<button ng-if="vc.canStopSpeakerList($parent.$parent.item)" ' +
                         'ng-click="stopSpeakerList()"' +
-                        'class="btn btn-sm btn-primary" translate>Stop speaker list voting</button>' +
+                        'class="btn btn-sm btn-primary">' +
+                        '<i class="fa fa-wifi" aria-hidden="true"></i> '+
+                        '<translate>Stop speaker list voting</translate></button>' +
                     '<uib-alert ng-show="alert.show" type="{{ alert.type }}" ng-click="alert={}" close="alert={}">' +
                         '{{ alert.msg }}</uib-alert>' +
                 '</div>'

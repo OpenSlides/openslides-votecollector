@@ -221,7 +221,11 @@ class StartYNA(StartVoting):
         projector = Projector.objects.get(id=1)
         projector.config[self.voting_key] = {
             'name': 'voting/prompt',
-            'message': config['votecollector_vote_started_msg'],
+            'message': config['votecollector_vote_started_msg'] +
+                "<br>" +
+                "<span class='nobr'><img src='/static/img/button-yes.png'> <translate>Yes</translate></span> &nbsp; " +
+                "<span class='nobr'><img src='/static/img/button-no.png'> <translate>No</translate></span> &nbsp; " +
+                "<span class='nobr'><img src='/static/img/button-abstain.png'> <translate>Abstain</translate></span>",
             'visible': True,
             'stable': True
         }
