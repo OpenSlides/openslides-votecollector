@@ -10,7 +10,7 @@
           <i class="fa fa-plus fa-lg"></i>
           <translate>New range</translate>
         </a>
-        <a ng-click="checkKeypads()" ng-disabled="testing" os-perms="motions.can_manage" class="btn btn-default btn-sm">
+        <a ng-click="checkKeypads()" ng-disabled="!vc.canPing()" os-perms="motions.can_manage" class="btn btn-default btn-sm">
           <i class="fa fa-check fa-lg"></i>
           <translate>System test</translate>
         </a>
@@ -68,6 +68,7 @@
         <option value="true" translate>Active</option>
         <option value="false" translate>Inactive</option>
       </select>
+      <!-- TODO: Add in range and battery filter -->
     </div>
   </div>
   <!-- delete mode options -->

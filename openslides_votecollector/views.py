@@ -7,6 +7,7 @@ from django.utils.translation import ugettext as _
 from openslides.agenda.models import Item, Speaker
 from openslides.core.config import config
 from openslides.core.exceptions import OpenSlidesError
+from openslides.core.models import Projector
 from openslides.motions.models import MotionPoll
 from openslides.utils import views as utils_views
 from openslides.utils.rest_api import ModelViewSet, ReadOnlyModelViewSet
@@ -23,8 +24,9 @@ from .access_permissions import (
     KeypadAccessPermissions,
     MotionPollKeypadConnectionAccessPermissions,
     SeatAccessPermissions,
+    VoteCollectorAccessPermissions,
 )
-from .models import Keypad, MotionPollKeypadConnection, Seat
+from .models import Keypad, MotionPollKeypadConnection, Seat, VoteCollector
 
 
 class AjaxView(utils_views.View):
@@ -72,6 +74,15 @@ class AjaxView(utils_views.View):
         return self.get(*args, **kwargs)
 
 
+class VotecollectorViewSet(ModelViewSet):
+    access_permissions = VoteCollectorAccessPermissions()
+    http_method_names = ['get', 'head', 'options']
+    queryset = VoteCollector.objects.all()
+
+    def check_view_permissions(self):
+        return self.request.user.has_perm('openslides_votecollector.can_manage_votecollector')
+
+
 class SeatViewSet(ModelViewSet):
     access_permissions = SeatAccessPermissions()
     queryset = Seat.objects.all()
@@ -101,6 +112,7 @@ class VotingView(AjaxView):
     An abstract view for the VoteCollector commands.
     """
     resource_path = '/votecollector'
+    voting_key = 'a016f7ecaf2147b2b656c6edf45c24ef'
 
     def get_callback_url(self, request):
         host = request.META['SERVER_NAME']
@@ -156,7 +168,10 @@ class DeviceStatus(VotingView):
         return super(DeviceStatus, self).get(request, *args, **kwargs)
 
     def no_error_context(self):
-        return {'device': self.result[8:] if self.result.startswith('Device: ') else self.result}
+        return {
+            'device': self.result,
+            'connected': not self.result.startswith('Device: None')
+        }
 
 
 class StartVoting(VotingView):
@@ -164,24 +179,30 @@ class StartVoting(VotingView):
         mode = kwargs['mode']
         resource = kwargs['resource']
         obj = self.get_poll_or_item()
+        vc, created = VoteCollector.objects.get_or_create(id=1)
         if not self.error:
-            target = obj.id if obj else 0
-            if not config['votecollector_is_polling']:
-                url = self.get_callback_url(request) + resource
-                if target:
-                    url += str(target)
+            # Stop any active voting no matter what mode.
+            if vc.is_voting:
                 try:
-                    self.result = start_voting(mode, url, target)
+                    stop_voting()
                 except VoteCollectorError as e:
-                    self.error = e.value
-                else:
-                    self.on_start(obj)
-            elif config['votecollector_mode'] == mode and config['votecollector_target'] == target:
-                # Voting is already running.
-                self.result = config['votecollector_active_keypads']
+                    pass
+            target = obj.id if obj else 0
+            url = self.get_callback_url(request) + resource
+            if target:
+                url += str(target)
+            try:
+                self.result = start_voting(mode, url)
+            except VoteCollectorError as e:
+                self.error = e.value
             else:
-                self.error = _('Another voting is active.')
-                # TODO: provide more information or link
+                vc.voting_mode = mode
+                vc.voting_target = target
+                vc.voters_count = self.result
+                vc.votes_received = 0
+                vc.is_voting = True
+                vc.save()
+                self.on_start(obj)
         return super(StartVoting, self).get(request, *args, **kwargs)
 
     def on_start(self, obj):
@@ -195,19 +216,34 @@ class StartYNA(StartVoting):
     def on_start(self, poll):
         # Clear poll results.
         poll.get_votes().delete()
-        # poll.votesvalid = poll.votesinvalid = poll.votescast = None
-        # poll.save()
+
+        # Show voting prompt on projector.
+        projector = Projector.objects.get(id=1)
+        projector.config[self.voting_key] = {
+            'name': 'voting/prompt',
+            'message': config['votecollector_vote_started_msg'],
+            'visible': True,
+            'stable': True
+        }
+        projector.save()
 
 
 class StartSpeakerList(StartVoting):
-    pass
+    def on_start(self, item):
+        # Show voting icon on projector.
+        projector = Projector.objects.get(id=1)
+        projector.config[self.voting_key] = {
+            'name': 'voting/icon',
+            'stable': True
+        }
+        projector.save()
 
 
 class StartPing(StartVoting):
     def on_start(self, obj):
         # Clear in_range and battery_level of all keypads.
-        # Cannot use Keypad.objects.all().update(in_range=False, battery_level=-1)
-        # since no post_save signals will be sent.
+        # Attention: Cannot use Keypad.objects.all().update(in_range=False, battery_level=-1)
+        # since no post_save signals will be sent on update.
         for keypad in Keypad.objects.all():
             keypad.in_range = False
             keypad.battery_level = -1
@@ -216,59 +252,43 @@ class StartPing(StartVoting):
 
 class StopVoting(VotingView):
     def get(self, request, *args, **kwargs):
-        mode = kwargs['mode']
-        obj = self.get_poll_or_item()
-        if not self.error and config['votecollector_is_polling']:
-            target = obj.id if obj else 0
-            if config['votecollector_mode'] != mode or config['votecollector_target'] != target:
-                self.error = _('Another voting is active.')
-                # TODO: provide more information or link
-            else:
-                try:
-                    self.result = stop_voting()
-                except VoteCollectorError as e:
-                    self.error = e.value
+        self.error = None
+
+        # Remove voting prompt from projector.
+        projector = Projector.objects.get(id=1)
+        try:
+            del projector.config[self.voting_key]
+        except KeyError:
+            pass
+        else:
+            projector.save()
+
+        try:
+            self.result = stop_voting()
+        except VoteCollectorError as e:
+            self.error = e.value
+        # Attention: We purposely set is_voting to False even if stop_voting fails.
+        vc = VoteCollector.objects.get(id=1)
+        vc.is_voting = False
+        vc.save()
         return super(StopVoting, self).get(request, *args, **kwargs)
 
 
-class StatusYNA(VotingView):
+class VotingStatus(VotingView):
     def get(self, request, *args, **kwargs):
         obj = self.get_poll_or_item()
         if not self.error:
-            if not config['votecollector_is_polling']:
-                self.result = [0, 0]
-            elif config['votecollector_mode'] != 'YesNoAbstain' or config['votecollector_target'] != obj.id:
-                self.error = _('Another voting is active.')
-                # TODO: provide more information or link
-            else:
-                try:
-                    self.result = get_voting_status()
-                except VoteCollectorError as e:
-                    self.error = e.value
-        return super(StatusYNA, self).get(request, *args, **kwargs)
+            try:
+                self.result = get_voting_status()
+            except VoteCollectorError as e:
+                self.error = e.value
+        return super(VotingStatus, self).get(request, *args, **kwargs)
 
     def no_error_context(self):
         import time
         return {
             'elapsed': time.strftime('%M:%S', time.gmtime(self.result[0])),
-            'votes_received': self.result[1],
-            'active_keypads': config['votecollector_active_keypads'],
-            'is_polling': config['votecollector_is_polling']
-        }
-
-
-class StatusSpeakerList(VotingView):
-    def get(self, request, *args, **kwargs):
-        obj = self.get_poll_or_item()
-        if not self.error:
-            if config['votecollector_is_polling']:
-                if config['votecollector_mode'] != 'SpeakerList' or config['votecollector_target'] != obj.id:
-                    self.error = _('Another voting is active.')
-        return super(StatusSpeakerList,self).get(request, *args, **kwargs)
-
-    def no_error_context(self):
-        return {
-            'is_polling': config['votecollector_is_polling']
+            'votes_received': self.result[1]
         }
 
 
@@ -276,14 +296,14 @@ class ResultYNA(VotingView):
     def get(self, request, *args, **kwargs):
         poll = self.get_poll_or_item()
         if not self.error:
-            if config['votecollector_mode'] != 'YesNoAbstain' or config['votecollector_target'] != poll.id:
-                self.error = _('Another voting is active.')
-                # TODO: provide more information or link
-            else:
+            vc = VoteCollector.objects.get(id=1)
+            if vc.voting_mode == 'YesNoAbstain' and vc.voting_target == poll.id:
                 try:
                     self.result = get_voting_result()
                 except VoteCollectorError as e:
                     self.error = e.value
+            else:
+                self.error = _('Another voting is active.')
         return super(ResultYNA, self).get(request, *args, **kwargs)
 
     def no_error_context(self):
@@ -291,8 +311,7 @@ class ResultYNA(VotingView):
             'yes': self.result[0],
             'no': self.result[1],
             'abstain': self.result[2],
-            'not_voted': self.result[3],
-            'voted': config['votecollector_active_keypads'] - self.result[3],
+            'not_voted': self.result[3]
         }
 
 
@@ -334,9 +353,11 @@ class VoteCallback(VotingCallbackView):
         conn.serial_number = request.POST.get('sn')
         conn.save()
 
-        # TODO: Save votes and elapsed in poll and signal client to eliminate StatusYNA polling
-        poll.votescast = request.POST.get('votes', 0)
-        poll.save()
+        # Update votecollector.
+        vc = VoteCollector.objects.get(id=1)
+        vc.votes_received = request.POST.get('votes', 0)
+        vc.voting_duration = request.POST.get('elapsed', 0)
+        vc.save()
 
         return HttpResponse()
 
@@ -373,6 +394,7 @@ class SpeakerCallback(VotingCallbackView):
         value = request.POST.get('value')
         if value == 'Y':
             try:
+                # FIXME: Sometimes speaker gets added.
                 Speaker.objects.add(keypad.user, item)
             except OpenSlidesError:
                 # User is already on the speaker list.

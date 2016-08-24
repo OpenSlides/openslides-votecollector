@@ -11,6 +11,7 @@ from .access_permissions import (
     KeypadAccessPermissions,
     MotionPollKeypadConnectionAccessPermissions,
     SeatAccessPermissions,
+    VoteCollectorAccessPermissions,
 )
 
 
@@ -18,6 +19,32 @@ KEYPAD_MAP = ({
     'Y': ('Yes', 'green'),
     'N': ('No', 'red'),
     'A': ('Abstention', 'yellow')})
+
+
+class VoteCollector(RESTModelMixin, models.Model):
+    """
+    VoteCollector model. Provides device and voting status information.
+
+    Currently only one votecollector is supported (pk=1).
+    """
+    access_permissions = VoteCollectorAccessPermissions()
+
+    device_status = models.CharField(max_length=200, default='No device')
+    voting_mode = models.CharField(max_length=50, null=True)
+    voting_target = models.IntegerField(default=0)
+    voting_duration = models.IntegerField(default=0)
+    voters_count = models.IntegerField(default=0)
+    votes_received = models.IntegerField(default=0)
+    is_voting = models.BooleanField(default=False)
+
+    class Meta:
+        default_permissions = ()
+        permissions = (
+            ('can_manage_votecollector', 'Can manage VoteCollector'),
+        )
+
+    def __str__(self):
+        return self.device_status
 
 
 class Seat(RESTModelMixin, models.Model):

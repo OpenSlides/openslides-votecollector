@@ -1,7 +1,6 @@
 from openslides.core.config import ConfigVariable
 
 # TODO: localize config site
-# TODO: update projector on change of settings?
 
 
 def get_config_variables():
@@ -65,33 +64,4 @@ def get_config_variables():
                   'You can see only WHICH seat has voted but not HOW.',
         weight=660,
         group='VoteCollector'
-    )
-    yield ConfigVariable(
-        name='votecollector_is_polling',
-        default_value=False,
-        input_type='boolean',
-        hidden=True
-    )
-    yield ConfigVariable(
-        name='votecollector_mode',
-        default_value=None,
-        hidden=True
-    )
-    yield ConfigVariable(
-        name='votecollector_target',
-        default_value=0,
-        input_type='integer',
-        hidden=True
-    )
-    yield ConfigVariable(
-        name='votecollector_active_keypads',
-        default_value=0,
-        input_type='integer',
-        hidden=True
-    )
-    yield ConfigVariable(
-        name='votecollector_votes_received',
-        default_value=0,
-        input_type='integer',
-        hidden=True
     )

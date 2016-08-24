@@ -38,3 +38,21 @@ class MotionPollSlide(ProjectorElement):
             yield ProjectorRequirement(
                 view_class=KeypadViewSet,
                 view_action='retrieve')
+
+
+class VotingPrompt(ProjectorElement):
+    """
+    Voting prompt on the projector.
+    """
+    name = 'voting/prompt'
+
+    def check_data(self):
+        if self.config_entry.get('message') is None:
+            raise ProjectorException('No message given.')
+
+
+class VotingIcon(ProjectorElement):
+    """
+    Voting icon on the projector.
+    """
+    name = 'voting/icon'

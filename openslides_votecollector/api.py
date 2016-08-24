@@ -52,8 +52,6 @@ def get_server():
     try:
         server.voteCollector.getDeviceStatus()
     except:
-        # TODO: review this. prevent lock out condition.
-        config['votecollector_is_polling'] = False
         raise VoteCollectorError(_('No connection to VoteCollector.'))
     else:
         return server
@@ -79,7 +77,7 @@ def get_device_status():
     return server.voteCollector.getDeviceStatus()
 
 
-def start_voting(mode, callback_url, target):
+def start_voting(mode, callback_url):
     server = get_server()
     keypads = get_keypads()
 
@@ -87,15 +85,9 @@ def start_voting(mode, callback_url, target):
     if count < 0:
         raise VoteCollectorError(nr=count)
 
-    config['votecollector_mode'] = mode
-    config['votecollector_target'] = target
-
     count = server.voteCollector.startVoting()
     if count < 0:
         raise VoteCollectorError(nr=count)
-
-    config['votecollector_active_keypads'] = count
-    config['votecollector_is_polling'] = True
 
     return count
 
@@ -103,7 +95,6 @@ def start_voting(mode, callback_url, target):
 def stop_voting():
     server = get_server()
     server.voteCollector.stopVoting()
-    config['votecollector_is_polling'] = False
     return True
 
 
