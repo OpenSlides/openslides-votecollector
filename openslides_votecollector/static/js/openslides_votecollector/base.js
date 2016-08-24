@@ -147,6 +147,64 @@ angular.module('OpenSlidesApp.openslides_votecollector', ['OpenSlidesApp.users']
     }
 ])
 
+.factory('MotionPollFinder', [
+    function () {
+        return {
+            find: function (motions, pollId) {
+                // Find motion and poll from poll id.
+                var i = -1;
+                var result = {};
+                while (++i < motions.length && !result.poll) {
+                    result.poll = _.find(
+                        motions[i].polls,
+                        function (poll) {
+                            return poll.id == pollId;
+                        }
+                    );
+                    if (result.poll) {
+                        result.motion = motions[i];
+                    }
+                }
+                return result;
+            }
+        }
+    }
+])
+
+.factory('SeatingPlan', [
+    function () {
+        return {
+            generate: function (seats, votes) {
+                // Generate seating plan with votes or empty seats
+                var seatingPlan = {};
+                var maxXAxis = _.reduce(seats, function (max, seat) {
+                    return seat.seating_plan_x_axis > max ? seat.seating_plan_x_axis : max;
+                }, 0);
+                var maxYAxis = _.reduce(seats, function (max, seat) {
+                    return seat.seating_plan_y_axis > max ? seat.seating_plan_y_axis : max;
+                }, 0);
+                seatingPlan.rows = _.map(_.range(maxYAxis), function () {
+                    return _.map(_.range(maxXAxis), function () {
+                        return {};
+                    });
+                });
+                angular.forEach(seats, function (seat) {
+                    var css = 'seat';
+                    if (votes && votes[seat.id]) {
+                        css += ' ' + votes[seat.id];
+                    }
+                    seatingPlan.rows[seat.seating_plan_y_axis-1][seat.seating_plan_x_axis-1] = {
+                        'css': css,
+                        'number': seat.number,
+                        'id': seat.id
+                    };
+                });
+                return seatingPlan;
+            }
+        };
+    }
+])
+
 .run(['VoteCollector', 'Keypad', 'Seat', 'MotionPollKeypadConnection',
     function (VoteCollector, Keypad, Seat, MotionPollKeypadConnection) {}]);
 

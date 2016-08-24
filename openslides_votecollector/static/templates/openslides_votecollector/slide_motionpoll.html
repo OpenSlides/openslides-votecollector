@@ -1,0 +1,64 @@
+<div ng-controller="SlideMotionPollCtrl" class="content scrollcontent">
+
+  <h1>{{ motion.agenda_item.getTitle() || motion.getTitle() }}</h1>
+  <h2><translate>Motion</translate> {{ motion.identifier }} |
+    <translate translate-comment='ballot of a motion'>Voting result</translate>
+  </h2>
+
+  <div>
+    <p>Yes: {{ poll.yes }}</p>
+    <p>No: {{ poll.no }}</p>
+    <p>Abstain: {{ poll.abstain }}</p>
+    <p>Valid votes: {{ poll.votesvalid }}</p>
+  </div>
+
+  <style>
+    #seating-plan table {
+        border-collapse: separate;
+        border-spacing: 5px;
+        border: none;
+    }
+    #seating-plan table td {
+        background-color: #ffffff;
+    }
+    #seating-plan table td {
+        padding: 0;
+        font-size: 0.75em;
+        min-width: 1em;
+        width: 3em;
+        height: 3em;
+        border: none;
+    }
+    #seating-plan table td.seat {
+        border: 1px solid black;
+        line-height: 120%;
+        text-align: center;
+    }
+    #seating-plan table td.seat-red {
+        background-color: #ff201c;
+    }
+    #seating-plan table td.seat-green {
+        background-color: #008f2a;
+    }
+    #seating-plan table td.seat-yellow {
+        background-color: #f1d300;
+    }
+    #seating-plan table td.seat-grey {
+        background-color: #999;
+    }
+  </style>
+
+  <div ng-if="config('votecollector_seating_plan')">
+    <h2 translate>Seating plan</h2>
+    <div id="seating-plan">
+      <table>
+        <tr ng-repeat="row in seatingPlan.rows">
+          <td ng-repeat="seat in row" ng-class="seat.css">
+            {{ seat.number }}
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+</div>

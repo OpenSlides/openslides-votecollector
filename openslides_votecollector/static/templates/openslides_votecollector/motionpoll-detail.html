@@ -19,10 +19,15 @@
         <i class="fa fa-angle-double-left fa-lg"></i>
         <translate>Motion</translate>
       </a>
+      <!-- Back to motion -->
+      <a class="btn btn-sm btn-default" ng-click="anonymizeVotes()">
+        <i class="fa fa-exclamation-triangle fa-lg"></i>
+        <translate>Anonymize Votes</translate>
+      </a>
       <!-- Project poll slide -->
       <a os-perms="core.can_manage_projector" class="btn btn-default btn-sm"
-          ng-class="{ 'btn-primary': poll.isProjected() }"
-          ng-click="poll.project()"
+          ng-class="{ 'btn-primary': false }"
+          ng-click="projectSlide()"
           title="{{ 'Project vote' | translate }}">
         <i class="fa fa-video-camera"></i>
       </a>

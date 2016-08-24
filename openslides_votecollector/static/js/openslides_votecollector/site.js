@@ -143,12 +143,13 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
     '$http',
     '$timeout',
     'ngDialog',
+    'SeatingPlan',
     'KeypadForm',
     'Keypad',
     'User',
     'Seat',
     'VoteCollector',
-    function ($scope, $http, $timeout, ngDialog, KeypadForm, Keypad, User, Seat, VoteCollector) {
+    function ($scope, $http, $timeout, ngDialog, SeatingPlan, KeypadForm, Keypad, User, Seat, VoteCollector) {
         Keypad.bindAll({}, $scope, 'keypads');
         User.bindAll({}, $scope, 'users');
         Seat.bindAll({}, $scope, 'seats');
@@ -256,23 +257,7 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
         };
 
         // Generate seating plan with empty seats
-        $scope.seatingPlan = {};
-        //~ max_x_axis = seats.aggregate(Max('seating_plan_x_axis'))['seating_plan_x_axis__max']
-        //~ max_y_axis = seats.aggregate(Max('seating_plan_y_axis'))['seating_plan_y_axis__max']
-        //TODO calc max x and y axis
-        var maxXAxis = 20, maxYAxis = 8;
-        $scope.seatingPlan.rows = _.map(_.range(maxYAxis), function () {
-            return _.map(_.range(maxXAxis), function () {
-                return {};
-            });
-        });
-        angular.forEach(Seat.getAll(), function (seat) {
-            $scope.seatingPlan.rows[seat.seating_plan_y_axis-1][seat.seating_plan_x_axis-1] = {
-                'css': 'seat',
-                'number': seat.number,
-                'id': seat.id
-            };
-        });
+        $scope.seatingPlan = SeatingPlan.generate(Seat.getAll());
 
         $scope.changeSeat = function (seat, result) {
             seat.number = result;
@@ -371,24 +356,16 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
 .controller('MotionPollDetailCtrl', [
     '$scope',
     '$stateParams',
+    '$http',
     'Keypad',
     'User',
+    'MotionPollFinder',
     'motions',
     'motionpollkeypadconnections',
-    function ($scope, $stateParams, Keypad, User, motions, motionpollkeypadconnections) {
+    function ($scope, $stateParams, $http, Keypad, User, MotionPollFinder, motions, motionpollkeypadconnections) {
         // Find motion and poll from URL parameter (via $stateparams).
-        var i = -1;
-        while (++i < motions.length && !$scope.poll) {
-            $scope.poll = _.find(
-                motions[i].polls,
-                function (poll) {
-                    return poll.id == $stateParams.id;
-                }
-            );
-            if ($scope.poll) {
-                $scope.motion = motions[i];
-            }
-        }
+        _.assign($scope, MotionPollFinder.find(motions, $stateParams.id));
+
         // Create table for single votes
         $scope.votesList = [];
         angular.forEach(motionpollkeypadconnections, function(motionpollkeypadconnection) {
@@ -405,6 +382,23 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
                 });
             }
         });
+
+        // TODO: Show blue button if slide is projected.
+
+        $scope.projectSlide = function () {
+            return $http.post(
+                '/rest/core/projector/1/prune_elements/',
+                [{name: 'votecollector/motionpoll', id: $scope.poll.id}]
+            );
+        };
+
+        $scope.anonymizeVotes = function () {
+            // TODO Add confirm, success and error dialogs, alerts or boxes.
+            return $http.post(
+                '/rest/openslides_votecollector/motionpollkeypadconnection/anonymize_votes/',
+                {poll_id: $scope.poll.id}
+            ).then(function (success) {}, function (error) {});
+        };
     }
 ])
 

@@ -3,7 +3,7 @@ from openslides.motions.models import MotionPoll
 from openslides.motions.views import MotionViewSet
 from openslides.utils.projector import ProjectorElement, ProjectorRequirement
 
-from .views import KeypadViewSet, SeatViewSet
+from .views import KeypadViewSet, SeatViewSet, MotionPollKeypadConnectionViewSet
 
 
 class MotionPollSlide(ProjectorElement):
@@ -33,10 +33,13 @@ class MotionPollSlide(ProjectorElement):
                 view_action='retrieve',
                 pk=str(motionpoll.motion.pk))
             yield ProjectorRequirement(
+                view_class=KeypadViewSet,
+                view_action='retrieve')
+            yield ProjectorRequirement(
                 view_class=SeatViewSet,
                 view_action='retrieve')
             yield ProjectorRequirement(
-                view_class=KeypadViewSet,
+                view_class=MotionPollKeypadConnectionViewSet,
                 view_action='retrieve')
 
 

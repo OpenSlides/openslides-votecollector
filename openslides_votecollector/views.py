@@ -10,7 +10,7 @@ from openslides.core.exceptions import OpenSlidesError
 from openslides.core.models import Projector
 from openslides.motions.models import MotionPoll
 from openslides.utils import views as utils_views
-from openslides.utils.rest_api import ModelViewSet, ReadOnlyModelViewSet
+from openslides.utils.rest_api import ModelViewSet, ReadOnlyModelViewSet, Response, list_route
 
 from .api import (
     get_device_status,
@@ -105,6 +105,15 @@ class MotionPollKeypadConnectionViewSet(ReadOnlyModelViewSet):
 
     def check_view_permissions(self):
         return self.get_access_permissions().can_retrieve(self.request.user)
+
+    @list_route(methods=['post'])
+    def anonymize_votes(self, request):
+        """
+        Anonymize all votes of the given poll.
+        """
+        MotionPollKeypadConnection.objects.filter(poll_id=request.data.get('poll_id')).update(keypad=None)
+        # TODO: Trigger autoupdate.
+        return Response({'detail': _('All votes are successfully anonymized.')})
 
 
 class VotingView(AjaxView):
