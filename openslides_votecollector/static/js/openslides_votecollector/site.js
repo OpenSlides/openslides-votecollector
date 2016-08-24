@@ -353,7 +353,6 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
     }
 ])
 
-
 // Button at template hook motionPollSmallButtons
 .run([
     'templateHooks',
@@ -407,7 +406,6 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
         });
     }
 ])
-
 
 .controller('VotingCtrl', [
     '$scope',
@@ -537,7 +535,6 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
     }
 ])
 
-
 // VotingCtrl at template hook motionPollFormButtons
 .run([
     'templateHooks',
@@ -558,7 +555,7 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
     }
 ])
 
-//SpeakerListCtrl at template hook itemDetailListOfSpeakersButtons
+// SpeakerListCtrl at template hook itemDetailListOfSpeakersButtons
 .run([
     'templateHooks',
     function (templateHooks) {
@@ -579,12 +576,11 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
     }
 ])
 
-
-// mark all votecollector config strings for translation in javascript
+// Mark strings for translation in javascript
 .config([
     'gettext',
     function (gettext) {
-        // TODO: add gettext config strings
+        // TODO: add strings to be translated
     }
 ])
 }());

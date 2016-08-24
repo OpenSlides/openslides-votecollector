@@ -394,7 +394,7 @@ class SpeakerCallback(VotingCallbackView):
         value = request.POST.get('value')
         if value == 'Y':
             try:
-                # FIXME: Sometimes speaker gets added.
+                # Add speaker to "next speakers" if not already on the list (begin_time=None).
                 Speaker.objects.add(keypad.user, item)
             except OpenSlidesError:
                 # User is already on the speaker list.
@@ -402,12 +402,8 @@ class SpeakerCallback(VotingCallbackView):
             content = _('Speaking')
         # Remove keypad user from the speaker list.
         elif value == 'N':
-            try:
-                speaker = Speaker.objects.get(user=keypad.user, item=item)
-            except Speaker.DoesNotExist:
-                pass
-            else:
-                speaker.delete()
+            # Remove speaker if on "next speakers" list (begin_time=None, end_time=None).
+            Speaker.objects.filter(user=keypad.user, item=item, begin_time=None, end_time=None).delete()
             content = _('Not speaking')
         else:
             content = _('Invalid')

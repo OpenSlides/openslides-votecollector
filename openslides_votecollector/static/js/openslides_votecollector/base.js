@@ -4,7 +4,6 @@
 
 angular.module('OpenSlidesApp.openslides_votecollector', ['OpenSlidesApp.users'])
 
-
 .factory('VoteCollector', [
     'DS',
     'gettext',
@@ -55,7 +54,6 @@ angular.module('OpenSlidesApp.openslides_votecollector', ['OpenSlidesApp.users']
         });
     }
 ])
-
 
 .factory('Keypad', [
     'DS',
@@ -149,7 +147,7 @@ angular.module('OpenSlidesApp.openslides_votecollector', ['OpenSlidesApp.users']
     }
 ])
 
-
-.run(['VoteCollector', 'Keypad', 'Seat', function (VoteCollector, Keypad, Seat) {}]);
+.run(['VoteCollector', 'Keypad', 'Seat', 'MotionPollKeypadConnection',
+    function (VoteCollector, Keypad, Seat, MotionPollKeypadConnection) {}]);
 
 }());
