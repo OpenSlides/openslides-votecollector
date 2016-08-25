@@ -358,11 +358,12 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
     '$stateParams',
     '$http',
     'Keypad',
+    'Projector',
     'User',
     'MotionPollFinder',
     'motions',
     'motionpollkeypadconnections',
-    function ($scope, $stateParams, $http, Keypad, User, MotionPollFinder, motions, motionpollkeypadconnections) {
+    function ($scope, $stateParams, $http, Keypad, Projector, User, MotionPollFinder, motions, motionpollkeypadconnections) {
         // Find motion and poll from URL parameter (via $stateparams).
         _.assign($scope, MotionPollFinder.find(motions, $stateParams.id));
 
@@ -370,10 +371,13 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
         $scope.votesList = [];
         angular.forEach(motionpollkeypadconnections, function(motionpollkeypadconnection) {
             if (motionpollkeypadconnection.poll_id == $scope.poll.id) {
-                var keypad = Keypad.get(motionpollkeypadconnection.keypad_id);
-                var user = null
-                if (keypad.user_id) {
-                    user = User.get(keypad.user_id);
+                var keypad = null;
+                if (motionpollkeypadconnection.keypad_id) {
+                    keypad = Keypad.get(motionpollkeypadconnection.keypad_id);
+                    var user = null;
+                    if (keypad.user_id) {
+                        user = User.get(keypad.user_id);
+                    }
                 }
                 $scope.votesList.push({
                     motionpollkeypadconnection: motionpollkeypadconnection,
@@ -383,7 +387,24 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
             }
         });
 
-        // TODO: Show blue button if slide is projected.
+        $scope.isProjected = function (poll) {
+            // Returns true if there is a projector element with the same
+            // name and the same id of poll.
+            var projector = Projector.get(1);
+            var isProjected;
+            if (typeof projector !== 'undefined') {
+                var self = this;
+                var predicate = function (element) {
+                    return element.name == "votecollector/motionpoll" &&
+                        typeof element.id !== 'undefined' &&
+                        element.id == poll.id;
+                };
+                isProjected = typeof _.findKey(projector.elements, predicate) === 'string';
+            } else {
+                isProjected = false;
+            }
+            return isProjected;
+        }
 
         $scope.projectSlide = function () {
             return $http.post(
@@ -393,7 +414,6 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
         };
 
         $scope.anonymizeVotes = function () {
-            // TODO Add confirm, success and error dialogs, alerts or boxes.
             return $http.post(
                 '/rest/openslides_votecollector/motionpollkeypadconnection/anonymize_votes/',
                 {poll_id: $scope.poll.id}
@@ -406,8 +426,9 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
     '$scope',
     '$http',
     'gettextCatalog',
+    'Projector',
     'VoteCollector',
-    function ($scope, $http,  gettextCatalog, VoteCollector) {
+    function ($scope, $http,  gettextCatalog, Projector, VoteCollector) {
         VoteCollector.find(1);
         VoteCollector.bindOne(1, $scope, 'vc');
 
@@ -483,6 +504,34 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
                 }
             );
         };
+
+        $scope.projectSlide = function (poll) {
+            console.log("project");
+            console.log(poll);
+            return $http.post(
+                '/rest/core/projector/1/prune_elements/',
+                [{name: 'votecollector/motionpoll', id: poll.id}]
+            );
+        };
+
+        $scope.isProjected = function (poll) {
+            // Returns true if there is a projector element with the same
+            // name and the same id of poll.
+            var projector = Projector.get(1);
+            var isProjected;
+            if (typeof projector !== 'undefined') {
+                var self = this;
+                var predicate = function (element) {
+                    return element.name == "votecollector/motionpoll" &&
+                        typeof element.id !== 'undefined' &&
+                        element.id == poll.id;
+                };
+                isProjected = typeof _.findKey(projector.elements, predicate) === 'string';
+            } else {
+                isProjected = false;
+            }
+            return isProjected;
+        }
     }
 ])
 
@@ -538,16 +587,22 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
             Id: 'motionPollFormButtons',
             template:
                 '<div ng-controller="VotingCtrl" class="spacer">' +
-                    '<button ng-if="vc.canStartVoting($parent.$parent.model)" ' +
+                    '<button type="button" ng-if="vc.canStartVoting($parent.$parent.model)" ' +
                         'ng-click="startVoting($parent.$parent.model)"' +
                         'class="btn btn-default">' +
                         '<i class="fa fa-wifi" aria-hidden="true"></i> '+
-                        '<translate>Start voting</translate></button>' +
-                    '<button ng-if="vc.canStopVoting($parent.$parent.model)" ' +
+                        '<translate>Start voting</translate></button> ' +
+                    '<button type="button" ng-if="vc.canStopVoting($parent.$parent.model)" ' +
                         'ng-click="stopVoting($parent.$parent.model)"' +
                         'class="btn btn-primary">' +
                         '<i class="fa fa-wifi" aria-hidden="true"></i> '+
-                        '<translate>Stop voting<translate></button>' +
+                        '<translate>Stop voting<translate></button> ' +
+                    '<button type="button" os-perms="core.can_manage_projector" class="btn btn-default"' +
+                      ' ng-class="{ \'btn-primary\': isProjected($parent.$parent.model) }"' +
+                      ' ng-click="projectSlide($parent.$parent.model)"' +
+                      ' title="{{ \'Project vote\' | translate }}">' +
+                      '<i class="fa fa-video-camera"></i> ' +
+                      '<translate>Vote<translate></button>' +
                     '<p>{{ vc.getVotingStatus($parent.$parent.model) }}</p>' +
                 '</div>'
         })
@@ -566,12 +621,12 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
                         'ng-click="startSpeakerList($parent.$parent.item)"' +
                         'class="btn btn-sm btn-default">' +
                         '<i class="fa fa-wifi" aria-hidden="true"></i> '+
-                        '<translate>Start speaker list voting</translate></button>' +
+                        '<translate>Start speakers voting</translate></button>' +
                     '<button ng-if="vc.canStopSpeakerList($parent.$parent.item)" ' +
                         'ng-click="stopSpeakerList()"' +
                         'class="btn btn-sm btn-primary">' +
                         '<i class="fa fa-wifi" aria-hidden="true"></i> '+
-                        '<translate>Stop speaker list voting</translate></button>' +
+                        '<translate>Stop speakers voting</translate></button>' +
                     '<uib-alert ng-show="alert.show" type="{{ alert.type }}" ng-click="alert={}" close="alert={}">' +
                         '{{ alert.msg }}</uib-alert>' +
                 '</div>'

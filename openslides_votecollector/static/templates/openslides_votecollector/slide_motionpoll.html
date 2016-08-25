@@ -1,18 +1,32 @@
 <div ng-controller="SlideMotionPollCtrl" class="content scrollcontent">
 
-  <h1>{{ motion.agenda_item.getTitle() || motion.getTitle() }}</h1>
-  <h2><translate>Motion</translate> {{ motion.identifier }} |
-    <translate translate-comment='ballot of a motion'>Voting result</translate>
-  </h2>
+  <style type="text/css">
+    #total-result-table {
+      font-size: 150%;
+      line-height: 40px;
+      margin: 0 20px 0 0;
+      font-weight: bold;
+      width: auto;
+    }
+    #total-result-table img {
+      width: auto;
+    }
+    #total-result-table td {
+      padding: 9px;
+    }
+    #total-result-table td.bold {
+      font-weight: bold;
+      text-align: right;
+    }
+    #total-result-table td.vote {
+      min-width: 30px;
+    }
+    #total-result-table td.percentage {
+        font-weight: normal;
+        font-size: 70%;
+        min-width: 80px;
+    }
 
-  <div>
-    <p>Yes: {{ poll.yes }}</p>
-    <p>No: {{ poll.no }}</p>
-    <p>Abstain: {{ poll.abstain }}</p>
-    <p>Valid votes: {{ poll.votesvalid }}</p>
-  </div>
-
-  <style>
     #seating-plan table {
         border-collapse: separate;
         border-spacing: 5px;
@@ -48,17 +62,72 @@
     }
   </style>
 
-  <div ng-if="config('votecollector_seating_plan')">
-    <h2 translate>Seating plan</h2>
-    <div id="seating-plan">
-      <table>
-        <tr ng-repeat="row in seatingPlan.rows">
-          <td ng-repeat="seat in row" ng-class="seat.css">
-            {{ seat.number }}
-          </td>
-        </tr>
-      </table>
+
+  <!-- Title -->
+  <div id="title">
+    <h1>{{ motion.agenda_item.getTitle() || motion.getTitle() }}</h1>
+    <h2>
+      <translate>Motion</translate> {{ motion.identifier }} |
+      <translate translate-comment='ballot of a motion'>Voting result</translate>
+    </h2>
+  </div>
+
+
+  <!-- voting results and seating plan -->
+  <div ng-if="config('votecollector_live_voting') || poll.has_votes">
+
+    <!-- total votes -->
+    <table class="well pull-left" id="total-result-table">
+      <!-- yes -->
+      <tr>
+        <td><img src='/static/img/button-yes.png'>
+        <td class="bold">
+          {{ poll.yes }}
+        <td class="percentage">
+          {{ poll.getVote(poll.yes).percentStr }}
+          <uib-progressbar value="poll.getVote(poll.yes).percentNumber" type="success"
+            ng-class="{ 'progress-striped active': !poll.has_votes }"></uib-progressbar>
+
+      <!-- no -->
+      <tr>
+        <td><img src='/static/img/button-no.png'>
+        <td class="bold">
+          {{ poll.no}}
+        <td class="percentage">
+          {{ poll.getVote(poll.no).percentStr }}
+          <uib-progressbar value="poll.getVote(poll.no).percentNumber" type="danger"
+            ng-class="{ 'progress-striped active': !poll.has_votes }"></uib-progressbar>
+
+      <!-- abstain -->
+      <tr>
+        <td><img src='/static/img/button-abstain.png'>
+        <td class="bold">
+          {{ poll.abstain}}
+        <td class="percentage">
+          {{ poll.getVote(poll.abstain).percentStr }}
+          <uib-progressbar value="poll.getVote(poll.abstain).percentNumber" type="warning"
+            ng-class="{ 'progress-striped active': !poll.has_votes }"></uib-progressbar>
+
+      <!-- valid votes -->
+      <tr class="total" ng-if="poll.has_votes">
+        <td>
+        <td class="bold">
+          {{ poll.votesvalid }}
+        <td>
+          {{ poll.getVote(poll.votesvalid).percentStr }}
+    </table>
+
+    <!-- seating plan -->
+    <div ng-if="config('votecollector_seating_plan')" id="seating-plan">
+        <table>
+          <tr ng-repeat="row in seatingPlan.rows">
+            <td ng-repeat="seat in row" ng-class="seat.css">
+              {{ seat.number }}
+            </td>
+          </tr>
+        </table>
     </div>
+
   </div>
 
 </div>

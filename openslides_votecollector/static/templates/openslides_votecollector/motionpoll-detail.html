@@ -19,14 +19,16 @@
         <i class="fa fa-angle-double-left fa-lg"></i>
         <translate>Motion</translate>
       </a>
-      <!-- Back to motion -->
-      <a class="btn btn-sm btn-default" ng-click="anonymizeVotes()">
+      <!-- Anonymize -->
+      <a class="btn btn-sm btn-default" ng-click=""
+        ng-bootbox-confirm="{{ 'Are you sure you want to anonymize all votes?' | translate }}"
+        ng-bootbox-confirm-action="anonymizeVotes()">
         <i class="fa fa-exclamation-triangle fa-lg"></i>
         <translate>Anonymize Votes</translate>
       </a>
       <!-- Project poll slide -->
       <a os-perms="core.can_manage_projector" class="btn btn-default btn-sm"
-          ng-class="{ 'btn-primary': false }"
+          ng-class="{ 'btn-primary': isProjected(poll) }"
           ng-click="projectSlide()"
           title="{{ 'Project vote' | translate }}">
         <i class="fa fa-video-camera"></i>
@@ -81,8 +83,10 @@
         <a ng-if="vote.user" href="" ui-sref="users.user.detail({id: vote.user.id})">{{ vote.user.get_full_name() }}</a>
         <span ng-if="!vote.user"><i><translate>Anonymous</translate></i></span>
       <td>{{ vote.motionpollkeypadconnection.serial_number }}
-      <!-- TODO: use mapping for 'Y', 'N', 'A' -->
-      <td>{{ vote.motionpollkeypadconnection.value }}
+      <td>
+        <span ng-if="vote.motionpollkeypadconnection.value == 'Y'" translate>Yes</translate></span>
+        <span ng-if="vote.motionpollkeypadconnection.value == 'N'" translate>No</translate></span>
+        <span ng-if="vote.motionpollkeypadconnection.value == 'A'" translate>Abstain</translate></span>
     </tr>
   </table>
 </div>
