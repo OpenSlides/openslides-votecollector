@@ -2,15 +2,13 @@
   <div class="title">
     <div class="submenu">
       <div>
-        <a ng-click="openDialog()" os-perms="openslides_votecollector.can_manage_votecollector" class="btn btn-primary btn-sm">
+        <a ng-click="openDialog()" os-perms="openslides_votecollector.can_manage_votecollector"
+           class="btn btn-primary btn-sm">
           <i class="fa fa-plus fa-lg"></i>
           <translate>New</translate>
         </a>
-        <a ng-click="openRangeDialog()" os-perms="motions.can_manage" class="btn btn-default btn-sm">
-          <i class="fa fa-plus fa-lg"></i>
-          <translate>New range</translate>
-        </a>
-        <a ng-click="checkKeypads()" ng-disabled="!vc.canPing()" os-perms="motions.can_manage" class="btn btn-default btn-sm">
+        <a ng-click="checkKeypads()" os-perms="openslides_votecollector.can_manage_votecollector"
+           class="btn btn-default btn-sm">
           <i class="fa fa-check fa-lg"></i>
           <translate>System test</translate>
         </a>
@@ -124,7 +122,7 @@
         <th>
           <translate>Battery</translate>
           <i class="fa fa-info-circle"
-            uib-tooltip="{{ 'Battery state is checked while each voting. Available states: full, medium, low, empty' | translate }}"></i>
+            uib-tooltip="{{ 'Battery state is checked with each voting. Available states: full, medium, low, empty' | translate }}"></i>
 
     <tbody>
       <tr ng-repeat="keypad in keypadsFiltered = (keypads | osFilter:filter.search:getFilterString |

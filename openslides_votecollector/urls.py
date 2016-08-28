@@ -8,15 +8,37 @@ urlpatterns = [
         views.DeviceStatus.as_view(),
         name='votecollector_device'),
 
-    url(r'^votecollector/start_yna/(?P<poll_id>\d+)/$',
+    url(r'^votecollector/start_yna/(?P<id>\d+)/$',
         views.StartYNA.as_view(), {
+            'app': 'motions',
+            'model': 'MotionPoll',
             'mode': 'YesNoAbstain',
             'resource': '/vote/'
         },
         name='votecollector_start_yna'),
 
-    url(r'^votecollector/start_speaker_list/(?P<item_id>\d+)/$',
+    url(r'^votecollector/start_election/(?P<id>\d+)/(?P<options>\d+)/$',
+        views.StartElection.as_view(), {
+            'app': 'assignments',
+            'model': 'AssignmentPoll',
+            'mode': 'SingleDigit',
+            'resource': '/candidate/'
+        },
+        name='votecollector_start_election'),
+
+    url(r'^votecollector/start_election_one/(?P<id>\d+)/$',
+        views.StartYNA.as_view(), {
+            'app': 'assignments',
+            'model': 'AssignmentPoll',
+            'mode': 'YesNoAbstain',
+            'resource': '/vote/'
+        },
+        name='votecollector_start_election_one'),
+
+    url(r'^votecollector/start_speaker_list/(?P<id>\d+)/$',
         views.StartSpeakerList.as_view(), {
+            'app': 'agenda',
+            'model': 'Item',
             'mode': 'SpeakerList',
             'resource': '/speaker/'
         },
@@ -37,13 +59,27 @@ urlpatterns = [
         views.VotingStatus.as_view(),
         name='votecollector_status'),
 
-    url(r'^votecollector/result_yna/(?P<poll_id>\d+)/$',
-        views.ResultYNA.as_view(),
+    url(r'^votecollector/result_yna/(?P<id>\d+)/$',
+        views.VotingResult.as_view(), {
+            'app': 'motions',
+            'model': 'MotionPoll'
+        },
         name='votecollector_result_yna'),
+
+    url(r'^votecollector/result_election/(?P<id>\d+)/$',
+        views.VotingResult.as_view(), {
+            'app': 'assignments',
+            'model': 'AssignmentPoll'
+        },
+        name='votecollector_result_election'),
 
     url(r'^votecollector/vote/(?P<poll_id>\d+)/(?P<keypad_id>\d+)/$',
         csrf_exempt(views.VoteCallback.as_view()),
         name='votecollector_vote'),
+
+    url(r'^votecollector/candidate/(?P<poll_id>\d+)/(?P<keypad_id>\d+)/$',
+        csrf_exempt(views.CandidateCallback.as_view()),
+        name='votecollector_candidate'),
 
     url(r'^votecollector/speaker/(?P<item_id>\d+)/(?P<keypad_id>\d+)/$',
         csrf_exempt(views.SpeakerCallback.as_view()),

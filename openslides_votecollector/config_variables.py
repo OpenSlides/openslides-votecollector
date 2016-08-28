@@ -1,8 +1,5 @@
 from openslides.core.config import ConfigVariable
 
-# TODO: localize config site
-
-
 def get_config_variables():
     """
     Generator which yields all config variables of this app.

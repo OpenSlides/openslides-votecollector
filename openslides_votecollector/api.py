@@ -77,11 +77,12 @@ def get_device_status():
     return server.voteCollector.getDeviceStatus()
 
 
-def start_voting(mode, callback_url):
+def start_voting(mode, options, callback_url):
     server = get_server()
     keypads = get_keypads()
 
-    count = server.voteCollector.prepareVoting(mode + '-' + callback_url, 0, 0, list(keypads))
+    ext_mode = options + ';' + callback_url if options else callback_url
+    count = server.voteCollector.prepareVoting(mode + '-' + ext_mode, 0, 0, list(keypads))
     if count < 0:
         raise VoteCollectorError(nr=count)
 

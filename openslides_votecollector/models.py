@@ -1,13 +1,16 @@
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import ugettext as _
 
 from openslides.core.config import config
+from openslides.assignments.models import AssignmentPoll
 from openslides.motions.models import MotionPoll
 from openslides.users.models import User
 from openslides.utils.models import RESTModelMixin
 
 from .access_permissions import (
+    AssignmentPollKeypadConnectionAccessPermissions,
     KeypadAccessPermissions,
     MotionPollKeypadConnectionAccessPermissions,
     SeatAccessPermissions,
@@ -74,7 +77,7 @@ class Seat(RESTModelMixin, models.Model):
 
         Attention: This method is not used by save() or bulk_create().
         """
-        #TODO: Reactivate this method in SeatViewSet
+        # TODO: Reactivate this method in SeatViewSet
         if self.number != '':
             queryset = self.objects.filter(number=self.number)
             if self.pk is not None:
@@ -113,8 +116,8 @@ class MotionPollKeypadConnection(RESTModelMixin, models.Model):
     """
     access_permissions = MotionPollKeypadConnectionAccessPermissions()
 
-    poll = models.ForeignKey(MotionPoll, related_name='keypad_data_list')
-    keypad = models.ForeignKey(Keypad, null=True)
+    poll = models.ForeignKey(MotionPoll, on_delete=models.CASCADE, related_name='keypad_data_list')
+    keypad = models.ForeignKey(Keypad, on_delete=models.CASCADE, null=True)
     value = models.CharField(max_length=255)
     serial_number = models.CharField(null=True, max_length=255)
 
@@ -135,3 +138,18 @@ class MotionPollKeypadConnection(RESTModelMixin, models.Model):
             return 'grey'
         else:
             return KEYPAD_MAP[self.value][1]
+
+
+class AssignmentPollKeypadConnection(RESTModelMixin, models.Model):
+    """
+    Model to connect a poll of an assignment with a keypad per personal voting.
+    """
+    access_permissions = AssignmentPollKeypadConnectionAccessPermissions()
+
+    poll = models.ForeignKey(AssignmentPoll, on_delete=models.CASCADE, related_name='keypad_data_list')
+    candidate = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
+    value = models.CharField(max_length=255)
+    serial_number = models.CharField(null=True, max_length=255)
+
+    class Meta:
+        default_permissions = ()

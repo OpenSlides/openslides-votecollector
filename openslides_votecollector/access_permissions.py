@@ -75,3 +75,22 @@ class MotionPollKeypadConnectionAccessPermissions(BaseAccessPermissions):
         from .serializers import MotionPollKeypadConnectionSerializer
 
         return MotionPollKeypadConnectionSerializer
+
+
+class AssignmentPollKeypadConnectionAccessPermissions(BaseAccessPermissions):
+    """
+    Access permissions container for AssignmentPollKeypadConnection and AssignmentPollKeypadConnectionViewSet.
+    """
+    def can_retrieve(self, user):
+        """
+        Returns True if the user has VoteCollector access.
+        """
+        return user.has_perm('openslides_votecollector.can_manage_votecollector')
+
+    def get_serializer_class(self, user=None):
+        """
+        Returns serializer class.
+        """
+        from .serializers import AssignmentPollKeypadConnectionSerializer
+
+        return AssignmentPollKeypadConnectionSerializer
