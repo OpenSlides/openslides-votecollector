@@ -1,9 +1,11 @@
 from openslides.core.exceptions import ProjectorException
+from openslides.assignments.models import AssignmentPoll
+from openslides.assignments.views import AssignmentViewSet
 from openslides.motions.models import MotionPoll
 from openslides.motions.views import MotionViewSet
 from openslides.utils.projector import ProjectorElement, ProjectorRequirement
 
-from .views import KeypadViewSet, SeatViewSet, MotionPollKeypadConnectionViewSet
+from .views import KeypadViewSet, SeatViewSet, MotionPollKeypadConnectionViewSet, AssignmentPollKeypadConnectionViewSet
 
 
 class MotionPollSlide(ProjectorElement):
@@ -40,6 +42,43 @@ class MotionPollSlide(ProjectorElement):
                 view_action='retrieve')
             yield ProjectorRequirement(
                 view_class=MotionPollKeypadConnectionViewSet,
+                view_action='retrieve')
+
+
+class AssignmentPollSlide(ProjectorElement):
+    """
+    Slide definitions for Assignment poll model.
+    """
+    name = 'votecollector/assignmentpoll'
+
+    def check_data(self):
+        pk = self.config_entry.get('id')
+        if pk is not None:
+            # Detail slide.
+            if not AssignmentPoll.objects.filter(pk=pk).exists():
+                raise ProjectorException('AssignmentPoll does not exist.')
+
+    def get_requirements(self, config_entry):
+        pk = config_entry.get('id')
+        # Detail slide.
+        try:
+            assignmentpoll = AssignmentPoll.objects.get(pk=pk)
+        except Assignment.DoesNotExist:
+            # Assignment does not exist. Just do nothing.
+            pass
+        else:
+            yield ProjectorRequirement(
+                view_class=AssignmentViewSet,
+                view_action='retrieve',
+                pk=str(assignmentpoll.assignment.pk))
+            yield ProjectorRequirement(
+                view_class=KeypadViewSet,
+                view_action='retrieve')
+            yield ProjectorRequirement(
+                view_class=SeatViewSet,
+                view_action='retrieve')
+            yield ProjectorRequirement(
+                view_class=AssignmentPollKeypadConnectionViewSet,
                 view_action='retrieve')
 
 

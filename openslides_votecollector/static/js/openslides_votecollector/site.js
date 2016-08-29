@@ -13,7 +13,7 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
         mainMenuProvider.register({
             'ui_sref': 'openslides_votecollector.keypad.list',
             'img_class': 'wifi',
-            'title': gettext('VoteCollector'),
+            'title': 'VoteCollector',
             'weight': 700,
             'perm': 'openslides_votecollector.can_manage_votecollector',
         });
@@ -46,6 +46,21 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
                 },
                 vc: function(VoteCollector) {
                     return VoteCollector.find(1);
+                }
+            }
+        })
+        .state('openslides_votecollector.keypad.import', {
+            url: '/import',
+            controller: 'KeypadImportCtrl',
+            resolve: {
+                users: function(User) {
+                    return User.findAll();
+                },
+                keypads: function(Keypad) {
+                    return Keypad.findAll();
+                },
+                seats: function (Seat) {
+                    return Seat.findAll();
                 }
             }
         })
@@ -84,6 +99,9 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
                 },
                 assignmentpollkeypadconnections: function (AssignmentPollKeypadConnection) {
                     return AssignmentPollKeypadConnection.findAll();
+                },
+                keypads: function (Keypad) {
+                    return Keypad.findAll();
                 },
                 users: function (User) {
                     return User.findAll();
@@ -129,7 +147,7 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
                         label: gettextCatalog.getString('Participant'),
                         options: User.getAll(),
                         ngOptions: 'option.id as option.full_name for option in to.options',
-                        placeholder: gettextCatalog.getString('(Anonymous)')
+                        placeholder: '(' + gettextCatalog.getString('Anonymous') + ')'
                     }
                 },
                 {
@@ -148,7 +166,7 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
                         label: gettextCatalog.getString('Seat'),
                         options: Seat.getAll(),
                         ngOptions: 'option.id as option.number for option in to.options',
-                        placeholder: gettextCatalog.getString('–')
+                        placeholder: gettextCatalog.getString('--- Select seat ---')
                     }
                 }
                 ]
@@ -352,6 +370,146 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
     }
 ])
 
+.controller('KeypadImportCtrl', [
+    '$scope',
+    '$http',
+    'gettext',
+    'Keypad',
+    'User',
+    'Seat',
+    function ($scope, $http, gettext, Keypad, User, Seat) {
+
+        $scope.users = [];
+        $scope.separator = ',';
+        $scope.encoding = 'UTF-8';
+        $scope.encodingOptions = ['UTF-8', 'ISO-8859-1'];
+        $scope.accept = '.csv, .txt';
+        $scope.csv = {
+            content: null,
+            header: true,
+            headerVisible: false,
+            separator: $scope.separator,
+            separatorVisible: false,
+            encoding: $scope.encoding,
+            encodingVisible: false,
+            accept: $scope.accept,
+            result: null
+        };
+        // set csv file encoding
+        $scope.setEncoding = function () {
+            $scope.csv.encoding = $scope.encoding;
+        };
+        // set csv file encoding
+        $scope.setSeparator = function () {
+            $scope.csv.separator = $scope.separator;
+        };
+
+        // detect if csv file is loaded
+        $scope.$watch('csv.result', function () {
+            $scope.users = [];
+            var quotionRe = /^"(.*)"$/;
+            angular.forEach($scope.csv.result, function (keypaduser) {
+                // title
+                if (keypaduser.title) {
+                    keypaduser.title = keypaduser.title.replace(quotionRe, '$1');
+                }
+                // first name
+                if (keypaduser.first_name) {
+                    keypaduser.first_name = keypaduser.first_name.replace(quotionRe, '$1');
+                }
+                // last name
+                if (keypaduser.last_name) {
+                    keypaduser.last_name = keypaduser.last_name.replace(quotionRe, '$1');
+                }
+                if (!keypaduser.first_name && !keypaduser.last_name) {
+                    keypaduser.importerror = true;
+                    keypaduser.name_error = gettext('Error: First and last name is required.');
+                }
+                // structure level
+                if (keypaduser.structure_level) {
+                    keypaduser.structure_level = keypaduser.structure_level.replace(quotionRe, '$1');
+                }
+                // keypad id
+                if (keypaduser.keypad_id) {
+                    keypaduser.keypad_id = keypaduser.keypad_id.replace(quotionRe, '$1');
+                }
+                // seat label
+                if (keypaduser.seat_label) {
+                    keypaduser.seat_label = keypaduser.seat_label.replace(quotionRe, '$1');
+                }
+                keypaduser.fullname = [keypaduser.title, keypaduser.first_name, keypaduser.last_name, keypaduser.structure_level].join(' ');
+
+                // check if keypaduser already exists
+                angular.forEach(User.getAll(), function(user) {
+                    user.fullname = [user.title, user.first_name, user.last_name, user.structure_level].join(' ');
+                    if (user.fullname == keypaduser.fullname) {
+                        keypaduser.user_id = user.id;
+                    }
+                });
+                // check if seat label exists
+                var seatFound = false;
+                angular.forEach(Seat.getAll(), function(seat) {
+                    if (seat.number == keypaduser.seat_label) {
+                        // check if the seat id already assigned to a keypad
+                        angular.forEach(Keypad.getAll(), function(keypad) {
+                            if (keypad.seat_id == seat.id) {
+                                keypaduser.importerror = true;
+                                keypaduser.seat_error = gettext('Error: Seat ID already assigned to a keypad.');
+                            }
+                        });
+                        keypaduser.seat_id = seat.id;
+                        seatFound = true;
+                    }
+                });
+                // seat label does not exists
+                if (!seatFound) {
+                    keypaduser.importerror = true;
+                    keypaduser.seat_error = gettext('Error: Seat label does not exists.');
+                }
+                // check if keypad id already exists
+                angular.forEach(Keypad.getAll(), function(keypad) {
+                    if (keypad.keypad_id == keypaduser.keypad_id) {
+                        keypaduser.importerror = true;
+                        keypaduser.keypad_error = gettext('Error: Keypad ID already exists.');
+                    }
+                });
+                // check if users exists
+                if (!keypaduser.user_id) {
+                    keypaduser.importerror = true;
+                    keypaduser.name_error = gettext('Error: Participant not found.');
+                }
+                $scope.users.push(keypaduser);
+            });
+        });
+
+        // import from csv file
+        $scope.import = function () {
+            $scope.csvImporting = true;
+            angular.forEach($scope.users, function (user) {
+                if (!user.importerror) {
+                    var keypad = {
+                        'keypad_id': user.keypad_id,
+                        'user_id': user.user_id,
+                        'seat_id': user.seat_id
+                    }
+                    Keypad.create(keypad).then(
+                        function(success) {
+                            user.imported = true;
+                        }
+                    );
+                }
+            });
+            $scope.csvimported = true;
+        };
+
+        // clear csv import preview
+        $scope.clear = function () {
+            $scope.csv.result = null;
+        };
+
+    }
+])
+
 // Button at template hook motionPollSmallButtons
 .run([
     'templateHooks',
@@ -361,7 +519,8 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
             template: '<div class="spacer" ng-if="poll.has_votes">' +
                       '<a ui-sref="openslides_votecollector.motionpoll.detail({id: poll.id})">' +
                       '<button class="btn btn-xs btn-default">' +
-                      '<i class="fa fa-table" aria-hidden="true"></i> <translate>Single votes</translate>' +
+                      '<i class="fa fa-table" aria-hidden="true"></i> ' +
+                      '{{ \'Single votes\' | translate }}' +
                       '</button></a></div>'
         })
     }
@@ -374,34 +533,45 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
     'Keypad',
     'Projector',
     'User',
+    'MotionPoll',
     'MotionPollFinder',
+    'MotionPollKeypadConnection',
     'motions',
-    'motionpollkeypadconnections',
-    function ($scope, $stateParams, $http, Keypad, Projector, User, MotionPollFinder, motions, motionpollkeypadconnections) {
+    function ($scope, $stateParams, $http, Keypad, Projector, User, MotionPoll, MotionPollFinder, MotionPollKeypadConnection, motions) {
         // Find motion and poll from URL parameter (via $stateparams).
         _.assign($scope, MotionPollFinder.find(motions, $stateParams.id));
+        // Bind poll to scope for autoupdate of total vote result
+        MotionPoll.bindOne($scope.poll.id, $scope, 'poll');
 
-        // Create table for single votes
-        $scope.votesList = [];
-        angular.forEach(motionpollkeypadconnections, function(motionpollkeypadconnection) {
-            if (motionpollkeypadconnection.poll_id == $scope.poll.id) {
-                var keypad = null;
-                if (motionpollkeypadconnection.keypad_id) {
-                    keypad = Keypad.get(motionpollkeypadconnection.keypad_id);
-                    var user = null;
-                    if (keypad.user_id) {
-                        user = User.get(keypad.user_id);
+        $scope.$watch(
+            function () {
+                return MotionPollKeypadConnection.lastModified();
+            },
+            function () {
+                // Create table for single votes
+                $scope.votesList = [];
+                angular.forEach(MotionPollKeypadConnection.getAll(), function(mpkc) {
+                    if (mpkc.poll_id == $scope.poll.id) {
+                        var keypad = null;
+                        if (mpkc.keypad_id) {
+                            keypad = Keypad.get(mpkc.keypad_id);
+                            var user = null;
+                            if (keypad.user_id) {
+                                user = User.get(keypad.user_id);
+                            }
+                        }
+                        $scope.votesList.push({
+                            user: user,
+                            keypad: keypad,
+                            serial_number: mpkc.serial_number,
+                            value: mpkc.value
+                        });
                     }
-                }
-                $scope.votesList.push({
-                    motionpollkeypadconnection: motionpollkeypadconnection,
-                    keypad: keypad,
-                    user: user,
                 });
             }
-        });
+        );
 
-        $scope.isProjected = function (poll) {
+        $scope.isProjected = function (poll_id) {
             // Returns true if there is a projector element with the same
             // name and the same id of poll.
             var projector = Projector.get(1);
@@ -411,7 +581,7 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
                 var predicate = function (element) {
                     return element.name == "votecollector/motionpoll" &&
                         typeof element.id !== 'undefined' &&
-                        element.id == poll.id;
+                        element.id == poll_id;
                 };
                 isProjected = typeof _.findKey(projector.elements, predicate) === 'string';
             } else {
@@ -444,8 +614,9 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
             Id: 'assignmentPollSmallButtons',
             template: '<div class="spacer" ng-if="poll.has_votes">' +
                       '<a ui-sref="openslides_votecollector.assignmentpoll.detail({id: poll.id})">' +
-                      '<button class="btn btn-xs btn-default">' +
-                      '<i class="fa fa-table" aria-hidden="true"></i> <translate>Single votes</translate>' +
+                      '<button class="btn btn-sm btn-default">' +
+                      '<i class="fa fa-table" aria-hidden="true"></i> ' +
+                      '{{ \'Single votes\' | translate }}' +
                       '</button></a></div>'
         })
     }
@@ -453,30 +624,87 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
 
 .controller('AssignmentPollDetailCtrl', [
     '$scope',
+    '$http',
     '$stateParams',
+    'Keypad',
+    'Projector',
     'User',
+    'AssignmentPoll',
     'AssignmentPollFinder',
+    'AssignmentPollKeypadConnection',
     'assignments',
-    'assignmentpollkeypadconnections',
-    function ($scope, $stateParams, User, AssignmentPollFinder, assignments, assignmentpollkeypadconnections) {
+    function ($scope, $http, $stateParams, Keypad, Projector, User, AssignmentPoll, AssignmentPollFinder, AssignmentPollKeypadConnection, assignments) {
         // Find assignment and poll from URL parameter (via $stateparams).
         _.assign($scope, AssignmentPollFinder.find(assignments, $stateParams.id));
+        // Bind poll to scope for autoupdate of total vote result
+        AssignmentPoll.bindOne($scope.poll.id, $scope, 'poll');
 
-        // Create table for single votes
-        $scope.votesList = [];
-        angular.forEach(assignmentpollkeypadconnections, function (apkc) {
-            if (apkc.poll_id == $scope.poll.id) {
-                var candidate = null;
-                if (apkc.candidate_id) {
-                    candidate = User.get(apkc.candidate_id);
-                }
-                $scope.votesList.push({
-                    value: apkc.value,
-                    serial_number: apkc.serial_number,
-                    candidate: candidate
+        $scope.$watch(
+            function () {
+                return AssignmentPollKeypadConnection.lastModified();
+            },
+            function () {
+                // Create table for single votes
+                $scope.votesList = [];
+                angular.forEach(AssignmentPollKeypadConnection.getAll(), function (apkc) {
+                    if (apkc.poll_id == $scope.poll.id) {
+                        var keypad = null;
+                        if (apkc.keypad_id) {
+                            keypad = Keypad.get(apkc.keypad_id);
+                            var user = null;
+                            if (keypad.user_id) {
+                                user = User.get(keypad.user_id);
+                            }
+                        }
+                        var candidate = null;
+                        if (apkc.candidate_id) {
+                            candidate = User.get(apkc.candidate_id);
+                        }
+                        $scope.votesList.push({
+                            user: user,
+                            keypad: keypad,
+                            serial_number: apkc.serial_number,
+                            value: apkc.value,
+                            candidate: candidate
+                        });
+                    }
                 });
             }
-        });
+        );
+
+        $scope.isProjected = function (poll_id) {
+            // Returns true if there is a projector element with the same
+            // name and the same id of poll.
+            var projector = Projector.get(1);
+            var isProjected;
+            if (typeof projector !== 'undefined') {
+                var self = this;
+                var predicate = function (element) {
+                    return element.name == "votecollector/assignmentpoll" &&
+                        typeof element.id !== 'undefined' &&
+                        element.id == poll_id;
+                };
+                isProjected = typeof _.findKey(projector.elements, predicate) === 'string';
+            } else {
+                isProjected = false;
+            }
+            return isProjected;
+        };
+
+        $scope.projectSlide = function () {
+            return $http.post(
+                '/rest/core/projector/1/prune_elements/',
+                [{name: 'votecollector/assignmentpoll', id: $scope.poll.id}]
+            );
+        };
+
+
+        $scope.anonymizeVotes = function () {
+            return $http.post(
+                '/rest/openslides_votecollector/assignmentpollkeypadconnection/anonymize_votes/',
+                {poll_id: $scope.poll.id}
+            ).then(function (success) {}, function (error) {});
+        };
     }
 ])
 
@@ -551,7 +779,7 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
                                     // Prompt user to save result.
                                     $scope.$parent.$parent.$parent.alert = {
                                         type: 'info',
-                                        msg: gettextCatalog.getString('Voting has finished.') + ' ' +
+                                        msg: gettextCatalog.getString('Motion voting has finished.') + ' ' +
                                              gettextCatalog.getString('Received votes:') + ' ' +
                                              $scope.vc.votes_received + ' / ' + $scope.vc.voters_count + '. ' +
                                              gettextCatalog.getString('Save this result now!'),
@@ -572,20 +800,20 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
         };
 
         $scope.getVotingStatus = function () {
-            if ($scope.vc.is_voting) {
-                if ($scope.vc.voting_mode == 'Test') {
-                    return gettextCatalog.getString('System test is runing') + '.';
+            if ($scope.vc !== undefined) {
+                if ($scope.vc.is_voting && $scope.vc.voting_mode == 'Test') {
+                    return gettextCatalog.getString('System test is running.');
                 }
-                if ($scope.vc.voting_mode == 'Item') {
-                    return gettextCatalog.getString('Speakers voting is running for item') + ' ' +
+                if ($scope.vc.is_voting && $scope.vc.voting_mode == 'Item') {
+                    return gettextCatalog.getString('Speakers voting is running for agenda item') + ' ' +
                         $scope.vc.voting_target + '.';
                 }
-                if ($scope.vc.voting_mode == 'AssignmentPoll') {
-                    return gettextCatalog.getString('An election is running') + '.';
+                if ($scope.vc.is_voting && $scope.vc.voting_mode == 'AssignmentPoll') {
+                    return gettextCatalog.getString('An election is running.');
                 }
-                if ($scope.vc.voting_mode == 'MotionPoll') {
+                if ($scope.vc.is_voting && $scope.vc.voting_mode == 'MotionPoll') {
                     if ($scope.vc.voting_target != $scope.poll.id) {
-                        return gettextCatalog.getString('Another motion voting is running') + '.';
+                        return gettextCatalog.getString('Another motion voting is running.');
                     }
                     return gettextCatalog.getString('Votes received:') + ' ' +
                         // TODO: Add voting duration.
@@ -596,8 +824,6 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
         };
 
         $scope.projectSlide = function () {
-            console.log("project");
-            console.log($scope.poll);
             return $http.post(
                 '/rest/core/projector/1/prune_elements/',
                 [{name: 'votecollector/motionpoll', id: $scope.poll.id}]
@@ -630,8 +856,9 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
     '$http',
     'gettextCatalog',
     'Config',
+    'Projector',
     'VoteCollector',
-    function ($scope, $http, gettextCatalog, Config, VoteCollector) {
+    function ($scope, $http, gettextCatalog, Config, Projector, VoteCollector) {
         VoteCollector.find(1);
         VoteCollector.bindOne(1, $scope, 'vc');
 
@@ -727,7 +954,7 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
                                     // Prompt user to save result.
                                     $scope.$parent.$parent.$parent.alert = {
                                         type: 'info',
-                                        msg: gettextCatalog.getString('Voting has finished.') + ' ' +
+                                        msg: gettextCatalog.getString('Election voting has finished.') + ' ' +
                                              gettextCatalog.getString('Received votes:') + ' ' +
                                              $scope.vc.votes_received + ' / ' + $scope.vc.voters_count + '. ' +
                                              gettextCatalog.getString('Save this result now!'),
@@ -748,20 +975,20 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
         };
 
         $scope.getVotingStatus = function () {
-            if ($scope.vc.is_voting) {
-                if ($scope.vc.voting_mode == 'Test') {
-                    return gettextCatalog.getString('System test is runing') + '.';
+            if ($scope.vc !== undefined) {
+                if ($scope.vc.is_voting && $scope.vc.voting_mode == 'Test') {
+                    return gettextCatalog.getString('System test is running.');
                 }
-                if ($scope.vc.voting_mode == 'Item') {
-                    return gettextCatalog.getString('Speakers voting is running for item') + ' ' +
+                if ($scope.vc.is_voting && $scope.vc.voting_mode == 'Item') {
+                    return gettextCatalog.getString('Speakers voting is running for agenda item') + ' ' +
                         $scope.vc.voting_target + '.';
                 }
-                if ($scope.vc.voting_mode == 'MotionPoll') {
-                    return gettextCatalog.getString('A motion voting is running') + '.';
+                if ($scope.vc.is_voting && $scope.vc.voting_mode == 'MotionPoll') {
+                    return gettextCatalog.getString('A motion voting is running.');
                 }
-                if ($scope.vc.voting_mode == 'AssignmentPoll') {
+                if ($scope.vc.is_voting && $scope.vc.voting_mode == 'AssignmentPoll') {
                     if ($scope.vc.voting_target != $scope.poll.id) {
-                        return gettextCatalog.getString('Another election is running') + '.';
+                        return gettextCatalog.getString('Another election is running.');
                     }
                     return gettextCatalog.getString('Votes received:') + ' ' +
                         // TODO: Add voting duration.
@@ -770,6 +997,32 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
             }
             return '';
         };
+
+        $scope.projectSlide = function () {
+            return $http.post(
+                '/rest/core/projector/1/prune_elements/',
+                [{name: 'votecollector/assignmentpoll', id: $scope.poll.id}]
+            );
+        };
+
+        $scope.isProjected = function (poll_id) {
+            // Returns true if there is a projector element with the same
+            // name and the same id of $scope.poll.
+            var projector = Projector.get(1);
+            var isProjected;
+            if (typeof projector !== 'undefined') {
+                var self = this;
+                var predicate = function (element) {
+                    return element.name == "votecollector/assignmentpoll" &&
+                        typeof element.id !== 'undefined' &&
+                        element.id == poll_id;
+                };
+                isProjected = typeof _.findKey(projector.elements, predicate) === 'string';
+            } else {
+                isProjected = false;
+            }
+            return isProjected;
+        }
     }
 ])
 
@@ -838,19 +1091,19 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
                     '<button type="button" ng-if="canStartVoting()" ' +
                         'ng-click="startVoting()"' +
                         'class="btn btn-default">' +
-                        '<i class="fa fa-wifi" aria-hidden="true"></i> '+
-                        '<translate>Start voting</translate></button> ' +
+                        '<i class="fa fa-wifi" aria-hidden="true"></i> ' +
+                        '{{ \'Start voting\' | translate }}</button> ' +
                     '<button type="button" ng-if="canStopVoting()" ' +
                         'ng-click="stopVoting()"' +
                         'class="btn btn-primary">' +
                         '<i class="fa fa-wifi" aria-hidden="true"></i> '+
-                        '<translate>Stop voting<translate></button> ' +
+                        '{{ \'Stop voting\' | translate }}</button> ' +
                     '<button type="button" os-perms="core.can_manage_projector" class="btn btn-default"' +
                       ' ng-class="{ \'btn-primary\': isProjected() }"' +
                       ' ng-click="projectSlide()"' +
-                      ' title="{{ \'Project vote\' | translate }}">' +
+                      ' title="{{ \'Project vote result\' | translate }}">' +
                       '<i class="fa fa-video-camera"></i> ' +
-                      '<translate>Vote<translate></button>' +
+                      '{{ \'Voting result\' | translate }}</button>' +
                     '<p>{{ getVotingStatus() }}</p>' +
                 '</div>'
         })
@@ -869,12 +1122,18 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
                         'ng-click="startVoting()"' +
                         'class="btn btn-default">' +
                         '<i class="fa fa-wifi" aria-hidden="true"></i> '+
-                        '<translate>Start voting</translate></button> ' +
+                        '{{ \'Start election\' | translate }}</button> ' +
                     '<button type="button" ng-if="canStopVoting()" ' +
                         'ng-click="stopVoting()"' +
                         'class="btn btn-primary">' +
                         '<i class="fa fa-wifi" aria-hidden="true"></i> '+
-                        '<translate>Stop voting<translate></button> ' +
+                        '{{ \'Stop election\' | translate }}</button> ' +
+                    '<button type="button" os-perms="core.can_manage_projector" class="btn btn-default"' +
+                      ' ng-class="{ \'btn-primary\': isProjected(poll.id) }"' +
+                      ' ng-click="projectSlide()"' +
+                      ' title="{{ \'Project election result\' | translate }}">' +
+                      '<i class="fa fa-video-camera"></i> ' +
+                      '{{ \'Election result\' | translate }}</button>' +
                     '<p>{{ getVotingStatus() }}</p>' +
                 '</div>'
         })
@@ -883,8 +1142,9 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
 
 // SpeakerListCtrl at template hook itemDetailListOfSpeakersButtons
 .run([
+    'gettextCatalog',
     'templateHooks',
-    function (templateHooks) {
+    function (gettextCatalog, templateHooks) {
         templateHooks.registerHook({
             Id: 'itemDetailListOfSpeakersButtons',
             template:
@@ -893,12 +1153,12 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
                         'ng-click="startVoting()"' +
                         'class="btn btn-sm btn-default">' +
                         '<i class="fa fa-wifi" aria-hidden="true"></i> '+
-                        '<translate>Start speakers voting</translate></button>' +
+                        '{{ \'Start speakers voting\' | translate }}</button> ' +
                     '<button ng-if="canStopVoting()" ' +
                         'ng-click="stopVoting()"' +
                         'class="btn btn-sm btn-primary">' +
                         '<i class="fa fa-wifi" aria-hidden="true"></i> '+
-                        '<translate>Stop speakers voting</translate></button>' +
+                        '{{ \'Stop speakers voting\' | translate }}</button> ' +
                     '<uib-alert ng-show="vcAlert.show" type="{{ vcAlert.type }}" ng-click="vcAlert={}" close="vcAlert={}">' +
                         '{{ vcAlert.msg }}</uib-alert>' +
                 '</div>'
@@ -906,11 +1166,41 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
     }
 ])
 
-// Mark strings for translation in javascript
+// Mark config strings for translation in javascript
 .config([
     'gettext',
     function (gettext) {
-        // Add strings to be translated
+        // config stings
+        gettext('Distribution method for keypads');
+        gettext('Use anonymous keypads only');
+        gettext('Use personalized keypads only');
+        gettext('Use anonymous and personalized keypads');
+        gettext('URL of VoteCollector');
+        gettext('Example: http://localhost:8030');
+        gettext("Overlay message 'Vote started'");
+        gettext('Please vote now!');
+        gettext('Use live voting for motions');
+        gettext('Incoming votes will be shown on projector while voting is active.');
+        gettext('Show seating plan');
+        gettext('Incoming votes will be shown in seating plan on projector for keypads with assigned seats.');
+        gettext('Show grey seats on seating plan');
+        gettext('Incoming votes will be shown in grey on seating plan. You can see only WHICH seat has voted but not HOW.');
+
+        // template hook strings
+        gettext('Start voting');
+        gettext('Stop voting');
+        gettext('Start election');
+        gettext('Stop election');
+        gettext('Start speakers voting');
+        gettext('Stop speakers voting');
+        gettext('Single votes');
+        gettext('Voting result');
+        gettext('Project vote result');
+        gettext('Election result');
+        gettext('Project election result');
+
+        // permission strings
+        gettext('Can manage VoteCollector');
     }
 ])
 }());

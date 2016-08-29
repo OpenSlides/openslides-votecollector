@@ -24,10 +24,11 @@ angular.module('OpenSlidesApp.openslides_votecollector', ['OpenSlidesApp.users']
 
 .factory('Keypad', [
     'DS',
+    'gettext',
     'jsDataModel',
-    function (DS, jsDataModel) {
+    function (DS, gettext, jsDataModel) {
         var name = 'openslides_votecollector/keypad',
-            powerLevel = ['', 'full', 'medium', 'low', 'empty'],
+            powerLevel = ['', gettext('full'), gettext('medium'), gettext('low'), gettext('empty')],
             powerCSSIcon = ['', 'full', 'half', 'quarter', 'empty'],
             powerCSSColor = ['', '', '', 'danger', 'danger'];
 
@@ -173,7 +174,7 @@ angular.module('OpenSlidesApp.openslides_votecollector', ['OpenSlidesApp.users']
 .factory('SeatingPlan', [
     function () {
         return {
-            generate: function (seats, votes) {
+            generate: function (seats, votes, keys) {
                 // Generate seating plan with votes or empty seats
                 var seatingPlan = {};
                 var maxXAxis = _.reduce(seats, function (max, seat) {
@@ -189,13 +190,18 @@ angular.module('OpenSlidesApp.openslides_votecollector', ['OpenSlidesApp.users']
                 });
                 angular.forEach(seats, function (seat) {
                     var css = 'seat';
+                    var key;
                     if (votes && votes[seat.id]) {
                         css += ' ' + votes[seat.id];
+                    }
+                    if (keys && keys[seat.id]) {
+                        key = keys[seat.id];
                     }
                     seatingPlan.rows[seat.seating_plan_y_axis-1][seat.seating_plan_x_axis-1] = {
                         'css': css,
                         'number': seat.number,
-                        'id': seat.id
+                        'id': seat.id,
+                        'key': key
                     };
                 });
                 return seatingPlan;

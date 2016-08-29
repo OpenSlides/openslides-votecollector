@@ -147,6 +147,7 @@ class AssignmentPollKeypadConnection(RESTModelMixin, models.Model):
     access_permissions = AssignmentPollKeypadConnectionAccessPermissions()
 
     poll = models.ForeignKey(AssignmentPoll, on_delete=models.CASCADE, related_name='keypad_data_list')
+    keypad = models.ForeignKey(Keypad, on_delete=models.CASCADE, null=True)
     candidate = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
     value = models.CharField(max_length=255)
     serial_number = models.CharField(null=True, max_length=255)

@@ -1,6 +1,7 @@
 from xmlrpc.client import ServerProxy
 
 from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_noop
 
 from openslides.core.config import config
 
@@ -8,14 +9,14 @@ from .models import Keypad
 
 
 VOTECOLLECTOR_ERROR_MESSAGES = {
-    -1: _('Unknown voting mode.'),
-    -2: _('Invalid keypad range.'),
-    -3: _('Invalid keypad list.'),
-    -4: _('No keypads authorized for voting.'),
-    -5: _('License not sufficient.'),
-    -6: _('No voting device connected.'),
-    -7: _('Failed to set up voting device.'),
-    -8: _('Voting device not ready.'),
+    -1: ugettext_noop('Unknown voting mode.'),
+    -2: ugettext_noop('Invalid keypad range.'),
+    -3: ugettext_noop('Invalid keypad list.'),
+    -4: ugettext_noop('No keypads authorized for voting.'),
+    -5: ugettext_noop('License not sufficient.'),
+    -6: ugettext_noop('No voting device connected.'),
+    -7: ugettext_noop('Failed to set up voting device.'),
+    -8: ugettext_noop('Voting device not ready.'),
 }
 
 # For cert authentification see:
@@ -28,7 +29,7 @@ class VoteCollectorError(Exception):
     """
     def __init__(self, value=None, nr=None):
         if nr is not None:
-            self.value = VOTECOLLECTOR_ERROR_MESSAGES[nr]
+            self.value = _(VOTECOLLECTOR_ERROR_MESSAGES[nr])
         elif value is not None:
             self.value = value
         else:

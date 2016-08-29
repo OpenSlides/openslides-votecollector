@@ -10,6 +10,14 @@ __pycache__/
 # Local user data (settings, database, media, search index, static files)
 personal_data/*
 
+# Javascript tools and libraries
+node_modules/*
+bower_components/*
+
+# Generated i18n files
+openslides_votecollector/static/i18n
+openslides_votecollector/locale/en/LC_MESSAGES/django.mo
+
 # Package building
 *.egg-info
 build/

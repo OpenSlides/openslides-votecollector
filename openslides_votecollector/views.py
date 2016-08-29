@@ -6,7 +6,7 @@ from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 
 from openslides.agenda.models import Item, Speaker
-from openslides.assignments.models import AssignmentPoll, AssignmentRelatedUser
+from openslides.assignments.models import AssignmentOption, AssignmentPoll, AssignmentRelatedUser
 from openslides.core.config import config
 from openslides.core.exceptions import OpenSlidesError
 from openslides.core.models import Projector
@@ -114,8 +114,10 @@ class MotionPollKeypadConnectionViewSet(ReadOnlyModelViewSet):
         """
         Anonymize all votes of the given poll.
         """
-        MotionPollKeypadConnection.objects.filter(poll_id=request.data.get('poll_id')).update(keypad=None)
-        # TODO: Trigger autoupdate.
+        # Clear keypad id and save model to trigger autoupdate.
+        for mpkc in MotionPollKeypadConnection.objects.filter(poll_id=request.data.get('poll_id')):
+            mpkc.keypad_id = None
+            mpkc.save()
         return Response({'detail': _('All votes are successfully anonymized.')})
 
 
@@ -125,6 +127,17 @@ class AssignmentPollKeypadConnectionViewSet(ReadOnlyModelViewSet):
 
     def check_view_permissions(self):
         return self.get_access_permissions().can_retrieve(self.request.user)
+
+    @list_route(methods=['post'])
+    def anonymize_votes(self, request):
+        """
+        Anonymize all votes of the given poll.
+        """
+        # Clear keypad id and save model to trigger autoupdate.
+        for apkc in AssignmentPollKeypadConnection.objects.filter(poll_id=request.data.get('poll_id')):
+            apkc.keypad_id = None
+            apkc.save()
+        return Response({'detail': _('All votes are successfully anonymized.')})
 
 
 class VotingView(AjaxView):
@@ -241,15 +254,22 @@ class StartYNA(StartVoting):
         model = MotionPollKeypadConnection if type(poll) == MotionPoll else AssignmentPollKeypadConnection
         model.objects.filter(poll=poll).delete()
 
+        # Get candidate name (if is an election with one candidate only)
+        candidate_str = ''
+        if (type(poll) == AssignmentPoll) and (AssignmentOption.objects.filter(poll=poll).all().count() == 1):
+            candidate = AssignmentOption.objects.filter(poll=poll)[0].candidate
+            candidate_str = "<div class='spacer candidate'>" + candidate.get_full_name() + "</div>"
+
         # Show voting prompt on projector.
         projector = Projector.objects.get(id=1)
         projector.config[self.voting_key] = {
             'name': 'voting/prompt',
-            'message': config['votecollector_vote_started_msg'] +
+            'message' : _(config['votecollector_vote_started_msg']) +
                 "<br>" +
-                "<span class='nobr'><img src='/static/img/button-yes.png'> <translate>Yes</translate></span> &nbsp; " +
-                "<span class='nobr'><img src='/static/img/button-no.png'> <translate>No</translate></span> &nbsp; " +
-                "<span class='nobr'><img src='/static/img/button-abstain.png'> <translate>Abstain</translate></span>",
+                "<span class='nobr'><img src='/static/img/button-yes.png'> " + _('Yes') + "</span> &nbsp; " +
+                "<span class='nobr'><img src='/static/img/button-no.png'> " + _('No') + "</span> &nbsp; " +
+                "<span class='nobr'><img src='/static/img/button-abstain.png'> " + _('Abstain') + "</span>" +
+                candidate_str,
             'visible': True,
             'stable': True
         }
@@ -261,11 +281,25 @@ class StartElection(StartVoting):
         self.clear_votes(poll)
         AssignmentPollKeypadConnection.objects.filter(poll=poll).delete()
 
+        # Get candidate names (if is an election with >1 candidate)
+        candidate_str = ''
+        if (type(poll) == AssignmentPoll):
+            options = AssignmentOption.objects.filter(poll=poll).order_by('id').all()
+            candidate_str += "<div><ul class='columns' data-columns='3'>"
+            for index, option in enumerate(options):
+                candidate_str += \
+                        "<li><span class='key'>" + str(index + 1) + "</span> " + \
+                        "<span class='candidate'>" + option.candidate.get_full_name() + "</span>"
+            candidate_str += "<li><span class='key'>0</span> " + \
+                        "<span class='candidate'>" + _('Abstain') +"</span>"
+            candidate_str += "</ul></div>"
+
         # Show voting prompt on projector.
         projector = Projector.objects.get(id=1)
         projector.config[self.voting_key] = {
             'name': 'voting/prompt',
-            'message': config['votecollector_vote_started_msg'],
+            'message': _(config['votecollector_vote_started_msg']) +
+                "<br>" + candidate_str,
             'visible': True,
             'stable': True
         }
@@ -417,8 +451,8 @@ class VoteCallback(VotingCallbackView):
             conn, created = MotionPollKeypadConnection.objects.get_or_create(poll=poll, keypad=keypad)
             conn.serial_number = request.POST.get('sn')
         else:
-            conn, created = AssignmentPollKeypadConnection.objects.get_or_create(
-                poll=poll, serial_number=request.POST.get('sn'))
+            conn, created = AssignmentPollKeypadConnection.objects.get_or_create(poll=poll, keypad=keypad)
+            conn.serial_number = request.POST.get('sn')
         conn.value = value
         conn.save()
 
@@ -427,7 +461,7 @@ class VoteCallback(VotingCallbackView):
         vc.voting_duration = request.POST.get('elapsed', 0)
         vc.save()
 
-        return HttpResponse(_('Vote received'))
+        return HttpResponse(_('Vote submitted'))
 
 
 class CandidateCallback(VotingCallbackView):
@@ -455,14 +489,12 @@ class CandidateCallback(VotingCallbackView):
         # Get the elected candidate.
         candidate = None
         if key > 0 and key <= poll.assignment.related_users.all().count():
-            candidate = AssignmentRelatedUser.objects.order_by('id').filter(
-                assignment=poll.assignment).all()[key - 1].user
-            # NOTE: Must not use related_users since the ordering does not match the site ordering.
-            # candidate = poll.assignment.related_users.all()[key - 1]
+            # TODO: sort candidates by weight if implemented in OpenSlides core
+            candidate = AssignmentOption.objects.filter(poll=poll_id).order_by('id').all()[key - 1].candidate
 
         # Save vote.
-        conn, created = AssignmentPollKeypadConnection.objects.get_or_create(
-            poll=poll, serial_number=request.POST.get('sn'))
+        conn, created = AssignmentPollKeypadConnection.objects.get_or_create(poll=poll, keypad=keypad)
+        conn.serial_number = request.POST.get('sn')
         conn.value = str(key)
         conn.candidate = candidate
         conn.save()
@@ -473,7 +505,7 @@ class CandidateCallback(VotingCallbackView):
         vc.voting_duration = request.POST.get('elapsed', 0)
         vc.save()
 
-        return HttpResponse(_('Vote received'))
+        return HttpResponse(_('Vote submitted'))
 
 
 class SpeakerCallback(VotingCallbackView):
@@ -501,12 +533,12 @@ class SpeakerCallback(VotingCallbackView):
             except OpenSlidesError:
                 # User is already on the speaker list.
                 pass
-            content = _('Added to list of speakers')
+            content = _('Added to        list of speakers')
         # Remove keypad user from the speaker list.
         elif value == 'N':
             # Remove speaker if on "next speakers" list (begin_time=None, end_time=None).
             Speaker.objects.filter(user=keypad.user, item=item, begin_time=None, end_time=None).delete()
-            content = _('Removed from list of speakers')
+            content = _('Removed from    list of speakers')
         else:
             content = _('Invalid entry')
         return HttpResponse(content)

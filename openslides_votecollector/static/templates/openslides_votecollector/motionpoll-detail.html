@@ -20,15 +20,16 @@
         <translate>Motion</translate>
       </a>
       <!-- Anonymize -->
-      <a class="btn btn-sm btn-default" ng-click=""
+      <a os-perms="openslides_votecollector.can_manage_votecollector"
+        class="btn btn-sm btn-default"
         ng-bootbox-confirm="{{ 'Are you sure you want to anonymize all votes?' | translate }}"
         ng-bootbox-confirm-action="anonymizeVotes()">
         <i class="fa fa-exclamation-triangle fa-lg"></i>
-        <translate>Anonymize Votes</translate>
+        <translate>Anonymize votes</translate>
       </a>
       <!-- Project poll slide -->
       <a os-perms="core.can_manage_projector" class="btn btn-default btn-sm"
-          ng-class="{ 'btn-primary': isProjected(poll) }"
+          ng-class="{ 'btn-primary': isProjected(poll.id) }"
           ng-click="projectSlide()"
           title="{{ 'Project vote' | translate }}">
         <i class="fa fa-video-camera"></i>
@@ -46,26 +47,29 @@
     <!-- yes -->
     <tr>
       <td><img src='/static/img/button-yes.png'> <translate>Yes</translate>
-      <td ng-init="voteYes = poll.getVote(poll.yes)" class="bold">
-        {{ voteYes.value }} {{ voteYes.percentStr }}
-
+      <td class="bold">
+        {{ poll.getVote(poll.yes, 'yes').value }}
+        {{ poll.getVote(poll.yes, 'yes').percentStr }}
     <!-- no -->
     <tr>
       <td><img src='/static/img/button-no.png'> <translate>No</translate>
-      <td ng-init="voteNo = poll.getVote(poll.no)" class="bold">
-        {{ voteNo.value }} {{ voteNo.percentStr }}
+      <td class="bold">
+        {{ poll.getVote(poll.no, 'no').value }}
+        {{ poll.getVote(poll.yes, 'no').percentStr }}
 
     <!-- abstain -->
     <tr>
       <td><img src='/static/img/button-abstain.png'> <translate>Abstain</translate>
-      <td ng-init="voteAbstain = poll.getVote(poll.abstain)" class="bold">
-        {{ voteAbstain.value }} {{ voteAbstain.percentStr }}
+      <td class="bold">
+        {{ poll.getVote(poll.abstain, 'abstain').value }}
+        {{ poll.getVote(poll.abstain, 'abstain').percentStr }}
 
     <!-- valid votes -->
     <tr>
       <td><translate>Valid votes</translate>
-      <td ng-init="votesValid = poll.getVote(poll.votesvalid)" class="bold">
-        {{ votesValid.value }} {{ votesValid.percentStr }}
+      <td class="bold">
+        {{ poll.getVote(poll.votesvalid, 'votesvalid').value }}
+        {{ poll.getVote(poll.votesvalid, 'votesvalid').percentStr }}
   </table>
 
   <!-- single votes -->
@@ -76,17 +80,25 @@
       <th><translate>Keypad serial number</translate>
           <i class="fa fa-info-circle"
             uib-tooltip="{{ 'Press \'Fn+6\' on keypad to show the serial number.' | translate }}"></i>
-      <th translate>Vote</th>
+      <th translate-context="single motion vote result" translate>Vote result</th>
     </tr>
-    <tr ng-repeat="vote in votesList ">
+
+    <tr ng-repeat="vote in votesList">
+      <!-- name -->
       <td>
-        <a ng-if="vote.user" href="" ui-sref="users.user.detail({id: vote.user.id})">{{ vote.user.get_full_name() }}</a>
+        <a ng-if="vote.user" href="" ui-sref="users.user.detail({id: vote.user.id})">
+          {{ vote.user.get_full_name() }}
+        </a>
         <span ng-if="!vote.user"><i><translate>Anonymous</translate></i></span>
-      <td>{{ vote.motionpollkeypadconnection.serial_number }}
+
+      <!-- serial number -->
+      <td>{{ vote.serial_number }}
+
+      <!-- vote result -->
       <td>
-        <span ng-if="vote.motionpollkeypadconnection.value == 'Y'" translate>Yes</span>
-        <span ng-if="vote.motionpollkeypadconnection.value == 'N'" translate>No</span>
-        <span ng-if="vote.motionpollkeypadconnection.value == 'A'" translate>Abstain</span>
+        <span ng-if="vote.value == 'Y'" translate>Yes</span>
+        <span ng-if="vote.value == 'N'" translate>No</span>
+        <span ng-if="vote.value == 'A'" translate>Abstain</span>
     </tr>
   </table>
 </div>

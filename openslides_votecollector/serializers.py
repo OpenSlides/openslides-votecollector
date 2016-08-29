@@ -75,6 +75,7 @@ class AssignmentPollKeypadConnectionSerializer(ModelSerializer):
         fields = (
             'id',
             'poll',
+            'keypad',
             'candidate',
             'value',
             'serial_number',

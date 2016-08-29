@@ -1,3 +1,5 @@
+from django.utils.translation import ugettext_lazy
+
 from openslides.core.config import ConfigVariable
 
 def get_config_variables():
@@ -22,14 +24,14 @@ def get_config_variables():
         # TODO: Use URL validator.
         name='votecollector_uri',
         default_value='http://localhost:8030',
-        label='URL for VoteCollector',
+        label='URL of VoteCollector',
         help_text='Example: http://localhost:8030',
         weight=620,
         group='VoteCollector'
     )
     yield ConfigVariable(
         name='votecollector_vote_started_msg',
-        default_value='Please vote now!',
+        default_value=ugettext_lazy('Please vote now!'),
         label="Overlay message 'Vote started'",
         weight=630,
         group='VoteCollector'
@@ -38,7 +40,7 @@ def get_config_variables():
         name='votecollector_live_voting',
         default_value=True,
         input_type='boolean',
-        label='Use live voting',
+        label='Use live voting for motions',
         help_text='Incoming votes will be shown on projector while voting is active.',
         weight=640,
         group='VoteCollector'
@@ -57,8 +59,7 @@ def get_config_variables():
         default_value=False,
         input_type='boolean',
         label='Show grey seats on seating plan',
-        help_text='Incoming votes will be shown in grey on seating plan. '
-                  'You can see only WHICH seat has voted but not HOW.',
+        help_text='Incoming votes will be shown in grey on seating plan. You can see only WHICH seat has voted but not HOW.',
         weight=660,
         group='VoteCollector'
     )

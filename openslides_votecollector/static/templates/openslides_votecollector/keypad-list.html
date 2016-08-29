@@ -2,14 +2,16 @@
   <div class="title">
     <div class="submenu">
       <div>
-        <a ng-click="openDialog()" os-perms="openslides_votecollector.can_manage_votecollector"
-           class="btn btn-primary btn-sm">
+        <a ng-click="openDialog()" class="btn btn-primary btn-sm">
           <i class="fa fa-plus fa-lg"></i>
           <translate>New</translate>
         </a>
-        <a ng-click="checkKeypads()" os-perms="openslides_votecollector.can_manage_votecollector"
-           class="btn btn-default btn-sm">
-          <i class="fa fa-check fa-lg"></i>
+        <a ui-sref="openslides_votecollector.keypad.import" class="btn btn-default btn-sm">
+          <i class="fa fa-download fa-lg"></i>
+          <translate>Import</translate>
+        </a>
+        <a ng-click="checkKeypads()" class="btn btn-default btn-sm">
+          <i class="fa fa-cogs fa-lg"></i>
           <translate>System test</translate>
         </a>
       </div>
@@ -25,9 +27,9 @@
   <div class="row">
     <div class="col-sm-6">
       <!-- delete mode -->
-      <button os-perms="openslides_votecollector.can_manage_votecollector" class="btn"
-          ng-class="$parent.isDeleteMode ? 'btn-primary' : 'btn-default'"
-          ng-click="$parent.isDeleteMode = !$parent.isDeleteMode; uncheckAll()">
+      <button class="btn"
+          ng-class="isDeleteMode ? 'btn-primary' : 'btn-default'"
+          ng-click="isDeleteMode = !isDeleteMode; uncheckAll()">
         <i class="fa fa-check-square-o"></i>
         <translate>Select ...</translate>
       </button>
@@ -56,15 +58,15 @@
     <div class="col-sm-6 text-right form-inline">
       <!-- user filter -->
       <select ng-model="userFilter" class="form-control" id="userFilter">
-        <option value="" translate>--- Select user ---</option>
-        <option value="false" translate>Anonymous</option>
-        <option value="true" translate>Personalized</option>
+        <option value="" translate>--- Select keypad usage ---</option>
+        <option value="false" translate>anonymous</option>
+        <option value="true" translate>personalized</option>
       </select>
       <!-- active filter -->
       <select ng-model="activeFilter" class="form-control" id="activeFilter">
         <option value="" translate>--- Select status ---</option>
-        <option value="true" translate>Active</option>
-        <option value="false" translate>Inactive</option>
+        <option value="true" translate>active</option>
+        <option value="false" translate>inactive</option>
       </select>
       <!-- TODO: Add in range and battery filter -->
     </div>
@@ -92,7 +94,7 @@
     <thead>
       <tr>
         <!-- delete selection column -->
-        <th ng-show="$parent.isDeleteMode" os-perms="openslides_votecollector.can_manage_votecollector" class="minimum deleteColumn">
+        <th ng-show="isDeleteMode" class="minimum deleteColumn">
           <input type="checkbox" ng-model="$parent.selectedAll" ng-change="checkAll()">
 
         <!-- keypad id column -->
@@ -104,8 +106,7 @@
 
         <!-- user column -->
         <th ng-click="toggleSort('first_name')" class="sortable optional">
-          <translate>User</translate>
-          <!-- TODO: sort by first OR last name -->
+          <translate>Participant</translate>
           <i class="pull-right fa" ng-show="sortColumn === 'first_name' && header.sortable != false"
               ng-class="reverse ? 'fa-sort-desc' : 'fa-sort-asc'">
           </i>

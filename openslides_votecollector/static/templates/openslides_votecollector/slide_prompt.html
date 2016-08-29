@@ -20,6 +20,29 @@
     #votecollector_slide_message img {
         width: 50px;
     }
+    #votecollector_slide_message .candidate {
+      font-weight: normal;
+    }
+    #votecollector_slide_message .key {
+      width: 45px;
+      height: 45px;
+      -webkit-border-radius: 7px;
+      -moz-border-radius: 7px;
+      border-radius: 7px;
+      background-color:#100A4A;
+      color: white;
+      font-weight: bold;
+      font-size: 1.2em;
+      display: inline-block;
+      text-align: center;
+    }
+    #votecollector_slide_message .columns {
+      text-align: left;
+      list-style: none;
+      columns: 2;
+      -webkit-columns: 2;
+      -moz-columns: 2;
+    }
   </style>
 
   <div ng-if="visible" id="votecollector_slide_message" class="well" ng-bind-html="message"></div>
