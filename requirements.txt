@@ -1,6 +1,1 @@
-# Requirements for production
--r requirements_production.txt
-
-# Requirements for development and tests in alphabetical order
-Fabric==1.10.1
-flake8==2.3.0
+openslides>=2.1,<2.2

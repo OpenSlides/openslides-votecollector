@@ -1,0 +1,16 @@
+{
+  "name": "openslides-votecollector",
+  "private": true,
+  "scripts": {
+    "prepublish": "bower install && gulp"
+  },
+  "devDependencies": {
+    "bower": "~1.7.9",
+    "es6-promise": "~3.2.1",
+    "gulp": "~3.9.1",
+    "gulp-angular-gettext": "~2.2.0",
+    "gulp-jshint": "~2.0.1",
+    "jshint": "~2.9.3",
+    "po2json": "~0.4.4"
+  }
+}

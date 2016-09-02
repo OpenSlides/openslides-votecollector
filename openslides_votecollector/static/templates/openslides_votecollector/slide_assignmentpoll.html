@@ -1,0 +1,215 @@
+<div ng-controller="SlideAssignmentPollCtrl" class="content scrollcontent">
+
+  <style type="text/css">
+    #total-result-table {
+      font-size: 150%;
+      line-height: 40px;
+      margin: 0 20px 0 0;
+      width: auto;
+    }
+    #total-result-table img {
+      width: auto;
+    }
+    #total-result-table td {
+      padding: 9px;
+    }
+    #total-result-table td.bold {
+      font-weight: bold;
+      text-align: right;
+    }
+    #total-result-table td.vote {
+      min-width: 30px;
+    }
+    #total-result-table td.chart-column {
+      width: 200px;
+    }
+    #total-result-table td.percentage {
+        font-weight: normal;
+        font-size: 70%;
+        min-width: 80px;
+    }
+    #total-result-table .key {
+      width: 45px;
+      height: 45px;
+      -webkit-border-radius: 7px;
+      -moz-border-radius: 7px;
+      border-radius: 7px;
+      background-color:#100A4A;
+      color: white;
+      font-weight: bold;
+      font-size: 1.2em;
+      display: inline-block;
+      text-align: center;
+    }
+
+    #seating-plan table {
+        border-collapse: separate;
+        border-spacing: 5px;
+        border: none;
+    }
+    #seating-plan table td {
+        background-color: #ffffff;
+    }
+    #seating-plan table td {
+        padding: 0;
+        font-size: 0.75em;
+        min-width: 1em;
+        width: 3em;
+        height: 3em;
+        border: none;
+    }
+    #seating-plan table td.seat {
+        border: 1px solid black;
+        line-height: 120%;
+        text-align: center;
+    }
+    #seating-plan table td.seat-red {
+        background-color: #ff201c;
+    }
+    #seating-plan table td.seat-green {
+        background-color: #008f2a;
+    }
+    #seating-plan table td.seat-yellow {
+        background-color: #f1d300;
+    }
+    #seating-plan table td.seat-grey {
+        background-color: #999;
+    }
+    #seating-plan table td.seat-invalid {
+        background-color: #fe9a9a;
+    }
+    #seating-plan table td.seat-voted {
+        background-color: #92b8de;
+    }
+    #seating-plan table td span.key {
+        font-weight: bold;
+        width: 1.2em;
+        height: 1.2em;
+        -webkit-border-radius: 2px;
+        -moz-border-radius: 2px;
+        border-radius: 2px;
+        background-color: #100A4A;
+        color: white;
+        font-size: 110%;
+        display: inline-block;
+        text-align: center;
+    }
+  </style>
+
+
+  <!-- Title -->
+  <div id="title">
+    <h1>{{ assignment.agenda_item.getTitle() || assignment.title }}</h1>
+    <h2>
+      <translate>Election</translate> |
+      <translate>Election result</translate>
+    </h2>
+  </div>
+
+  <!-- voting results for yes/no/abstain -->
+  <div ng-if="poll.yesnoabstain">
+    <!-- total votes -->
+    <table class="well pull-left" id="total-result-table">
+      <!-- yes -->
+      <tr>
+        <td><img src='/static/img/button-yes.png'>
+        <td class="bold">
+          {{ ynaVotes[0].value }}
+        <td class="percentage">
+          <div ng-if="ynaVotes[0].percentNumber || !poll.has_votes">
+            {{ ynaVotes[0].percentStr }}
+            <uib-progressbar value="ynaVotes[0].percentNumber" type="success"
+                ng-class="{ 'progress-striped active': !poll.has_votes }"></uib-progressbar>
+          </div>
+
+      <!-- no -->
+      <tr>
+        <td><img src='/static/img/button-no.png'>
+        <td class="bold">
+          {{ ynaVotes[1].value }}
+        <td class="percentage">
+          <div ng-if="ynaVotes[1].percentNumber || !poll.has_votes">
+            {{ ynaVotes[1].percentStr }}
+            <uib-progressbar value="ynaVotes[1].percentNumber" type="danger"
+                ng-class="{ 'progress-striped active': !poll.has_votes }"></uib-progressbar>
+          </div>
+
+      <!-- abstain -->
+      <tr>
+        <td><img src='/static/img/button-abstain.png'>
+        <td class="bold">
+          {{ ynaVotes[2].value }}
+        <td class="percentage">
+          <div ng-if="ynaVotes[2].percentNumber || !poll.has_votes">
+            {{ ynaVotes[2].percentStr }}
+            <uib-progressbar value="ynaVotes[2].percentNumber" type="warning"
+                ng-class="{ 'progress-striped active': !poll.has_votes }"></uib-progressbar>
+          </div>
+
+      <!-- valid votes -->
+      <tr class="total" ng-if="poll.has_votes">
+        <td>
+        <td class="bold">
+          {{ poll.votesvalid }}
+        <td>
+    </table>
+  </div>
+
+  <!-- voting results for yes votes (1..n candidates) -->
+  <div ng-if="!poll.yesnoabstain && poll.has_votes">
+    <!-- total votes -->
+    <table class="well table-striped" id="total-result-table">
+      <tr ng-repeat="option in poll.options" ng-init="votes = option.getVotes()">
+
+        <!-- keypad key -->
+        <td><span class="key">{{ $index + 1 }}</span>
+
+        <!--candidate name -->
+        <td>
+          <i ng-if="option.is_elected" class="fa fa-star"></i>
+          <strong>{{ option.candidate.get_full_name() }}</strong>
+
+        <!-- votes -->
+        <td class="bold">
+          {{votes[0].value}}
+        <td class="bold">
+          {{votes[0].percentStr}}
+        <td class="chart-column">
+          <uib-progressbar ng-if="votes[0].percentNumber" value="votes[0].percentNumber" type="success"></uib-progressbar>
+
+      <!-- valid votes -->
+      <tr class="total">
+        <td>
+        <td translate>Valid votes
+        <td>
+          {{ poll.votesvalid }}
+        <td>
+        <td>
+
+      <!-- invalid votes -->
+      <tr>
+        <td>
+        <td><translate>Abstains</translate> / <translate>Invalid votes</translate>
+        <td>
+          {{ poll.votesinvalid }}
+        <td>
+        <td>
+
+      </table>
+  </div>
+
+  <!-- seating plan -->
+  <div ng-if="( poll.yesnoabstain && config('votecollector_seating_plan') ) ||
+              (!poll.yesnoabstain && config('votecollector_seating_plan') && !poll.has_votes)" id="seating-plan">
+      <table>
+        <tr ng-repeat="row in seatingPlan.rows">
+          <td ng-repeat="seat in row"
+              ng-class="{ '{{seat.css}}': config('votecollector_live_voting') || poll.has_votes, 'seat': seat.number }">
+            {{ seat.number }}
+            <span class="key" ng-if="seat.key && !poll.yesnoabstain && (config('votecollector_live_voting') || poll.has_votes)">{{seat.key}}</span>
+          </td>
+        </tr>
+      </table>
+  </div>
+
+</div>

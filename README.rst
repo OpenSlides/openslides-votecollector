@@ -19,8 +19,8 @@ by Emanuel Schütze.
 Requirements
 ============
 
-- OpenSlides 1.7.x
-- VoteCollector 1.3.x
+- OpenSlides 2.1.x (https://openslides.org/)
+- VoteCollector 1.7.6
 
 
 Install
@@ -31,7 +31,7 @@ I. Installation on Windows (with OpenSlides portable version)
 
 1. Install and run VoteCollector
 
-   Download VoteColletor from http://files.softwein.de/VoteCollector.zip
+   Download VoteColletor from http://files.softwein.de/OpenSlides-VoteCollector.zip.
 
    To use VoteCollector in simulation mode (no keypads required)
    please run from command line::
@@ -55,7 +55,7 @@ I. Installation on Windows (with OpenSlides portable version)
 Now the plugin installation is finished. You can open the new menu
 item 'VoteCollector' in the main navigation of OpenSlides.
 
-Change settings of plugin under 'Configuration > VoteCollector'.
+Change settings of plugin under 'Settings > VoteCollector'.
 
 
 II. Installation on GNU/Linux and MacOSX
@@ -75,7 +75,7 @@ II. Installation on GNU/Linux and MacOSX
 
 2. Setup and activate a virtual environment::
 
-    $ virtualenv .virtualenv
+    $ python3 -m venv .virtualenv
 
     $ source .virtualenv/bin/activate
 
@@ -112,6 +112,16 @@ MIT License, see LICENSE file. The authors are mentioned in the AUTHORS file.
 
 Changelog
 =========
+
+Version 2.0.0 (unreleased)
+--------------------------
+* Added support for OpenSlides 2.1.x with autoupdate for all incoming votes.
+* New speakers voting (add or remove from list of speakers via keypad).
+* New election voting (Yes/No/Abstain for one candidate or 1 of n candidates
+  via keypad keys 1..10) with anonymize votes.
+* Updated motion voting, with anonymize votes.
+* Added possibility to change the seat label.
+
 
 Version 1.2.1 (2015-03-18)
 --------------------------

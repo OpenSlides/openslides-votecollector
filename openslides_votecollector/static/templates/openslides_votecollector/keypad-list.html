@@ -1,0 +1,217 @@
+<div class="header">
+  <div class="title">
+    <div class="submenu">
+      <div>
+        <a ng-click="openDialog()" class="btn btn-primary btn-sm">
+          <i class="fa fa-plus fa-lg"></i>
+          <translate>New</translate>
+        </a>
+        <a ui-sref="openslides_votecollector.keypad.import" class="btn btn-default btn-sm">
+          <i class="fa fa-download fa-lg"></i>
+          <translate>Import</translate>
+        </a>
+        <a ng-click="checkKeypads()" class="btn btn-default btn-sm">
+          <i class="fa fa-cogs fa-lg"></i>
+          <translate>System test</translate>
+        </a>
+      </div>
+      <div class="spacer">
+        <span class="small pull-right">{{ device }}</span>
+      </div>
+    </div>
+    <h1 translate>Keypads</h1>
+  </div>
+</div>
+
+<div class="details">
+  <div class="row">
+    <div class="col-sm-6">
+      <!-- delete mode -->
+      <button class="btn"
+          ng-class="isDeleteMode ? 'btn-primary' : 'btn-default'"
+          ng-click="isDeleteMode = !isDeleteMode; uncheckAll()">
+        <i class="fa fa-check-square-o"></i>
+        <translate>Select ...</translate>
+      </button>
+    </div>
+    <!-- search/filter -->
+    <div class="col-sm-6">
+      <div class="form-inline text-right">
+        <div class="form-group">
+          <div class="input-group">
+            <div class="input-group-addon"><i class="fa fa-search"></i></div>
+            <input type="text" ng-model="filter.search" class="form-control"
+               placeholder="{{ 'Search' | translate}}">
+          </div>
+        </div>
+        <button class="btn btn-default" ng-click="isFilterOpen = !isFilterOpen"
+            ng-class="isFilterOpen ? 'btn-primary' : 'btn-default'">
+          <i class="fa fa-filter"></i>
+          <translate>Filter ...</translate>
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- filter options -->
+  <div uib-collapse="!isFilterOpen" class="row spacer">
+    <div class="col-sm-6 text-right"></div>
+    <div class="col-sm-6 text-right form-inline">
+      <!-- user filter -->
+      <select ng-model="userFilter" class="form-control" id="userFilter">
+        <option value="" translate>--- Select keypad usage ---</option>
+        <option value="false" translate>anonymous</option>
+        <option value="true" translate>personalized</option>
+      </select>
+      <!-- active filter -->
+      <select ng-model="activeFilter" class="form-control" id="activeFilter">
+        <option value="" translate>--- Select status ---</option>
+        <option value="true" translate>active</option>
+        <option value="false" translate>inactive</option>
+      </select>
+      <!-- TODO: Add in range and battery filter -->
+    </div>
+  </div>
+  <!-- delete mode options -->
+  <div uib-collapse="!isDeleteMode" class="row spacer">
+    <div class="col-sm-12 text-left">
+      <!-- delete button -->
+      <a ng-show="isDeleteMode"
+          ng-click="deleteMultiple()"
+          class="btn btn-primary">
+        <i class="fa fa-trash fa-lg"></i>
+        <translate>Delete selected keypads</translate>
+      </a>
+    </div>
+  </div>
+
+  <div class="spacer-top-lg italic">
+    {{ keypadsFiltered.length }} /
+    {{ keypads.length }} {{ "keypads" | translate }}<span ng-if="(keypads|filter:{selected:true}).length > 0">,
+    {{(keypads|filter:{selected:true}).length}} {{ "selected" | translate }}</span>
+  </div>
+
+  <table class="table table-striped table-bordered table-hover">
+    <thead>
+      <tr>
+        <!-- delete selection column -->
+        <th ng-show="isDeleteMode" class="minimum deleteColumn">
+          <input type="checkbox" ng-model="$parent.selectedAll" ng-change="checkAll()">
+
+        <!-- keypad id column -->
+        <th ng-click="toggleSort('keypad_id')" class="sortable">
+          <translate>Keypad ID</translate>
+          <i class="pull-right fa" ng-show="sortColumn === 'keypad_id' && header.sortable != false"
+              ng-class="reverse ? 'fa-sort-desc' : 'fa-sort-asc'">
+          </i>
+
+        <!-- user column -->
+        <th ng-click="toggleSort('first_name')" class="sortable optional">
+          <translate>Participant</translate>
+          <i class="pull-right fa" ng-show="sortColumn === 'first_name' && header.sortable != false"
+              ng-class="reverse ? 'fa-sort-desc' : 'fa-sort-asc'">
+          </i>
+
+        <!-- seat column -->
+        <th class="optional">
+          <translate>Seat</translate>
+
+        <!-- in_range column -->
+        <th>
+          <translate>In range</translate>
+
+        <!-- battery column -->
+        <th>
+          <translate>Battery</translate>
+          <i class="fa fa-info-circle"
+            uib-tooltip="{{ 'Battery state is checked with each voting. Available states: full, medium, low, empty' | translate }}"></i>
+
+    <tbody>
+      <tr ng-repeat="keypad in keypadsFiltered = (keypads | osFilter:filter.search:getFilterString |
+        filter:{active: activeFilter} | filter:{identified: userFilter} | orderBy:sortColumn:reverse)"
+        class="animate-item"
+        ng-class="{'selected':keypad.selected}">
+
+        <!-- delete selection -->
+        <td ng-show="isDeleteMode" class="deleteColumn">
+          <input type="checkbox" ng-model="keypad.selected">
+
+        <!-- keypad id -->
+        <td ng-mouseover="keypad.hover=true" ng-mouseleave="keypad.hover=false">
+            <strong>{{ keypad.keypad_id }}</strong>
+            &nbsp; <span ng-if="!keypad.isActive()" class="label label-warning"><translate>inactive</translate></span>
+            <div class="hoverActions" ng-class="{'hiddenDiv': !keypad.hover}">
+              <span>
+                <a href="" ng-click="openDialog(keypad)" translate>Edit</a> |
+                <a href="" class="text-danger"
+                  ng-bootbox-confirm="{{ 'Are you sure you want to delete this entry?' | translate }}<br>
+                  <b>{{ keypad.getTitle() }}</b>"
+                  ng-bootbox-confirm-action="delete(keypad)" translate>Delete</a>
+              </span>
+            </div>
+
+        <!-- user -->
+        <td class="optional">
+          <span ng-if="keypad.user">
+            <i ng-show="!keypad.user.is_active" class="fa fa-ban"
+              title="{{ 'Is inactive' | translate }}"></i>
+            <a href="" ui-sref="users.user.detail({id: keypad.user.id})">{{ keypad.user.get_full_name() }}</a>
+          </span>
+          <span ng-if="!keypad.user"><i><translate>Anonymous</translate></i></span>
+
+        <!-- seat -->
+        <td class="optional">
+          <span ng-if="keypad.seat">{{ keypad.seat.number }}</span>
+          <span ng-if="!keypad.seat">–</span>
+
+        <!-- in range -->
+        <td>
+          <i ng-if="keypad.in_range" class="fa fa-check-square-o fa-lg" title="{{ 'Yes' | translate }}" aria-hidden="true"></i>
+          <i ng-if="!keypad.in_range" class="fa fa-ban fa-lg text-danger" title="{{ 'No' | translate }}" aria-hidden="true"></i></span>
+
+        <!-- battery -->
+        <td>
+          <i class="fa fa-lg fa-battery-{{ keypad.powerCSSIcon() }} text-{{ keypad.powerCSSColor() }}"
+            title="{{ keypad.power() | translate }}" aria-hidden="true"></i>
+  </table>
+</div>
+
+<style>
+    #seating-plan table {
+        border-collapse: separate;
+        border-spacing: 5px;
+        border: none;
+    }
+    #seating-plan table td {
+        background-color: #ffffff;
+    }
+    #seating-plan table td {
+        padding: 0;
+        font-size: 0.75em;
+        min-width: 1em;
+        width: 3em;
+        height: 3em;
+        border: none;
+    }
+    #seating-plan table td.seat {
+        border: 1px solid black;
+        line-height: 120%;
+        text-align: center;
+    }
+</style>
+
+<div class="details" ng-if="config('votecollector_seating_plan')">
+  <h2 translate>Seating plan</h2>
+  <p translate>Click on a seat to edit its label.</p>
+  <div id="seating-plan">
+    <table>
+        <tr ng-repeat="row in seatingPlan.rows">
+          <td ng-repeat="seat in row" ng-class="seat.css">
+            <span ng-bootbox-prompt="{{ 'Change seat label for' | translate }} '{{seat.number}}':"
+                  ng-bootbox-prompt-action="changeSeat(seat, result)">
+              {{ seat.number }}
+            </span>
+          </td>
+        </tr>
+    </table>
+  </div>
+</div>

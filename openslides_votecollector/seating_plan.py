@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
-
 from .models import Seat
 
 
 def setup_default_plan():
     """
-    Adds a default seating plan:
+    Adds a default seating plan.
     """
     seats = []
 

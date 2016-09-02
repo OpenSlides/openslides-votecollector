@@ -1,17 +1,22 @@
 # Patterns of intentionally untracked files that Git should ignore
 
+# Python compiled files
+__pycache__/
+
 # Virtual Python Environment builder
 .virtualenv/
 .venv/
 
-# Python compiled files
-*.pyc
+# Local user data (settings, database, media, search index, static files)
+personal_data/*
 
-# Development user data (settings, database, media, search index)
-settings.py
-database.sqlite
-media/
-whoosh_index/
+# Javascript tools and libraries
+node_modules/*
+bower_components/*
+
+# Generated i18n files
+openslides_votecollector/static/i18n
+openslides_votecollector/locale/en/LC_MESSAGES/django.mo
 
 # Package building
 *.egg-info
@@ -21,5 +26,4 @@ dist/
 # Miscellaneous
 *.swp
 *~
-.DS_Store
-versiontools*
+private/
