@@ -8,7 +8,7 @@ module = __import__(module_name)
 with open('README.rst') as readme:
     long_description = readme.read()
 
-with open('requirements_production.txt') as requirements:
+with open('requirements.txt') as requirements:
     install_requires = requirements.readlines()
 
 setup(

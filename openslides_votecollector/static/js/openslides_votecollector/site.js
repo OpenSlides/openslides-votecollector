@@ -1203,4 +1203,5 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
         gettext('Can manage VoteCollector');
     }
 ])
+
 }());
