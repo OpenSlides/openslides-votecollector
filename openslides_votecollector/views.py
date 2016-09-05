@@ -448,13 +448,25 @@ class VoteCallback(VotingCallbackView):
             return HttpResponse(_('Vote rejected'))
 
         if vc.voting_mode == 'MotionPoll':
-            conn, created = MotionPollKeypadConnection.objects.get_or_create(poll=poll, keypad=keypad)
-            conn.serial_number = request.POST.get('sn')
+            try:
+                conn = MotionPollKeypadConnection.objects.get(poll=poll, keypad=keypad)
+            except MotionPollKeypadConnection.DoesNotExist:
+                conn = MotionPollKeypadConnection()
+                conn.poll = poll
+                conn.keypad = keypad
+                conn.serial_number = request.POST.get('sn')
+                conn.value = value
+                conn.save()
         else:
-            conn, created = AssignmentPollKeypadConnection.objects.get_or_create(poll=poll, keypad=keypad)
-            conn.serial_number = request.POST.get('sn')
-        conn.value = value
-        conn.save()
+            try:
+                conn = AssignmentPollKeypadConnection.objects.get(poll=poll, keypad=keypad)
+            except AssignmentPollKeypadConnection.DoesNotExist:
+                conn = AssignmentPollKeypadConnection()
+                conn.poll = poll
+                conn.keypad = keypad
+                conn.serial_number = request.POST.get('sn')
+                conn.value = value
+                conn.save()
 
         # Update votecollector.
         vc.votes_received = request.POST.get('votes', 0)
@@ -493,11 +505,16 @@ class CandidateCallback(VotingCallbackView):
             candidate = AssignmentOption.objects.filter(poll=poll_id).order_by('id').all()[key - 1].candidate
 
         # Save vote.
-        conn, created = AssignmentPollKeypadConnection.objects.get_or_create(poll=poll, keypad=keypad)
-        conn.serial_number = request.POST.get('sn')
-        conn.value = str(key)
-        conn.candidate = candidate
-        conn.save()
+        try:
+            conn = AssignmentPollKeypadConnection.objects.get(poll=poll, keypad=keypad)
+        except AssignmentPollKeypadConnection.DoesNotExist:
+            conn = AssignmentPollKeypadConnection()
+            conn.poll = poll
+            conn.keypad = keypad
+            conn.serial_number = request.POST.get('sn')
+            conn.value = str(key)
+            conn.candidate = candidate
+            conn.save()
 
         # Update votecollector.
         vc = VoteCollector.objects.get(id=1)
