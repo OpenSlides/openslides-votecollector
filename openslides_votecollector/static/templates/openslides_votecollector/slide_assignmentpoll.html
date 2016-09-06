@@ -203,9 +203,9 @@
               (!poll.yesnoabstain && config('votecollector_seating_plan') && !poll.has_votes)" id="seating-plan">
       <table>
         <tr ng-repeat="row in seatingPlan.rows">
-          <td ng-repeat="seat in row"
+          <td ng-repeat="seat in row track by $index"
               ng-class="{ '{{seat.css}}': config('votecollector_live_voting') || poll.has_votes, 'seat': seat.number }">
-            {{ seat.number }}
+            <span ng-show="seat.is_active">{{ seat.number }}</span>
             <span class="key" ng-if="seat.key && !poll.yesnoabstain && (config('votecollector_live_voting') || poll.has_votes)">{{seat.key}}</span>
           </td>
         </tr>

@@ -454,9 +454,9 @@ class VoteCallback(VotingCallbackView):
                 conn = MotionPollKeypadConnection()
                 conn.poll = poll
                 conn.keypad = keypad
-                conn.serial_number = request.POST.get('sn')
-                conn.value = value
-                conn.save()
+            conn.serial_number = request.POST.get('sn')
+            conn.value = value
+            conn.save()
         else:
             try:
                 conn = AssignmentPollKeypadConnection.objects.get(poll=poll, keypad=keypad)
@@ -464,9 +464,9 @@ class VoteCallback(VotingCallbackView):
                 conn = AssignmentPollKeypadConnection()
                 conn.poll = poll
                 conn.keypad = keypad
-                conn.serial_number = request.POST.get('sn')
-                conn.value = value
-                conn.save()
+            conn.serial_number = request.POST.get('sn')
+            conn.value = value
+            conn.save()
 
         # Update votecollector.
         vc.votes_received = request.POST.get('votes', 0)
@@ -511,10 +511,10 @@ class CandidateCallback(VotingCallbackView):
             conn = AssignmentPollKeypadConnection()
             conn.poll = poll
             conn.keypad = keypad
-            conn.serial_number = request.POST.get('sn')
-            conn.value = str(key)
-            conn.candidate = candidate
-            conn.save()
+        conn.serial_number = request.POST.get('sn')
+        conn.value = str(key)
+        conn.candidate = candidate
+        conn.save()
 
         # Update votecollector.
         vc = VoteCollector.objects.get(id=1)

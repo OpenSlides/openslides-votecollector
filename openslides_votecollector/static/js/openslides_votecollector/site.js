@@ -272,10 +272,10 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
                                         $scope.device = success.data.error;
                                     }
                                     else {
-                                        // Stop pinging after 5 seconds.
+                                        // Stop pinging after 50 seconds.
                                         $timeout(function () {
                                             $http.get('/votecollector/stop/');
-                                        }, 25000);
+                                        }, 50000);
                                     }
                                 }
                             );

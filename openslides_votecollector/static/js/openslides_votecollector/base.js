@@ -49,7 +49,7 @@ angular.module('OpenSlidesApp.openslides_votecollector', ['OpenSlidesApp.users']
                     return "Keypad " + this.keypad_id;
                 },
                 isActive: function () {
-                    return this.user === undefined || this.user.is_active;
+                    return this.user === undefined || this.user.is_present;
                 },
                 isIdentified: function () {
                     return this.user !== undefined;
@@ -90,9 +90,27 @@ angular.module('OpenSlidesApp.openslides_votecollector', ['OpenSlidesApp.users']
 
 .factory('Seat', [
     'DS',
-    function (DS) {
+    'Keypad',
+    function (DS, Keypad) {
         return DS.defineResource({
-            name: 'openslides_votecollector/seat'
+            name: 'openslides_votecollector/seat',
+            relations: {
+                hasOne: {
+                    'openslides_votecollector/keypad': {
+                        localField: 'keypad',
+                        localKey: 'keypad_id'
+                    }
+                }
+            },
+            methods: {
+                isActive: function () {
+                    var seat = this;
+                    var keypad = _.find(Keypad.getAll(), function(keypad) {
+                        return keypad.seat_id == seat.id;
+                    });
+                    return keypad ? keypad.isActive() : undefined;
+                }
+            }
         });
     }
 ])
@@ -201,7 +219,8 @@ angular.module('OpenSlidesApp.openslides_votecollector', ['OpenSlidesApp.users']
                         'css': css,
                         'number': seat.number,
                         'id': seat.id,
-                        'key': key
+                        'key': key,
+                        'is_active': seat ? seat.isActive() : null
                     };
                 });
                 return seatingPlan;
