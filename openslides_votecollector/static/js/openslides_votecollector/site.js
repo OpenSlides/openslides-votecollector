@@ -275,7 +275,7 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
                                         // Stop pinging after 5 seconds.
                                         $timeout(function () {
                                             $http.get('/votecollector/stop/');
-                                        }, 5000);
+                                        }, 25000);
                                     }
                                 }
                             );
