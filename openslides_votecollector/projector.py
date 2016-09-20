@@ -1,11 +1,9 @@
 from openslides.core.exceptions import ProjectorException
 from openslides.assignments.models import AssignmentPoll
-from openslides.assignments.views import AssignmentViewSet
 from openslides.motions.models import MotionPoll
-from openslides.motions.views import MotionViewSet
-from openslides.utils.projector import ProjectorElement, ProjectorRequirement
+from openslides.utils.projector import ProjectorElement
 
-from .views import KeypadViewSet, SeatViewSet, MotionPollKeypadConnectionViewSet, AssignmentPollKeypadConnectionViewSet
+from .models import Keypad, Seat, MotionPollKeypadConnection, AssignmentPollKeypadConnection
 
 
 class MotionPollSlide(ProjectorElement):
@@ -15,34 +13,26 @@ class MotionPollSlide(ProjectorElement):
     name = 'votecollector/motionpoll'
 
     def check_data(self):
-        pk = self.config_entry.get('id')
-        if pk is not None:
-            # Detail slide.
-            if not MotionPoll.objects.filter(pk=pk).exists():
-                raise ProjectorException('MotionPoll does not exist.')
+        if not MotionPoll.objects.filter(pk=self.config_entry.get('id')).exists():
+            raise ProjectorException('MotionPoll does not exist.')
 
     def get_requirements(self, config_entry):
-        pk = config_entry.get('id')
-        # Detail slide.
         try:
-            motionpoll = MotionPoll.objects.get(pk=pk)
-        except Motion.DoesNotExist:
-            # Motion does not exist. Just do nothing.
+            motionpoll = MotionPoll.objects.get(pk=config_entry.get('id'))
+        except MotionPoll.DoesNotExist:
+            # MotionPoll does not exist. Just do nothing.
             pass
         else:
-            yield ProjectorRequirement(
-                view_class=MotionViewSet,
-                view_action='retrieve',
-                pk=str(motionpoll.motion.pk))
-            yield ProjectorRequirement(
-                view_class=KeypadViewSet,
-                view_action='retrieve')
-            yield ProjectorRequirement(
-                view_class=SeatViewSet,
-                view_action='retrieve')
-            yield ProjectorRequirement(
-                view_class=MotionPollKeypadConnectionViewSet,
-                view_action='retrieve')
+            yield motionpoll.motion
+            yield motionpoll.motion.agenda_item
+            yield from Seat.objects.all()
+            keypads = Keypad.objects.all()
+            yield from keypads
+            for keypad in keypads:
+                # Yield user of each keypad
+                if keypad.user is not None:
+                    yield keypad.user
+            yield from MotionPollKeypadConnection.objects.all()
 
 
 class AssignmentPollSlide(ProjectorElement):
@@ -52,35 +42,29 @@ class AssignmentPollSlide(ProjectorElement):
     name = 'votecollector/assignmentpoll'
 
     def check_data(self):
-        pk = self.config_entry.get('id')
-        if pk is not None:
-            # Detail slide.
-            if not AssignmentPoll.objects.filter(pk=pk).exists():
-                raise ProjectorException('AssignmentPoll does not exist.')
+        if not AssignmentPoll.objects.filter(pk=self.config_entry.get('id')).exists():
+            raise ProjectorException('AssignmentPoll does not exist.')
 
     def get_requirements(self, config_entry):
-        pk = config_entry.get('id')
-        # Detail slide.
         try:
-            assignmentpoll = AssignmentPoll.objects.get(pk=pk)
-        except Assignment.DoesNotExist:
-            # Assignment does not exist. Just do nothing.
+            assignmentpoll = AssignmentPoll.objects.get(pk=config_entry.get('id'))
+        except AssignmentPoll.DoesNotExist:
+            # AssignmentPoll does not exist. Just do nothing.
             pass
         else:
-            yield ProjectorRequirement(
-                view_class=AssignmentViewSet,
-                view_action='retrieve',
-                pk=str(assignmentpoll.assignment.pk))
-            yield ProjectorRequirement(
-                view_class=KeypadViewSet,
-                view_action='retrieve')
-            yield ProjectorRequirement(
-                view_class=SeatViewSet,
-                view_action='retrieve')
-            yield ProjectorRequirement(
-                view_class=AssignmentPollKeypadConnectionViewSet,
-                view_action='retrieve')
-
+            assignment = assignmentpoll.assignment
+            yield assignment
+            yield assignment.agenda_item
+            for option in assignmentpoll.options.all():
+                yield option.candidate
+            yield from Seat.objects.all()
+            keypads = Keypad.objects.all()
+            yield from keypads
+            for keypad in keypads:
+                # Yield user of each keypad
+                if keypad.user is not None:
+                    yield keypad.user
+            yield from AssignmentPollKeypadConnection.objects.all()
 
 class VotingPrompt(ProjectorElement):
     """

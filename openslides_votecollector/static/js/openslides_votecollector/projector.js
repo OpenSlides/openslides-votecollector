@@ -59,26 +59,16 @@ angular.module('OpenSlidesApp.openslides_votecollector.projector', ['OpenSlidesA
         // Add it to the coresponding get_requirements method of the ProjectorElement
         // class.
         var pollId = $scope.element.id;
-        Motion.findAll().then(
-            function (motions) {
-                var result = MotionPollFinder.find(motions, pollId);
-                $scope.$watch(function () {
-                  return Motion.lastModified(result.motion.id);
-                }, function () {
-                    var result = MotionPollFinder.find(motions, pollId);
-                    $scope.motion = Motion.get(result.motion.id);
-                    $scope.poll = result.poll;
-                });
-            }
-        );
-
-        MotionPollKeypadConnection.findAll();
-        Seat.findAll();
-        Keypad.findAll().then(function(keypads){
-            angular.forEach(keypads, function(keypad) {
-                Keypad.loadRelations(keypad, 'user');
-            });
+        var result = MotionPollFinder.find(Motion.getAll(), pollId);
+        $scope.$watch(function () {
+            return Motion.lastModified(result.motion.id);
+                // + Agenda.lastModified(result.motion.agenda_item_id);
+        }, function () {
+            var result = MotionPollFinder.find(Motion.getAll(), pollId);
+            $scope.motion = result.motion;
+            $scope.poll = result.poll;
         });
+
         $scope.$watch(function () {
             return MotionPollKeypadConnection.lastModified() +
                     Keypad.lastModified() +
@@ -140,42 +130,19 @@ angular.module('OpenSlidesApp.openslides_votecollector.projector', ['OpenSlidesA
         // Add it to the coresponding get_requirements method of the ProjectorElement
         // class.
         var pollId = $scope.element.id;
-        User.findAll()
-        Assignment.findAll().then(
-            function (assignments) {
-                var result = AssignmentPollFinder.find(assignments, pollId);
-                $scope.$watch(function () {
-                    if (result.assignment) {
-                        return Assignment.lastModified(result.assignment.id);
-                    } else {
-                        return false;
-                    }
-                }, function () {
-                    var result = AssignmentPollFinder.find(assignments, pollId);
-                    $scope.assignment = Assignment.get(result.assignment.id);
-                    $scope.poll = result.poll;
-                });
+        var result = AssignmentPollFinder.find(Assignment.getAll(), pollId);
+        $scope.$watch(function () {
+            return Assignment.lastModified(result.assignment.id);
+                // + Agenda.lastModified(result.motion.agenda_item_id);
+        }, function () {
+            var result = AssignmentPollFinder.find(Assignment.getAll(), pollId);
+            $scope.assignment = result.assignment;
+            $scope.poll = result.poll;
+            if ($scope.poll) {
+                $scope.ynaVotes = $scope.poll.options[0].getVotes();
             }
-        );
-
-        $scope.$watch(
-            function () {
-                return $scope.poll;
-            },
-            function () {
-                if ($scope.poll) {
-                    $scope.ynaVotes = $scope.poll.options[0].getVotes();
-                }
-            }
-        );
-
-        AssignmentPollKeypadConnection.findAll();
-        Seat.findAll();
-        Keypad.findAll().then(function(keypads){
-            angular.forEach(keypads, function(keypad) {
-                Keypad.loadRelations(keypad, 'user');
-            });
         });
+
         $scope.$watch(function () {
             return AssignmentPollKeypadConnection.lastModified() +
                     Keypad.lastModified() +

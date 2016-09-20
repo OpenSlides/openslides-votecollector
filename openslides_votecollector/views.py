@@ -91,7 +91,7 @@ class SeatViewSet(ModelViewSet):
     queryset = Seat.objects.all()
 
     def check_view_permissions(self):
-        return self.get_access_permissions().can_retrieve(self.request.user)
+        return self.get_access_permissions().check_permissions(self.request.user)
 
 
 class KeypadViewSet(ModelViewSet):
@@ -99,7 +99,7 @@ class KeypadViewSet(ModelViewSet):
     queryset = Keypad.objects.all()
 
     def check_view_permissions(self):
-        return self.get_access_permissions().can_retrieve(self.request.user)
+        return self.get_access_permissions().check_permissions(self.request.user)
 
 
 class MotionPollKeypadConnectionViewSet(ReadOnlyModelViewSet):
@@ -107,7 +107,7 @@ class MotionPollKeypadConnectionViewSet(ReadOnlyModelViewSet):
     queryset = MotionPollKeypadConnection.objects.all()
 
     def check_view_permissions(self):
-        return self.get_access_permissions().can_retrieve(self.request.user)
+        return self.get_access_permissions().check_permissions(self.request.user)
 
     @list_route(methods=['post'])
     def anonymize_votes(self, request):
@@ -126,7 +126,7 @@ class AssignmentPollKeypadConnectionViewSet(ReadOnlyModelViewSet):
     queryset = AssignmentPollKeypadConnection.objects.all()
 
     def check_view_permissions(self):
-        return self.get_access_permissions().can_retrieve(self.request.user)
+        return self.get_access_permissions().check_permissions(self.request.user)
 
     @list_route(methods=['post'])
     def anonymize_votes(self, request):
