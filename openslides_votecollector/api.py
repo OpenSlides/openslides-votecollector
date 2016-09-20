@@ -59,7 +59,7 @@ def get_server():
 
 
 def get_keypads():
-    keypads = Keypad.objects.exclude(user__is_active=False).values_list(
+    keypads = Keypad.objects.exclude(user__is_present=False).values_list(
         'keypad_id', flat=True).order_by('keypad_id')
 
     if config['votecollector_method'] == 'anonym':
