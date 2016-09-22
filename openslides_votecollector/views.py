@@ -4,6 +4,7 @@ from django.apps import apps
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from django.utils.translation import ugettext as _
+from rest_framework.viewsets import ReadOnlyModelViewSet
 
 from openslides.agenda.models import Item, Speaker
 from openslides.assignments.models import AssignmentOption, AssignmentPoll, AssignmentRelatedUser
@@ -12,7 +13,7 @@ from openslides.core.exceptions import OpenSlidesError
 from openslides.core.models import Projector
 from openslides.motions.models import MotionPoll
 from openslides.utils import views as utils_views
-from openslides.utils.rest_api import ModelViewSet, ReadOnlyModelViewSet, Response, list_route
+from openslides.utils.rest_api import ListModelMixin, ModelViewSet, PermissionMixin, RetrieveModelMixin, Response, list_route
 
 from .api import (
     get_device_status,
@@ -102,7 +103,7 @@ class KeypadViewSet(ModelViewSet):
         return self.get_access_permissions().check_permissions(self.request.user)
 
 
-class MotionPollKeypadConnectionViewSet(ReadOnlyModelViewSet):
+class MotionPollKeypadConnectionViewSet(PermissionMixin, ListModelMixin, RetrieveModelMixin, ReadOnlyModelViewSet):
     access_permissions = MotionPollKeypadConnectionAccessPermissions()
     queryset = MotionPollKeypadConnection.objects.all()
 
@@ -121,7 +122,7 @@ class MotionPollKeypadConnectionViewSet(ReadOnlyModelViewSet):
         return Response({'detail': _('All votes are successfully anonymized.')})
 
 
-class AssignmentPollKeypadConnectionViewSet(ReadOnlyModelViewSet):
+class AssignmentPollKeypadConnectionViewSet(PermissionMixin, ListModelMixin, RetrieveModelMixin, ReadOnlyModelViewSet):
     access_permissions = AssignmentPollKeypadConnectionAccessPermissions()
     queryset = AssignmentPollKeypadConnection.objects.all()
 
@@ -273,7 +274,7 @@ class StartYNA(StartVoting):
             'visible': True,
             'stable': True
         }
-        projector.save()
+        projector.save(information={'votecollector_voting_msg_toggled': True})
 
 
 class StartElection(StartVoting):
@@ -303,7 +304,7 @@ class StartElection(StartVoting):
             'visible': True,
             'stable': True
         }
-        projector.save()
+        projector.save(information={'votecollector_voting_msg_toggled': True})
 
 
 class StartSpeakerList(StartVoting):
@@ -314,7 +315,7 @@ class StartSpeakerList(StartVoting):
             'name': 'voting/icon',
             'stable': True
         }
-        projector.save()
+        projector.save(information={'votecollector_voting_msg_toggled': True})
 
 
 class StartPing(StartVoting):
@@ -339,7 +340,7 @@ class StopVoting(VotingView):
         except KeyError:
             pass
         else:
-            projector.save()
+            projector.save(information={'votecollector_voting_msg_toggled': True})
 
         try:
             self.result = stop_voting()
@@ -376,7 +377,7 @@ class VotingResult(VotingView):
         if not self.error:
             vc = VoteCollector.objects.get(id=1)
             if vc.voting_mode == kwargs['model'] and vc.voting_target == int(kwargs['id']):
-                if vc.voting_mode == 'AssignmentPoll' and not poll.yesnoabstain and not poll.yesno:
+                if vc.voting_mode == 'AssignmentPoll' and poll.pollmethod == 'votes':
                     # Calculate vote result.
                     self.result = {
                         'invalid': 0,
@@ -422,7 +423,7 @@ class VotingCallbackView(utils_views.View):
         # Mark keypad as in range and update battery level.
         keypad.in_range = True
         keypad.battery_level = request.POST.get('battery', -1)
-        keypad.save()
+        keypad.save(skip_autoupdate=True)
         return keypad
 
 

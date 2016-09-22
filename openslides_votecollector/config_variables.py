@@ -38,7 +38,7 @@ def get_config_variables():
     )
     yield ConfigVariable(
         name='votecollector_live_voting',
-        default_value=True,
+        default_value=False,
         input_type='boolean',
         label='Use live voting for motions',
         help_text='Incoming votes will be shown on projector while voting is active.',

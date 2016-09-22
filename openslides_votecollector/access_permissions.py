@@ -81,7 +81,7 @@ class AssignmentPollKeypadConnectionAccessPermissions(BaseAccessPermissions):
     """
     Access permissions container for AssignmentPollKeypadConnection and AssignmentPollKeypadConnectionViewSet.
     """
-    def check_permisions(self, user):
+    def check_permissions(self, user):
         """
         Returns True if the user has VoteCollector access.
         """

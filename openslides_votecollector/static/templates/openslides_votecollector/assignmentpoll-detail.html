@@ -56,7 +56,7 @@
         <i class="fa fa-info-circle"
           uib-tooltip="{{ 'Press \'Fn+6\' on keypad to show the serial number.' | translate }}"></i>
       <th translate>Keypad key</th>
-      <th ng-if="!poll.yesnoabstain" translate>Candidate</th>
+      <th ng-if="poll.pollmethod == 'votes'" translate>Candidate</th>
     </tr>
 
     <tr ng-repeat="vote in votesList">
@@ -71,14 +71,14 @@
       <td>{{ vote.serial_number }}
 
       <!-- Keypad key -->
-      <td ng-if="poll.yesnoabstain">
+      <td ng-if="poll.pollmethod == 'yna'">
         <span ng-if="vote.value == 'Y'" translate>Yes</span>
         <span ng-if="vote.value == 'N'" translate>No</span>
         <span ng-if="vote.value == 'A'" translate>Abstain</span>
-      <td ng-if="!poll.yesnoabstain">{{ vote.value }}
+      <td ng-if="poll.pollmethod == 'votes'">{{ vote.value }}
 
-      <!-- Candidate name (only if voting mode is not YNA) -->
-      <td ng-if="!poll.yesnoabstain">
+      <!-- Candidate name (only if voting method is 'votes') -->
+      <td ng-if="poll.pollmethod == 'votes'">
         <a ng-if="vote.candidate" href="" ui-sref="users.user.detail({id: vote.candidate.id})">
           {{ vote.candidate.get_full_name() }}
         </a>

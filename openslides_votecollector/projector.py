@@ -1,9 +1,10 @@
+from openslides.core.config import config
 from openslides.core.exceptions import ProjectorException
 from openslides.assignments.models import AssignmentPoll
 from openslides.motions.models import MotionPoll
 from openslides.utils.projector import ProjectorElement
 
-from .models import Keypad, Seat, MotionPollKeypadConnection, AssignmentPollKeypadConnection
+from .models import Keypad, Seat, MotionPollKeypadConnection, AssignmentPollKeypadConnection, VoteCollector
 
 
 class MotionPollSlide(ProjectorElement):
@@ -25,14 +26,31 @@ class MotionPollSlide(ProjectorElement):
         else:
             yield motionpoll.motion
             yield motionpoll.motion.agenda_item
-            yield from Seat.objects.all()
-            keypads = Keypad.objects.all()
-            yield from keypads
-            for keypad in keypads:
-                # Yield user of each keypad
-                if keypad.user is not None:
-                    yield keypad.user
-            yield from MotionPollKeypadConnection.objects.all()
+            if config['votecollector_seating_plan']:
+                yield from Seat.objects.all()
+                keypads = Keypad.objects.all()
+                yield from keypads
+                for keypad in keypads:
+                    # Yield user of each keypad
+                    if keypad.user is not None:
+                        yield keypad.user
+            yield from MotionPollKeypadConnection.objects.filter(poll=motionpoll)
+
+    def get_collection_elements_required_for_this(self, collection_element, config_entry):
+        # If MPKC or Keypad is updated send only this element to projectors.
+        # Else use default (which means a huge parsing of requirements).
+        if collection_element.collection_string == MotionPollKeypadConnection.get_collection_string():
+            output = [collection_element]
+        elif collection_element.collection_string == Keypad.get_collection_string():
+            output = [collection_element]
+        elif collection_element.collection_string == VoteCollector.get_collection_string():
+            output = []
+        elif collection_element.information.get('votecollector_voting_msg_toggled'):
+            output = []
+        # TODO: Add new elif if seating plan config changed, use "information.get('changed_config')"
+        else:
+            output = super().get_collection_elements_required_for_this(collection_element, config_entry)
+        return output
 
 
 class AssignmentPollSlide(ProjectorElement):
@@ -52,19 +70,34 @@ class AssignmentPollSlide(ProjectorElement):
             # AssignmentPoll does not exist. Just do nothing.
             pass
         else:
-            assignment = assignmentpoll.assignment
-            yield assignment
-            yield assignment.agenda_item
+            yield assignmentpoll.assignment
+            yield assignmentpoll.assignment.agenda_item
             for option in assignmentpoll.options.all():
                 yield option.candidate
-            yield from Seat.objects.all()
-            keypads = Keypad.objects.all()
-            yield from keypads
-            for keypad in keypads:
-                # Yield user of each keypad
-                if keypad.user is not None:
-                    yield keypad.user
-            yield from AssignmentPollKeypadConnection.objects.all()
+            if config['votecollector_seating_plan']:
+                yield from Seat.objects.all()
+                keypads = Keypad.objects.all()
+                yield from keypads
+                for keypad in keypads:
+                    # Yield user of each keypad
+                    if keypad.user is not None:
+                        yield keypad.user
+            yield from AssignmentPollKeypadConnection.objects.filter(poll=assignmentpoll)
+
+    def get_collection_elements_required_for_this(self, collection_element, config_entry):
+        # If APKC or Keypad is updated send only this element to projectors.
+        # Else use default (which means a huge parsing of requirements).
+        if collection_element.collection_string == AssignmentPollKeypadConnection.get_collection_string():
+            output = [collection_element]
+        elif collection_element.collection_string == Keypad.get_collection_string():
+            output = [collection_element]
+        elif collection_element.information.get('votecollector_voting_msg_toggled'):
+            output = []
+        # TODO: Add new elif if seating plan config changed, use "information.get('changed_config')"
+        else:
+            output = super().get_collection_elements_required_for_this(collection_element, config_entry)
+        return output
+
 
 class VotingPrompt(ProjectorElement):
     """

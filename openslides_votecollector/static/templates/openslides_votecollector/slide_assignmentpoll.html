@@ -107,17 +107,17 @@
   </div>
 
   <!-- voting results for yes/no/abstain -->
-  <div ng-if="poll.yesnoabstain">
+  <div ng-if="poll.pollmethod == 'yna'">
     <!-- total votes -->
     <table class="well pull-left" id="total-result-table">
       <!-- yes -->
       <tr>
         <td><img src='/static/img/button-yes.png'>
         <td class="bold">
-          {{ ynaVotes[0].value }}
+          {{ ynaVotes[0].value || liveVotes.yes }}
         <td class="percentage">
           <div ng-if="ynaVotes[0].percentNumber || !poll.has_votes">
-            {{ ynaVotes[0].percentStr }}
+            {{ ynaVotes[0].percentStr || '&nbsp;' }}
             <uib-progressbar value="ynaVotes[0].percentNumber" type="success"
                 ng-class="{ 'progress-striped active': !poll.has_votes }"></uib-progressbar>
           </div>
@@ -126,10 +126,10 @@
       <tr>
         <td><img src='/static/img/button-no.png'>
         <td class="bold">
-          {{ ynaVotes[1].value }}
+          {{ ynaVotes[1].value || liveVotes.no }}
         <td class="percentage">
           <div ng-if="ynaVotes[1].percentNumber || !poll.has_votes">
-            {{ ynaVotes[1].percentStr }}
+            {{ ynaVotes[1].percentStr || '&nbsp;' }}
             <uib-progressbar value="ynaVotes[1].percentNumber" type="danger"
                 ng-class="{ 'progress-striped active': !poll.has_votes }"></uib-progressbar>
           </div>
@@ -138,25 +138,25 @@
       <tr>
         <td><img src='/static/img/button-abstain.png'>
         <td class="bold">
-          {{ ynaVotes[2].value }}
+          {{ ynaVotes[2].value || liveVotes.abstain }}
         <td class="percentage">
           <div ng-if="ynaVotes[2].percentNumber || !poll.has_votes">
-            {{ ynaVotes[2].percentStr }}
+            {{ ynaVotes[2].percentStr || '&nbsp;' }}
             <uib-progressbar value="ynaVotes[2].percentNumber" type="warning"
                 ng-class="{ 'progress-striped active': !poll.has_votes }"></uib-progressbar>
           </div>
 
       <!-- valid votes -->
-      <tr class="total" ng-if="poll.has_votes">
+      <tr class="total">
         <td>
         <td class="bold">
-          {{ poll.votesvalid }}
+          {{ poll.votesvalid || votes_received }}
         <td>
     </table>
   </div>
 
   <!-- voting results for yes votes (1..n candidates) -->
-  <div ng-if="!poll.yesnoabstain && poll.has_votes">
+  <div ng-if="poll.pollmethod == 'votes' && poll.has_votes">
     <!-- total votes -->
     <table class="well table-striped" id="total-result-table">
       <tr ng-repeat="option in poll.options" ng-init="votes = option.getVotes()">
@@ -199,17 +199,8 @@
   </div>
 
   <!-- seating plan -->
-  <div ng-if="( poll.yesnoabstain && config('votecollector_seating_plan') ) ||
-              (!poll.yesnoabstain && config('votecollector_seating_plan') && !poll.has_votes)" id="seating-plan">
-      <table>
-        <tr ng-repeat="row in seatingPlan.rows">
-          <td ng-repeat="seat in row track by $index"
-              ng-class="{ '{{seat.css}}': config('votecollector_live_voting') || poll.has_votes, 'seat': seat.number }">
-            <span ng-show="seat.is_active">{{ seat.number }}</span>
-            <span class="key" ng-if="seat.key && !poll.yesnoabstain && (config('votecollector_live_voting') || poll.has_votes)">{{seat.key}}</span>
-          </td>
-        </tr>
-      </table>
+  <div ng-if="( poll.pollmethod == 'yna' && config('votecollector_seating_plan') ) ||
+              ( poll.pollmethod == 'votes' && config('votecollector_seating_plan') && !poll.has_votes)"
+      id="seating-plan" ng-bind-html="seatingPlanTable">
   </div>
-
 </div>

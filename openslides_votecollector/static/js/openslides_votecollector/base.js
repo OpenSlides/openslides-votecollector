@@ -190,9 +190,10 @@ angular.module('OpenSlidesApp.openslides_votecollector', ['OpenSlidesApp.users']
 ])
 
 .factory('SeatingPlan', [
-    function () {
+    'Config',
+    function (Config) {
         return {
-            generate: function (seats, votes, keys) {
+            generateRows: function (seats, votes, keys) {
                 // Generate seating plan with votes or empty seats
                 var seatingPlan = {};
                 var maxXAxis = _.reduce(seats, function (max, seat) {
@@ -224,6 +225,29 @@ angular.module('OpenSlidesApp.openslides_votecollector', ['OpenSlidesApp.users']
                     };
                 });
                 return seatingPlan;
+            },
+            generateHTML: function (seats, votes, poll, keys) {
+                // get seatingPlan rows
+                var seatingPlan = this.generateRows(seats, votes, keys);
+
+                // prebuild seatingPlan html table to speed up template rendering
+                var table = '<table>';
+                angular.forEach(seatingPlan.rows, function(row) {
+                    table += '<tr>';
+                    angular.forEach(row, function(seat) {
+                        var css = '';
+                        css += seat.css ? seat.css : '';
+                        table += '<td class="' + css + '">';
+                        if (seat.is_active) {
+                            table += seat.number;
+                        }
+                        if (seat.key && poll.pollmethod == 'votes') {
+                            table += '<span class="key">' + seat.key + '</span>';
+                        }
+                        table += '</td>';
+                    })
+                });
+                return table;
             }
         };
     }
