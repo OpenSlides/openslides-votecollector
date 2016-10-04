@@ -59,68 +59,77 @@ angular.module('OpenSlidesApp.openslides_votecollector.projector', ['OpenSlidesA
         // Add it to the coresponding get_requirements method of the ProjectorElement
         // class.
         var pollId = $scope.element.id;
-        Motion.findAll().then(
-            function (motions) {
-                var result = MotionPollFinder.find(motions, pollId);
-                $scope.$watch(function () {
-                  return Motion.lastModified(result.motion.id);
-                }, function () {
-                    var result = MotionPollFinder.find(motions, pollId);
-                    $scope.motion = Motion.get(result.motion.id);
-                    $scope.poll = result.poll;
-                });
-            }
-        );
-
-        MotionPollKeypadConnection.findAll();
-        Seat.findAll();
-        Keypad.findAll().then(function(keypads){
-            angular.forEach(keypads, function(keypad) {
-                Keypad.loadRelations(keypad, 'user');
-            });
+        var result = MotionPollFinder.find(Motion.getAll(), pollId);
+        $scope.$watch(function () {
+            return Motion.lastModified(result.motion.id);
+                // + Agenda.lastModified(result.motion.agenda_item_id);
+        }, function () {
+            var result = MotionPollFinder.find(Motion.getAll(), pollId);
+            $scope.motion = result.motion;
+            $scope.poll = result.poll;
         });
+
         $scope.$watch(function () {
             return MotionPollKeypadConnection.lastModified() +
                     Keypad.lastModified() +
                     Seat.lastModified() +
-                    User.lastModified();
+                    User.lastModified() +
+                    Motion.lastModified(result.motion.id);
         }, function () {
-            var allMPKCs = MotionPollKeypadConnection.getAll();
+            var allMPKCs = MotionPollKeypadConnection.filter({poll_id: pollId});
             var seats = Seat.getAll();
             var keypads = Keypad.getAll();
 
             // Extract all votes from collection of MotionPollKeypadConnection objects
             var votes = {};
+            $scope.votes_received = 0;
+            if (Config.get('votecollector_live_voting').value) {
+                $scope.liveVotes = {yes: 0, no: 0, abstain: 0};
+            }
             angular.forEach(allMPKCs, function (mpkc) {
-                if (mpkc.poll_id === pollId) {
-                    // Get seat id from keypad
-                    var keypad = _.find(keypads, function (keypad) {
-                        return keypad.id == mpkc.keypad_id;
-                    });
-                    var seat_id = keypad ? keypad.seat_id : undefined;
-                    // Set seat colors
-                    // TODO: Fix autoupdate if config changes on runtime.
-                    if (seat_id) {
-                        if (Config.get('votecollector_seats_grey').value) {
-                            votes[seat_id] = 'seat-grey';
-                        } else {
-                            switch (mpkc.value) {
-                                case 'Y':
-                                    votes[seat_id] = 'seat-green';
-                                    break;
-                                case 'N':
-                                    votes[seat_id] = 'seat-red';
-                                    break;
-                                case 'A':
-                                    votes[seat_id] = 'seat-yellow';
-                                    break;
-                            }
+                // Get seat id from keypad
+                var keypad = _.find(keypads, function (keypad) {
+                    return keypad.id == mpkc.keypad_id;
+                });
+                var seat_id = keypad ? keypad.seat_id : undefined;
+                // Set seat colors
+                // TODO: Fix autoupdate if config changes on runtime.
+                if (seat_id) {
+                    if (Config.get('votecollector_seats_grey').value) {
+                        votes[seat_id] = 'seat-grey';
+                    } else {
+                        switch (mpkc.value) {
+                            case 'Y':
+                                votes[seat_id] = 'seat-green';
+                                break;
+                            case 'N':
+                                votes[seat_id] = 'seat-red';
+                                break;
+                            case 'A':
+                                votes[seat_id] = 'seat-yellow';
+                                break;
                         }
                     }
                 }
+                if (Config.get('votecollector_live_voting').value) {
+                    switch (mpkc.value) {
+                        case 'Y':
+                            $scope.liveVotes.yes += 1;
+                            break;
+                        case 'N':
+                            $scope.liveVotes.no += 1;
+                            break;
+                        case 'A':
+                            $scope.liveVotes.abstain += 1;
+                            break;
+                    }
+                }
+                if (mpkc.value == 'Y' || mpkc.value == 'N' || mpkc.value == 'A') {
+                    $scope.votes_received += 1;
+                }
             });
             // Generate seating plan with votes
-            $scope.seatingPlan = SeatingPlan.generate(seats, votes);
+            $scope.seatingPlanTable = SeatingPlan.generateHTML(seats, votes, $scope.poll);
         });
     }
 ])
@@ -140,92 +149,88 @@ angular.module('OpenSlidesApp.openslides_votecollector.projector', ['OpenSlidesA
         // Add it to the coresponding get_requirements method of the ProjectorElement
         // class.
         var pollId = $scope.element.id;
-        User.findAll()
-        Assignment.findAll().then(
-            function (assignments) {
-                var result = AssignmentPollFinder.find(assignments, pollId);
-                $scope.$watch(function () {
-                    if (result.assignment) {
-                        return Assignment.lastModified(result.assignment.id);
-                    } else {
-                        return false;
-                    }
-                }, function () {
-                    var result = AssignmentPollFinder.find(assignments, pollId);
-                    $scope.assignment = Assignment.get(result.assignment.id);
-                    $scope.poll = result.poll;
-                });
+        var result = AssignmentPollFinder.find(Assignment.getAll(), pollId);
+        $scope.$watch(function () {
+            return Assignment.lastModified(result.assignment_id);
+                // + Agenda.lastModified(result.motion.agenda_item_id);
+        }, function () {
+            var result = AssignmentPollFinder.find(Assignment.getAll(), pollId);
+            $scope.assignment = result.assignment;
+            $scope.poll = result.poll;
+            if ($scope.poll) {
+                $scope.ynaVotes = $scope.poll.options[0].getVotes();
             }
-        );
-
-        $scope.$watch(
-            function () {
-                return $scope.poll;
-            },
-            function () {
-                if ($scope.poll) {
-                    $scope.ynaVotes = $scope.poll.options[0].getVotes();
-                }
-            }
-        );
-
-        AssignmentPollKeypadConnection.findAll();
-        Seat.findAll();
-        Keypad.findAll().then(function(keypads){
-            angular.forEach(keypads, function(keypad) {
-                Keypad.loadRelations(keypad, 'user');
-            });
         });
+
         $scope.$watch(function () {
             return AssignmentPollKeypadConnection.lastModified() +
                     Keypad.lastModified() +
                     Seat.lastModified() +
-                    User.lastModified();
+                    User.lastModified() +
+                    Assignment.lastModified(result.assignment_id);
         }, function () {
-            var allAPKCs = AssignmentPollKeypadConnection.getAll();
+            var allAPKCs = AssignmentPollKeypadConnection.filter({poll_id: pollId});
             var seats = Seat.getAll();
             var keypads = Keypad.getAll();
 
             // Extract all votes from collection of MotionPollKeypadConnection objects
             var votes = {};
             var keys = {};
+            $scope.votes_received = 0;
+            if (Config.get('votecollector_live_voting').value) {
+                $scope.liveVotes = {yes: 0, no: 0, abstain: 0};
+            }
             angular.forEach(allAPKCs, function (apkc) {
-                if (apkc.poll_id === pollId) {
-                    // Get seat id from keypad
-                    var keypad = _.find(keypads, function (keypad) {
-                        return keypad.id == apkc.keypad_id;
-                    });
-                    var seat_id = keypad ? keypad.seat_id : undefined;
-                    // Set seat colors
-                    // TODO: Fix autoupdate if config changes on runtime.
-                    if (seat_id) {
-                        if (Config.get('votecollector_seats_grey').value) {
-                            votes[seat_id] = 'seat-grey';
-                        } else {
-                            keys[seat_id] = apkc.value;
-                            switch (apkc.value) {
-                                case 'Y':
-                                    votes[seat_id] = 'seat-green';
-                                    break;
-                                case 'N':
-                                    votes[seat_id] = 'seat-red';
-                                    break;
-                                case 'A':
-                                    votes[seat_id] = 'seat-yellow';
-                                    break;
-                                case '0':
-                                    votes[seat_id] = 'seat-yellow';
-                                    break;
-                                default:
-                                    votes[seat_id] = 'seat-voted';
-                                    break;
-                            }
+                // Get seat id from keypad
+                var keypad = _.find(keypads, function (keypad) {
+                    return keypad.id == apkc.keypad_id;
+                });
+                var seat_id = keypad ? keypad.seat_id : undefined;
+                // Set seat colors
+                // TODO: Fix autoupdate if config changes on runtime.
+                if (seat_id) {
+                    if (Config.get('votecollector_seats_grey').value) {
+                        votes[seat_id] = 'seat-grey';
+                    } else {
+                        keys[seat_id] = apkc.value;
+                        switch (apkc.value) {
+                            case 'Y':
+                                votes[seat_id] = 'seat-green';
+                                break;
+                            case 'N':
+                                votes[seat_id] = 'seat-red';
+                                break;
+                            case 'A':
+                                votes[seat_id] = 'seat-yellow';
+                                break;
+                            case '0':
+                                votes[seat_id] = 'seat-yellow';
+                                break;
+                            default:
+                                votes[seat_id] = 'seat-voted';
+                                break;
                         }
                     }
                 }
+                if (Config.get('votecollector_live_voting').value) {
+                    switch (apkc.value) {
+                        case 'Y':
+                            $scope.liveVotes.yes += 1;
+                            break;
+                        case 'N':
+                            $scope.liveVotes.no += 1;
+                            break;
+                        case 'A':
+                            $scope.liveVotes.abstain += 1;
+                            break;
+                    }
+                }
+                if (apkc.value == 'Y' || apkc.value == 'N' || apkc.value == 'A') {
+                    $scope.votes_received += 1;
+                }
             });
             // Generate seating plan with votes
-            $scope.seatingPlan = SeatingPlan.generate(seats, votes, keys);
+            $scope.seatingPlanTable = SeatingPlan.generateHTML(seats, votes, $scope.poll, keys);
         });
     }
 ]);

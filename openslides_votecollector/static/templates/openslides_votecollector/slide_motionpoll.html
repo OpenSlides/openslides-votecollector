@@ -79,10 +79,10 @@
     <tr>
       <td><img src='/static/img/button-yes.png'>
       <td class="bold">
-        {{ poll.yes }}
+        {{ poll.yes || liveVotes.yes }}
       <td class="percentage">
         <div ng-if="poll.getVote(poll.yes, 'yes').percentNumber || !poll.has_votes">
-          {{ poll.getVote(poll.yes, 'yes').percentStr }}
+          {{ poll.getVote(poll.yes, 'yes').percentStr || '&nbsp;' }}
           <uib-progressbar value="poll.getVote(poll.yes, 'yes').percentNumber" type="success"
               ng-class="{ 'progress-striped active': !poll.has_votes }"></uib-progressbar>
         </div>
@@ -91,10 +91,10 @@
     <tr>
       <td><img src='/static/img/button-no.png'>
       <td class="bold">
-        {{ poll.no}}
+        {{ poll.no || liveVotes.no }}
       <td class="percentage">
         <div ng-if="poll.getVote(poll.no, 'no').percentNumber || !poll.has_votes">
-          {{ poll.getVote(poll.no, 'no').percentStr }}
+          {{ poll.getVote(poll.no, 'no').percentStr || '&nbsp;' }}
           <uib-progressbar value="poll.getVote(poll.no, 'no').percentNumber" type="danger"
               ng-class="{ 'progress-striped active': !poll.has_votes }"></uib-progressbar>
         </div>
@@ -103,33 +103,23 @@
     <tr>
       <td><img src='/static/img/button-abstain.png'>
       <td class="bold">
-        {{ poll.abstain}}
+        {{ poll.abstain || liveVotes.abstain }}
       <td class="percentage">
         <div ng-if="poll.getVote(poll.abstain, 'abstain').percentNumber || !poll.has_votes">
-          {{ poll.getVote(poll.abstain, 'abstain').percentStr }}
+          {{ poll.getVote(poll.abstain, 'abstain').percentStr || '&nbsp;'}}
           <uib-progressbar value="poll.getVote(poll.abstain, 'abstain').percentNumber" type="warning"
               ng-class="{ 'progress-striped active': !poll.has_votes }"></uib-progressbar>
         </div>
 
     <!-- valid votes -->
-    <tr class="total" ng-if="poll.has_votes">
+    <tr class="total">
       <td>
       <td class="bold">
-        {{ poll.votesvalid }}
+        {{ poll.votesvalid || votes_received }}
       <td>
         {{ poll.getVote(poll.votesvalid, 'votesvalid').percentStr }}
   </table>
 
   <!-- seating plan -->
-  <div ng-if="config('votecollector_seating_plan')" id="seating-plan">
-      <table>
-        <tr ng-repeat="row in seatingPlan.rows">
-          <td ng-repeat="seat in row track by $index"
-              ng-class="{ '{{seat.css}}': config('votecollector_live_voting') || poll.has_votes, 'seat': seat.number }">
-            <span ng-show="seat.is_active">{{ seat.number }}</span>
-          </td>
-        </tr>
-      </table>
-  </div>
-
+  <div ng-if="config('votecollector_seating_plan')" id="seating-plan" ng-bind-html="seatingPlanTable"></div>
 </div>

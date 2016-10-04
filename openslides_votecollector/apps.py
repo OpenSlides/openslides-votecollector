@@ -11,9 +11,9 @@ class VoteCollectorAppConfig(AppConfig):
     angular_site_module = True
     angular_projector_module = True
     js_files = [
-        'js/openslides_votecollector/base.js',
-        'js/openslides_votecollector/site.js',
-        'js/openslides_votecollector/projector.js'
+        'static/js/openslides_votecollector/base.js',
+        'static/js/openslides_votecollector/site.js',
+        'static/js/openslides_votecollector/projector.js'
     ]
 
     def ready(self):

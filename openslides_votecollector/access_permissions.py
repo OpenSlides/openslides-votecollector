@@ -5,7 +5,7 @@ class VoteCollectorAccessPermissions(BaseAccessPermissions):
     """
     Access permissions container for VoteCollector.
     """
-    def can_retrieve(self, user):
+    def check_permissions(self, user):
         """
         Returns True if the user has VoteCollector access.
         """
@@ -24,7 +24,7 @@ class SeatAccessPermissions(BaseAccessPermissions):
     """
     Access permissions container for Seat and SeatViewSet.
     """
-    def can_retrieve(self, user):
+    def check_permissions(self, user):
         """
         Returns True if the user has VoteCollector access.
         """
@@ -43,7 +43,7 @@ class KeypadAccessPermissions(BaseAccessPermissions):
     """
     Access permissions container for Keypad and KeypadViewSet.
     """
-    def can_retrieve(self, user):
+    def check_permissions(self, user):
         """
         Returns True if the user has VoteCollector access.
         """
@@ -62,7 +62,7 @@ class MotionPollKeypadConnectionAccessPermissions(BaseAccessPermissions):
     """
     Access permissions container for MotionPollKeypadConnection and MotionPollKeypadConnectionViewSet.
     """
-    def can_retrieve(self, user):
+    def check_permissions(self, user):
         """
         Returns True if the user has VoteCollector access.
         """
@@ -81,7 +81,7 @@ class AssignmentPollKeypadConnectionAccessPermissions(BaseAccessPermissions):
     """
     Access permissions container for AssignmentPollKeypadConnection and AssignmentPollKeypadConnectionViewSet.
     """
-    def can_retrieve(self, user):
+    def check_permissions(self, user):
         """
         Returns True if the user has VoteCollector access.
         """

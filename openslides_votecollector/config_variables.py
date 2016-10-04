@@ -1,4 +1,4 @@
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import ugettext_noop
 
 from openslides.core.config import ConfigVariable
 
@@ -31,14 +31,14 @@ def get_config_variables():
     )
     yield ConfigVariable(
         name='votecollector_vote_started_msg',
-        default_value=ugettext_lazy('Please vote now!'),
+        default_value=ugettext_noop('Please vote now!'),
         label="Overlay message 'Vote started'",
         weight=630,
         group='VoteCollector'
     )
     yield ConfigVariable(
         name='votecollector_live_voting',
-        default_value=True,
+        default_value=False,
         input_type='boolean',
         label='Use live voting for motions',
         help_text='Incoming votes will be shown on projector while voting is active.',
