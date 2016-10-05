@@ -187,6 +187,17 @@ class VotingView(AjaxView):
         """
         return {}
 
+    @staticmethod
+    def clear_votes(poll):
+        # poll is MotionPoll or AssignmentPoll
+        if poll.has_votes():
+            poll.get_votes().delete()
+            poll.votescast = poll.votesinvalid = poll.votesvalid = None
+            poll.save()
+
+        model = MotionPollKeypadConnection if type(poll) == MotionPoll else AssignmentPollKeypadConnection
+        model.objects.filter(poll=poll).delete()
+
 
 class DeviceStatus(VotingView):
     def get(self, request, *args, **kwargs):
@@ -241,19 +252,10 @@ class StartVoting(VotingView):
     def no_error_context(self):
         return {'count': self.result}
 
-    @staticmethod
-    def clear_votes(poll):
-        if poll.has_votes():
-            poll.get_votes().delete()
-            poll.votescast = poll.votesinvalid = poll.votesvalid = None
-            poll.save()
-
 
 class StartYNA(StartVoting):
     def on_start(self, poll):
         self.clear_votes(poll)
-        model = MotionPollKeypadConnection if type(poll) == MotionPoll else AssignmentPollKeypadConnection
-        model.objects.filter(poll=poll).delete()
 
         # Get candidate name (if is an election with one candidate only)
         candidate_str = ''
@@ -280,7 +282,6 @@ class StartYNA(StartVoting):
 class StartElection(StartVoting):
     def on_start(self, poll):
         self.clear_votes(poll)
-        AssignmentPollKeypadConnection.objects.filter(poll=poll).delete()
 
         # Get candidate names (if is an election with >1 candidate)
         candidate_str = ''
@@ -353,14 +354,21 @@ class StopVoting(VotingView):
         return super(StopVoting, self).get(request, *args, **kwargs)
 
 
+class ClearVotes(VotingView):
+    def get(self, request, *args, **kwargs):
+        poll = self.get_poll_object()
+        if not self.error:
+            self.clear_votes(poll)
+        return super(ClearVotes,self).get(request, *args, **kwargs)
+
+
 class VotingStatus(VotingView):
     def get(self, request, *args, **kwargs):
-        obj = self.get_poll_object()
-        if not self.error:
-            try:
-                self.result = get_voting_status()
-            except VoteCollectorError as e:
-                self.error = e.value
+        self.error = None
+        try:
+            self.result = get_voting_status()
+        except VoteCollectorError as e:
+            self.error = e.value
         return super(VotingStatus, self).get(request, *args, **kwargs)
 
     def no_error_context(self):
