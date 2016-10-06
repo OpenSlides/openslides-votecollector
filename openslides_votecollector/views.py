@@ -13,6 +13,7 @@ from openslides.core.exceptions import OpenSlidesError
 from openslides.core.models import Projector
 from openslides.motions.models import MotionPoll
 from openslides.utils import views as utils_views
+from openslides.utils.autoupdate import inform_deleted_data
 from openslides.utils.rest_api import ListModelMixin, ModelViewSet, PermissionMixin, RetrieveModelMixin, Response, list_route
 
 from .api import (
@@ -196,7 +197,15 @@ class VotingView(AjaxView):
             poll.save()
 
         model = MotionPollKeypadConnection if type(poll) == MotionPoll else AssignmentPollKeypadConnection
+        # collect all votes of the poll (with their collection_string and id)
+        args = []
+        for instance_dict in model.objects.filter(poll=poll).values('pk'):
+            pk = instance_dict['pk']
+            args.append(model.get_collection_string())
+            args.append(pk)
         model.objects.filter(poll=poll).delete()
+        # trigger autoupdate
+        inform_deleted_data(*args)
 
 
 class DeviceStatus(VotingView):
@@ -255,7 +264,6 @@ class StartVoting(VotingView):
 
 class StartYNA(StartVoting):
     def on_start(self, poll):
-        self.clear_votes(poll)
 
         # Get candidate name (if is an election with one candidate only)
         candidate_str = ''
@@ -281,8 +289,6 @@ class StartYNA(StartVoting):
 
 class StartElection(StartVoting):
     def on_start(self, poll):
-        self.clear_votes(poll)
-
         # Get candidate names (if is an election with >1 candidate)
         candidate_str = ''
         if (type(poll) == AssignmentPoll):
