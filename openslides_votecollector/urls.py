@@ -8,14 +8,14 @@ urlpatterns = [
         views.DeviceStatus.as_view(),
         name='votecollector_device'),
 
-    url(r'^votecollector/start_yna/(?P<id>\d+)/$',
+    url(r'^votecollector/start_voting/(?P<id>\d+)/$',
         views.StartYNA.as_view(), {
             'app': 'motions',
             'model': 'MotionPoll',
             'mode': 'YesNoAbstain',
             'resource': '/vote/'
         },
-        name='votecollector_start_yna'),
+        name='votecollector_start_voting'),
 
     url(r'^votecollector/start_election/(?P<id>\d+)/(?P<options>\d+)/$',
         views.StartElection.as_view(), {
@@ -55,11 +55,25 @@ urlpatterns = [
         views.StopVoting.as_view(),
         name='votecollector_stop'),
 
+    url(r'^votecollector/clear_voting/(?P<id>\d+)/$',
+        views.ClearVotes.as_view(), {
+            'app': 'motions',
+            'model': 'MotionPoll'
+        },
+        name='votecollector_clear_voting'),
+
+    url(r'^votecollector/clear_election/(?P<id>\d+)/$',
+        views.ClearVotes.as_view(), {
+            'app': 'assignments',
+            'model': 'AssignmentPoll'
+        },
+        name='votecollector_clear_election'),
+
     url(r'^votecollector/status/$',
         views.VotingStatus.as_view(),
         name='votecollector_status'),
 
-    url(r'^votecollector/result_yna/(?P<id>\d+)/$',
+    url(r'^votecollector/result_voting/(?P<id>\d+)/$',
         views.VotingResult.as_view(), {
             'app': 'motions',
             'model': 'MotionPoll'
