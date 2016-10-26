@@ -153,7 +153,7 @@ class VotingView(AjaxView):
         host = request.META['SERVER_NAME']
         port = request.META.get('SERVER_PORT', 0)
         if port:
-            return 'http://%s:%d%s' % (host, port, self.resource_path)
+            return 'http://%s:%s%s' % (host, port, self.resource_path)
         else:
             return 'http://%s%s' % (host, self.resource_path)
 

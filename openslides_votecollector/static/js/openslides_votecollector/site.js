@@ -70,7 +70,7 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
         })
         .state('openslides_votecollector.motionpoll.detail', {
             url: '/motionpoll/:id',
-            controller: 'MotionPollDetailCtrl',
+            controller: 'MotionPollVoteDetailCtrl',
             resolve: {
                 motions: function (Motion) {
                     return Motion.findAll();
@@ -525,7 +525,7 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
     }
 ])
 
-.controller('MotionPollDetailCtrl', [
+.controller('MotionPollVoteDetailCtrl', [
     '$scope',
     '$stateParams',
     '$http',
