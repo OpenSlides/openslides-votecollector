@@ -1,4 +1,4 @@
-include AUTHORS LICENSE README.rst requirements_production.txt
+include AUTHORS LICENSE README.rst requirements.txt
 graft openslides_votecollector
 recursive-exclude openslides_votecollector *.pyc
 recursive-exclude openslides_votecollector *.swp
