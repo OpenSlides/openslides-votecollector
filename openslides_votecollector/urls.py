@@ -87,9 +87,17 @@ urlpatterns = [
         },
         name='votecollector_result_election'),
 
+    url(r'^votecollector/vote/(?P<poll_id>\d+)/$',
+        csrf_exempt(views.Votes.as_view()),
+        name='votecollector_votes'),
+
     url(r'^votecollector/vote/(?P<poll_id>\d+)/(?P<keypad_id>\d+)/$',
         csrf_exempt(views.VoteCallback.as_view()),
         name='votecollector_vote'),
+
+    url(r'^votecollector/candidate/(?P<poll_id>\d+)/$',
+        csrf_exempt(views.Candidates.as_view()),
+        name='votecollector_candidates'),
 
     url(r'^votecollector/candidate/(?P<poll_id>\d+)/(?P<keypad_id>\d+)/$',
         csrf_exempt(views.CandidateCallback.as_view()),
@@ -99,7 +107,11 @@ urlpatterns = [
         csrf_exempt(views.SpeakerCallback.as_view()),
         name='votecollector_speaker'),
 
+    url(r'^votecollector/keypad/$',
+        csrf_exempt(views.Keypads.as_view()),
+        name='votecollector_keypads'),
+
     url(r'^votecollector/keypad/(?P<keypad_id>\d+)/$',
         csrf_exempt(views.KeypadCallback.as_view()),
-        name='votecollector_speaker'),
+        name='votecollector_keypad'),
 ]

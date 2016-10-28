@@ -81,6 +81,7 @@ angular.module('OpenSlidesApp.openslides_votecollector.projector', ['OpenSlidesA
             var keypads = Keypad.getAll();
 
             // Extract all votes from collection of MotionPollKeypadConnection objects
+            // TODO: Use MotionPollBallot to mark seats of represented delegates.
             var votes = {};
             $scope.votes_received = 0;
             if (Config.get('votecollector_live_voting').value) {
