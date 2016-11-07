@@ -569,8 +569,17 @@ class SpeakerCallback(VotingCallbackView):
         # Remove keypad user from the speaker list.
         elif value == 'N':
             # Remove speaker if on "next speakers" list (begin_time=None, end_time=None).
-            Speaker.objects.filter(user=keypad.user, item=item, begin_time=None, end_time=None).delete()
-            content = _('Removed from    list of speakers')
+            queryset = Speaker.objects.filter(user=keypad.user, item=item, begin_time=None, end_time=None)
+            try:
+                # We assume that there aren't multiple entries because this
+                # is forbidden by the Manager's add method. We assume that
+                # there is only one speaker instance or none.
+                speaker = queryset.get()
+            except Speaker.DoesNotExist:
+                content = _('Not exists on   list of speakers')
+            else:
+                speaker.delete()
+                content = _('Removed from    list of speakers')
         else:
             content = _('Invalid entry')
         return HttpResponse(content)
