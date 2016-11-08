@@ -286,7 +286,7 @@ class StartYNA(StartVoting):
         candidate_str = ''
         if (type(poll) == AssignmentPoll) and (AssignmentOption.objects.filter(poll=poll).all().count() == 1):
             candidate = AssignmentOption.objects.filter(poll=poll)[0].candidate
-            candidate_str = "<div class='spacer candidate'>" + candidate.get_full_name() + "</div>"
+            candidate_str = "<div class='spacer candidate'>" + str(candidate) + "</div>"
 
         # Show voting prompt on projector.
         projector = Projector.objects.get(id=1)
@@ -314,7 +314,7 @@ class StartElection(StartVoting):
             for index, option in enumerate(options):
                 candidate_str += \
                         "<li><span class='key'>" + str(index + 1) + "</span> " + \
-                        "<span class='candidate'>" + option.candidate.get_full_name() + "</span>"
+                        "<span class='candidate'>" + str(option.candidate) + "</span>"
             candidate_str += "<li><span class='key'>0</span> " + \
                         "<span class='candidate'>" + _('Abstain') +"</span>"
             candidate_str += "</ul></div>"
