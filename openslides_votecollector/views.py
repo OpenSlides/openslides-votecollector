@@ -1,6 +1,7 @@
 import json
 
 from django.apps import apps
+from django.db import transaction
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from django.utils.translation import ugettext as _
@@ -13,8 +14,14 @@ from openslides.core.exceptions import OpenSlidesError
 from openslides.core.models import Projector
 from openslides.motions.models import MotionPoll
 from openslides.utils import views as utils_views
-from openslides.utils.autoupdate import inform_deleted_data
+from openslides.utils.autoupdate import inform_changed_data, inform_deleted_data
 from openslides.utils.rest_api import ListModelMixin, ModelViewSet, PermissionMixin, RetrieveModelMixin, Response, list_route
+
+try:
+    # Proxy voting hook
+    from openslides_proxyvoting.voting import Ballot
+except ImportError:
+    Ballot = None
 
 from .api import (
     get_device_status,
@@ -112,6 +119,7 @@ class MotionPollKeypadConnectionViewSet(PermissionMixin, ListModelMixin, Retriev
         return self.get_access_permissions().check_permissions(self.request.user)
 
     @list_route(methods=['post'])
+    @transaction.atomic
     def anonymize_votes(self, request):
         """
         Anonymize all votes of the given poll.
@@ -131,6 +139,7 @@ class AssignmentPollKeypadConnectionViewSet(PermissionMixin, ListModelMixin, Ret
         return self.get_access_permissions().check_permissions(self.request.user)
 
     @list_route(methods=['post'])
+    @transaction.atomic
     def anonymize_votes(self, request):
         """
         Anonymize all votes of the given poll.
@@ -188,8 +197,8 @@ class VotingView(AjaxView):
         """
         return {}
 
-    @staticmethod
-    def clear_votes(poll):
+    @transaction.atomic
+    def clear_votes(self, poll):
         # poll is MotionPoll or AssignmentPoll
         if poll.has_votes():
             poll.get_votes().delete()
@@ -205,7 +214,12 @@ class VotingView(AjaxView):
             args.append(pk)
         model.objects.filter(poll=poll).delete()
         # trigger autoupdate
-        inform_deleted_data(*args)
+        if args:
+            inform_deleted_data(*args)
+
+        if Ballot and type(poll) == MotionPoll:
+            ballot = Ballot(poll)
+            ballot.delete_ballots()
 
 
 class DeviceStatus(VotingView):
@@ -240,7 +254,7 @@ class StartVoting(VotingView):
             target = obj.id if obj else 0
             url = self.get_callback_url(request) + resource
             if target:
-                url += str(target)
+                url += '%s/' % target
             try:
                 self.result = start_voting(mode, kwargs.get('options'), url)
             except VoteCollectorError as e:
@@ -264,6 +278,9 @@ class StartVoting(VotingView):
 
 class StartYNA(StartVoting):
     def on_start(self, poll):
+        if type(poll) == MotionPoll and Ballot:
+            ballot = Ballot(poll)
+            ballot.create_absentee_ballots()
 
         # Get candidate name (if is an election with one candidate only)
         candidate_str = ''
@@ -328,12 +345,8 @@ class StartSpeakerList(StartVoting):
 class StartPing(StartVoting):
     def on_start(self, obj):
         # Clear in_range and battery_level of all keypads.
-        # Attention: Cannot use Keypad.objects.all().update(in_range=False, battery_level=-1)
-        # since no post_save signals will be sent on update.
-        for keypad in Keypad.objects.all():
-            keypad.in_range = False
-            keypad.battery_level = -1
-            keypad.save()
+        Keypad.objects.all().update(in_range=False, battery_level=-1)
+        # We intentionally do not trigger an autoupdate.
 
 
 class StopVoting(VotingView):
@@ -406,6 +419,15 @@ class VotingResult(VotingView):
                             self.result['valid'] += 1
                         else:
                             self.result['invalid'] += 1
+                elif vc.voting_mode == 'MotionPoll' and Ballot:
+                    ballot = Ballot(poll)
+                    result = ballot.count_votes()
+                    # print(result)
+                    self.result = [
+                        int(result['Y'][1]),
+                        int(result['N'][1]),
+                        int(result['A'][1])
+                    ]
                 else:
                     # Get vote result from votecollector.
                     try:
@@ -426,8 +448,6 @@ class VotingCallbackView(utils_views.View):
     http_method_names = ['post']
 
     def post(self, request, poll_id, keypad_id):
-        # TODO: validate REMOTE_HOST to be VoteCollector or use other authentication method
-
         # Get keypad.
         try:
             keypad = Keypad.objects.get(keypad_id=keypad_id)
@@ -437,17 +457,91 @@ class VotingCallbackView(utils_views.View):
         # Mark keypad as in range and update battery level.
         keypad.in_range = True
         keypad.battery_level = request.POST.get('battery', -1)
+        # Do not auto update here to improve performance.
         keypad.save(skip_autoupdate=True)
         return keypad
 
 
+class Votes(utils_views.View):
+    http_method_names = ['post']
+
+    @transaction.atomic()
+    def post(self, request, poll_id):
+        # Get poll instance.
+        vc = VoteCollector.objects.get(id=1)
+        if vc.voting_mode == 'MotionPoll':
+            poll_model = MotionPoll
+            conn_model = MotionPollKeypadConnection
+        else:
+            poll_model = AssignmentPoll
+            conn_model = AssignmentPollKeypadConnection
+        try:
+            poll = poll_model.objects.get(id=poll_id)
+        except poll_model.DoesNotExist:
+            return HttpResponse('')
+
+        # Get ballot instance.
+        ballot = Ballot(poll) if Ballot else None
+
+        # Load json list from request body.
+        votes = json.loads(request.body.decode('utf-8'))
+        keypad_set = set()
+        connections = []
+        for vote in votes:
+            keypad_id = vote['id']
+            try:
+                keypad = Keypad.objects.get(keypad_id=keypad_id)
+            except Keypad.DoesNotExist:
+                continue
+
+            # Mark keypad as in range and update battery level.
+            keypad.in_range = True
+            keypad.battery_level = vote['bl']
+            keypad.save(skip_autoupdate=True)
+
+            # Validate vote value.
+            value = vote['value']
+            if value not in ('Y', 'N', 'A'):
+                continue
+
+            # Write ballot and poll keypad connection.
+            is_valid_keypad = True
+            if ballot and vc.voting_mode == 'MotionPoll':
+                # TODO: Ballot currently only implemented for MotionPoll.
+                is_valid_keypad = ballot.register_vote(keypad_id, value, commit=False) > 0
+            if is_valid_keypad:
+                try:
+                    conn = conn_model.objects.get(poll=poll, keypad=keypad)
+                except conn_model.DoesNotExist:
+                    conn = conn_model(poll=poll, keypad=keypad)
+                conn.serial_number = vote['sn']
+                conn.value = value
+                if conn.pk:
+                    # Save updated connection.
+                    conn.save(skip_autoupdate=True)
+                else:
+                    # Add new connection to bulk create list.
+                    connections.append(conn)
+                keypad_set.add(keypad.id)
+
+        # Bulk create ballots and connections.
+        if ballot:
+            ballot.save_ballots()
+        conn_model.objects.bulk_create(connections)
+
+        # Trigger auto update.
+        connections = conn_model.objects.filter(poll=poll, keypad_id__in=keypad_set)
+        inform_changed_data(connections)
+
+        return HttpResponse()
+
+
 class VoteCallback(VotingCallbackView):
+    @transaction.atomic
     def post(self, request, poll_id, keypad_id):
         keypad = super(VoteCallback, self).post(request, poll_id, keypad_id)
         if keypad is None:
             return HttpResponse(_('Vote rejected'))
-
-        # TODO: Use transaction here.
 
         # Validate vote value.
         value = request.POST.get('value')
@@ -463,15 +557,23 @@ class VoteCallback(VotingCallbackView):
             return HttpResponse(_('Vote rejected'))
 
         if vc.voting_mode == 'MotionPoll':
-            try:
-                conn = MotionPollKeypadConnection.objects.get(poll=poll, keypad=keypad)
-            except MotionPollKeypadConnection.DoesNotExist:
-                conn = MotionPollKeypadConnection()
-                conn.poll = poll
-                conn.keypad = keypad
-            conn.serial_number = request.POST.get('sn')
-            conn.value = value
-            conn.save()
+            is_valid_keypad = 1
+            if Ballot:
+                ballot = Ballot(poll)
+                is_valid_keypad = ballot.register_vote(keypad_id, value) > 0
+            if is_valid_keypad:
+                try:
+                    conn = MotionPollKeypadConnection.objects.get(poll=poll, keypad=keypad)
+                except MotionPollKeypadConnection.DoesNotExist:
+                    conn = MotionPollKeypadConnection()
+                    conn.poll = poll
+                    conn.keypad = keypad
+                conn.serial_number = request.POST.get('sn')
+                conn.value = value
+                conn.save()
+            else:
+                return HttpResponse(_('Vote rejected'))
+
         else:
             try:
                 conn = AssignmentPollKeypadConnection.objects.get(poll=poll, keypad=keypad)
@@ -491,13 +593,81 @@ class VoteCallback(VotingCallbackView):
         return HttpResponse(_('Vote submitted'))
 
 
+class Candidates(utils_views.View):
+    http_method_names = ['post']
+
+    @transaction.atomic()
+    def post(self, request, poll_id):
+        # Get assignment poll.
+        try:
+            poll = AssignmentPoll.objects.get(id=poll_id)
+        except AssignmentPoll.DoesNotExist:
+            return HttpResponse('')
+
+        # Load json list from request body.
+        votes = json.loads(request.body.decode('utf-8'))
+        candidate_count = poll.assignment.related_users.all().count()
+        keypad_set = set()
+        connections = []
+        for vote in votes:
+            keypad_id = vote['id']
+            try:
+                keypad = Keypad.objects.get(keypad_id=keypad_id)
+            except Keypad.DoesNotExist:
+                continue
+
+            # Mark keypad as in range and update battery level.
+            keypad.in_range = True
+            keypad.battery_level = vote['bl']
+            keypad.save(skip_autoupdate=True)
+
+            # Validate vote value.
+            try:
+                value = int(vote['value'])
+            except ValueError:
+                continue
+            if value < 0 or value > 9:
+                # Invalid candidate number.
+                continue
+
+            # Get the selected candidate.
+            candidate_id = None
+            if 0 < value <= candidate_count:
+                # TODO: Sort candidates by weight once implemented in OpenSlides core.
+                candidate_id = AssignmentOption.objects.filter(poll=poll_id).order_by('id').all()[value - 1].candidate_id
+
+            # Write poll connection.
+            try:
+                conn = AssignmentPollKeypadConnection.objects.get(poll=poll, keypad=keypad)
+            except AssignmentPollKeypadConnection.DoesNotExist:
+                conn = AssignmentPollKeypadConnection(poll=poll, keypad=keypad)
+            conn.serial_number = vote['sn']
+            conn.value = str(value)
+            conn.candidate_id = candidate_id
+            if conn.pk:
+                # Save updated connection.
+                conn.save(skip_autoupdate=True)
+            else:
+                # Add new connection to bulk create list.
+                connections.append(conn)
+            keypad_set.add(keypad.id)
+
+        # Bulk create connections.
+        AssignmentPollKeypadConnection.objects.bulk_create(connections)
+
+        # Trigger auto update.
+        connections = AssignmentPollKeypadConnection.objects.filter(poll=poll, keypad_id__in=keypad_set)
+        inform_changed_data(connections)
+
+        return HttpResponse()
+
+
 class CandidateCallback(VotingCallbackView):
+    @transaction.atomic()
     def post(self, request, poll_id, keypad_id):
         keypad = super(CandidateCallback, self).post(request, poll_id, keypad_id)
         if keypad is None:
             return HttpResponse(_('Vote rejected'))
-
-        # TODO: Use transaction here.
 
         # Get assignment poll.
         try:
@@ -516,7 +686,7 @@ class CandidateCallback(VotingCallbackView):
         # Get the elected candidate.
         candidate = None
         if key > 0 and key <= poll.assignment.related_users.all().count():
-            # TODO: sort candidates by weight if implemented in OpenSlides core
+            # TODO: Sort candidates by weight once implemented in OpenSlides core.
             candidate = AssignmentOption.objects.filter(poll=poll_id).order_by('id').all()[key - 1].candidate
 
         # Save vote.
@@ -541,6 +711,7 @@ class CandidateCallback(VotingCallbackView):
 
 
 class SpeakerCallback(VotingCallbackView):
+    @transaction.atomic()
     def post(self, request, item_id, keypad_id):
         keypad = super(SpeakerCallback, self).post(request, item_id, keypad_id)
         if keypad is None:
@@ -585,7 +756,36 @@ class SpeakerCallback(VotingCallbackView):
         return HttpResponse(content)
 
 
+class Keypads(utils_views.View):
+    http_method_names = ['post']
+
+    def post(self, request):
+        # Load json list from request body.
+        votes = json.loads(request.body.decode('utf-8'))
+        keypads = []
+        for vote in votes:
+            keypad_id = vote['id']
+            try:
+                keypad = Keypad.objects.get(keypad_id=keypad_id)
+            except Keypad.DoesNotExist:
+                continue
+
+            # Mark keypad as in range and update battery level.
+            keypad.in_range = True
+            keypad.battery_level = vote['bl']
+            keypad.save(skip_autoupdate=True)
+            keypads.append(keypad)
+
+        # Trigger auto-update.
+        inform_changed_data(keypads)
+
+        return HttpResponse()
+
+
 class KeypadCallback(VotingCallbackView):
+    @transaction.atomic()
     def post(self, request, poll_id=0, keypad_id=0):
-        super(KeypadCallback, self).post(request, poll_id, keypad_id)
+        keypad = super(KeypadCallback, self).post(request, poll_id, keypad_id)
+        if keypad:
+            inform_changed_data(keypad)
         return HttpResponse()

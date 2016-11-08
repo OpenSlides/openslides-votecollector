@@ -256,8 +256,14 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
         };
 
         // keypad system test
-        $scope.checkKeypads = function () {
+        $scope.startSysTest = function () {
             $scope.device = null;
+
+            angular.forEach($scope.keypads, function (keypad) {
+                keypad.in_range = false;
+                keypad.battery_level = -1;
+            })
+
             $http.get('/votecollector/device/').then(
                 function (success) {
                     if (success.data.error) {
@@ -272,10 +278,12 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
                                         $scope.device = success.data.error;
                                     }
                                     else {
-                                        // Stop pinging after 50 seconds.
+                                        // Stop test after 1 min.
                                         $timeout(function () {
-                                            $http.get('/votecollector/stop/');
-                                        }, 50000);
+                                            if ($scope.vc.is_voting && $scope.vc.voting_mode == 'Test') {
+                                                $scope.stopSysTest();
+                                            }
+                                        }, 60000);
                                     }
                                 }
                             );
@@ -286,6 +294,10 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
                     $scope.device = $scope.vc.getErrorMessage(failure.status, failure.statusText);
                 }
             );
+        };
+
+        $scope.stopSysTest = function () {
+            $http.get('/votecollector/stop/');
         };
 
         // Generate seating plan with empty seats

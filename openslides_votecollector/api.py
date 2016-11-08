@@ -41,21 +41,13 @@ class VoteCollectorError(Exception):
 
 def get_server():
     """
-    Gets a server proxy object and tests the connection.
+    Gets a server proxy object.
     """
     try:
         server = ServerProxy(config['votecollector_uri'])
-        # TODO: reduce timeout
     except TypeError:
         raise VoteCollectorError(_('Server not found.'))
-
-    # Test the connection
-    try:
-        server.voteCollector.getDeviceStatus()
-    except:
-        raise VoteCollectorError(_('No connection to VoteCollector.'))
-    else:
-        return server
+    return server
 
 
 def get_keypads():
@@ -75,7 +67,11 @@ def get_keypads():
 
 def get_device_status():
     server = get_server()
-    return server.voteCollector.getDeviceStatus()
+    try:
+        status = server.voteCollector.getDeviceStatus()
+    except:
+        raise VoteCollectorError(_('No connection to VoteCollector.'))
+    return status
 
 
 def start_voting(mode, options, callback_url):
@@ -83,11 +79,17 @@ def start_voting(mode, options, callback_url):
     keypads = get_keypads()
 
     ext_mode = options + ';' + callback_url if options else callback_url
-    count = server.voteCollector.prepareVoting(mode + '-' + ext_mode, 0, 0, list(keypads))
+    try:
+        count = server.voteCollector.prepareVoting(mode + '-' + ext_mode, 0, 0, list(keypads))
+    except Exception as e:
+        raise VoteCollectorError(_('No connection to VoteCollector.'))
     if count < 0:
         raise VoteCollectorError(nr=count)
 
-    count = server.voteCollector.startVoting()
+    try:
+        count = server.voteCollector.startVoting()
+    except:
+        raise VoteCollectorError(_('No connection to VoteCollector.'))
     if count < 0:
         raise VoteCollectorError(nr=count)
 
@@ -96,7 +98,10 @@ def start_voting(mode, options, callback_url):
 
 def stop_voting():
     server = get_server()
-    server.voteCollector.stopVoting()
+    try:
+        server.voteCollector.stopVoting()
+    except:
+        raise VoteCollectorError(_('No connection to VoteCollector.'))
     return True
 
 
@@ -105,7 +110,10 @@ def get_voting_status():
     Returns voting status as a list: [elapsed_seconds, votes_received]
     """
     server = get_server()
-    status = server.voteCollector.getVotingStatus()
+    try:
+        status = server.voteCollector.getVotingStatus()
+    except:
+        raise VoteCollectorError(_('No connection to VoteCollector.'))
     return status
 
 
@@ -114,4 +122,8 @@ def get_voting_result():
     Returns the voting result as a list.
     """
     server = get_server()
-    return server.voteCollector.getVotingResult()
+    try:
+        result = server.voteCollector.getVotingResult()
+    except:
+        raise VoteCollectorError(_('No connection to VoteCollector.'))
+    return result
