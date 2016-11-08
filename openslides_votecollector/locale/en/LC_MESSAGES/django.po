@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-01 10:48+0200\n"
+"POT-Creation-Date: 2016-11-08 11:21+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -49,16 +49,16 @@ msgstr ""
 msgid "Voting device not ready."
 msgstr ""
 
-#: api.py:50
+#: api.py:49
 msgid "Server not found."
 msgstr ""
 
-#: api.py:56
-msgid "No connection to VoteCollector."
+#: api.py:63
+msgid "No keypads selected."
 msgstr ""
 
-#: api.py:71
-msgid "No keypads selected."
+#: api.py:73 api.py:85 api.py:92 api.py:104 api.py:116 api.py:128
+msgid "No connection to VoteCollector."
 msgstr ""
 
 #: config_variables.py:34
@@ -75,62 +75,66 @@ msgstr ""
 msgid "Keypad %d"
 msgstr ""
 
-#: views.py:121 views.py:140
+#: views.py:131 views.py:151
 msgid "All votes are successfully anonymized."
 msgstr ""
 
-#: views.py:169
+#: views.py:180
 msgid "Unknown id."
 msgstr ""
 
-#: views.py:269
+#: views.py:297
 msgid "Yes"
 msgstr ""
 
-#: views.py:270
+#: views.py:298
 msgid "No"
 msgstr ""
 
-#: views.py:271 views.py:294
+#: views.py:299 views.py:319
 msgid "Abstain"
 msgstr ""
 
-#: views.py:401
+#: views.py:438
 msgid "Another voting is active."
 msgstr ""
 
-#: views.py:433 views.py:448 views.py:471 views.py:479
+#: views.py:544 views.py:557 views.py:575 views.py:670 views.py:676
 msgid "Vote rejected"
 msgstr ""
 
-#: views.py:440 views.py:485 views.py:487
+#: views.py:549 views.py:682 views.py:684
 msgid "Vote invalid"
 msgstr ""
 
-#: views.py:464 views.py:508
+#: views.py:593 views.py:710
 msgid "Vote submitted"
 msgstr ""
 
-#: views.py:515
+#: views.py:718
 msgid "Keypad not registered"
 msgstr ""
 
-#: views.py:519
+#: views.py:722
 msgid "User unknown"
 msgstr ""
 
-#: views.py:525
+#: views.py:728
 msgid "No agenda item selected"
 msgstr ""
 
-#: views.py:536
+#: views.py:739
 msgid "Added to        list of speakers"
 msgstr ""
 
-#: views.py:541
+#: views.py:750
+msgid "Not exists on   list of speakers"
+msgstr ""
+
+#: views.py:753
 msgid "Removed from    list of speakers"
 msgstr ""
 
-#: views.py:543
+#: views.py:755
 msgid "Invalid entry"
 msgstr ""
