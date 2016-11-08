@@ -2,7 +2,7 @@
 
 'use strict';
 
-angular.module('OpenSlidesApp.openslides_votecollector', ['OpenSlidesApp.users'])
+angular.module('OpenSlidesApp.openslides_votecollector', ['OpenSlidesApp.users', 'OpenSlidesApp.core'])
 
 .factory('VoteCollector', [
     'DS',
@@ -250,6 +250,17 @@ angular.module('OpenSlidesApp.openslides_votecollector', ['OpenSlidesApp.users']
                 return table;
             }
         };
+    }
+])
+
+.config([
+    'OpenSlidesPluginsProvider',
+    function(OpenSlidesPluginsProvider) {
+        OpenSlidesPluginsProvider.registerPlugin({
+            name: 'openslides_votecollector',
+            display_name: 'VoteCollector',
+            languages: ['de']
+        });
     }
 ])
 
