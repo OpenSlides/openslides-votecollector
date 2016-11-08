@@ -20,7 +20,7 @@ Requirements
 ============
 
 - OpenSlides 2.1.x (https://openslides.org/)
-- VoteCollector 1.7.6
+- VoteCollector 1.8.0
 
 
 Install
@@ -31,7 +31,7 @@ I. Installation on Windows (with OpenSlides portable version)
 
 1. Install and run VoteCollector
 
-   Download VoteColletor from http://files.softwein.de/OpenSlides-VoteCollector.zip.
+   Download VoteColletor from http://files.softwein.de/Votecollector180.zip
 
    To use VoteCollector in simulation mode (no keypads required)
    please run from command line::
