@@ -59,7 +59,7 @@ class Seat(RESTModelMixin, models.Model):
     """
     access_permissions = SeatAccessPermissions()
 
-    number = models.CharField(max_length=255)
+    number = models.CharField(max_length=255, blank=True)
     seating_plan_x_axis = models.PositiveIntegerField()
     seating_plan_y_axis = models.PositiveIntegerField()
 
