@@ -27,8 +27,8 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('motions', '0002_motion_origin'),
-        ('assignments', '0002_assignmentpoll_yesno'),
+        ('motions', '0002_misc_features'),
+        ('assignments', '0002_assignmentpoll_pollmethod'),
     ]
 
     operations = [

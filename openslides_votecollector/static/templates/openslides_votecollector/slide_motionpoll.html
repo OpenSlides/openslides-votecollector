@@ -74,7 +74,8 @@
 
 
   <!-- total votes table -->
-  <table ng-if="poll.has_votes" class="well pull-left" id="total-result-table">
+  <table ng-if="poll.has_votes || config('votecollector_live_voting')"
+      class="well pull-left" id="total-result-table">
     <!-- yes -->
     <tr>
       <td><img src='/static/img/button-yes.png'>
@@ -121,5 +122,5 @@
   </table>
 
   <!-- seating plan -->
-  <div ng-if="config('votecollector_seating_plan') && !poll.has_votes" id="seating-plan" ng-bind-html="seatingPlanTable"></div>
+  <div ng-if="config('votecollector_seating_plan')" id="seating-plan" ng-bind-html="seatingPlanTable"></div>
 </div>

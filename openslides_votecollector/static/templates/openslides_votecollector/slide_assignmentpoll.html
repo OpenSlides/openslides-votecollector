@@ -107,7 +107,7 @@
   </div>
 
   <!-- voting results for yes/no/abstain -->
-  <div ng-if="poll.pollmethod == 'yna' && poll.has_votes">
+  <div ng-if="poll.pollmethod == 'yna' && poll.has_votes || poll.pollmethod == 'yna' && config('votecollector_live_voting')">
     <!-- total votes -->
     <table class="well pull-left" id="total-result-table">
       <!-- yes -->
@@ -199,8 +199,8 @@
   </div>
 
   <!-- seating plan -->
-  <div ng-if="((poll.pollmethod == 'yna' && config('votecollector_seating_plan')) ||
-              (poll.pollmethod == 'votes' && config('votecollector_seating_plan'))) && !poll.has_votes"
+  <div ng-if="(poll.pollmethod == 'yna' && config('votecollector_seating_plan')) ||
+              (poll.pollmethod == 'votes' && config('votecollector_seating_plan') && !poll.has_votes)"
       id="seating-plan" ng-bind-html="seatingPlanTable">
   </div>
 </div>
