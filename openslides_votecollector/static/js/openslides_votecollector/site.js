@@ -92,7 +92,7 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
         })
         .state('openslides_votecollector.assignmentpoll.detail', {
             url: '/assignmentpoll/:id',
-            controller: 'AssignmentPollDetailCtrl',
+            controller: 'AssignmentPollVoteDetailCtrl',
             resolve: {
                 assignments: function (Assignment) {
                     return Assignment.findAll();
@@ -633,7 +633,7 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
     }
 ])
 
-.controller('AssignmentPollDetailCtrl', [
+.controller('AssignmentPollVoteDetailCtrl', [
     '$scope',
     '$http',
     '$stateParams',
