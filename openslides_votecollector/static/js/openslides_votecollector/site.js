@@ -1266,6 +1266,7 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
         gettext('Project vote result');
         gettext('Election result');
         gettext('Project election result');
+        gettext('Clear votes');
 
         // permission strings
         gettext('Can manage VoteCollector');

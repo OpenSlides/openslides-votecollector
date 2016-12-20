@@ -93,7 +93,7 @@ msgstr ""
 "Der Batterie-Status wird mit jeder Abstimmung geprüft. Verfügbare Zustände: "
 "voll, mittel, niedrig, leer"
 
-#: openslides_votecollector/site.js:1271
+#: openslides_votecollector/site.js:1272
 msgid "Can manage VoteCollector"
 msgstr "Darf den VoteCollector verwalten"
 
@@ -112,6 +112,10 @@ msgstr "Sitzplatzbezeichnung ändern für"
 #: openslides_votecollector/keypad-import.html:116
 msgid "Clear preview"
 msgstr "Vorschau leeren"
+
+#: openslides_votecollector/site.js:1269
+msgid "Clear votes"
+msgstr "Stimmen löschen"
 
 #: openslides_votecollector/keypad-list.html:206
 msgid "Click on a seat to edit its label."

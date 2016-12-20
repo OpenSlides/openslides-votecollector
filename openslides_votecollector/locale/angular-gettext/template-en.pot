@@ -83,7 +83,7 @@ msgstr ""
 msgid "Battery state is checked with each voting. Available states: full, medium, low, empty"
 msgstr ""
 
-#: openslides_votecollector/site.js:1271
+#: openslides_votecollector/site.js:1272
 msgid "Can manage VoteCollector"
 msgstr ""
 
@@ -101,6 +101,10 @@ msgstr ""
 
 #: openslides_votecollector/keypad-import.html:116
 msgid "Clear preview"
+msgstr ""
+
+#: openslides_votecollector/site.js:1269
+msgid "Clear votes"
 msgstr ""
 
 #: openslides_votecollector/keypad-list.html:206
