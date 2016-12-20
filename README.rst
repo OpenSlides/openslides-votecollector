@@ -113,7 +113,7 @@ MIT License, see LICENSE file. The authors are mentioned in the AUTHORS file.
 Changelog
 =========
 
-Version 2.0.0 (unreleased)
+Version 2.0.0 (2016-12-20)
 --------------------------
 * Added support for OpenSlides 2.1.x with autoupdate for all incoming votes.
 * New speakers voting (add or remove from list of speakers via keypad).
