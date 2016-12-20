@@ -309,7 +309,7 @@ class StartElection(StartVoting):
         # Get candidate names (if is an election with >1 candidate)
         candidate_str = ''
         if (type(poll) == AssignmentPoll):
-            options = AssignmentOption.objects.filter(poll=poll).order_by('id').all()
+            options = AssignmentOption.objects.filter(poll=poll).order_by('weight').all()
             candidate_str += "<div><ul class='columns' data-columns='3'>"
             for index, option in enumerate(options):
                 candidate_str += \
@@ -633,8 +633,7 @@ class Candidates(utils_views.View):
             # Get the selected candidate.
             candidate_id = None
             if 0 < value <= candidate_count:
-                # TODO: Sort candidates by weight once implemented in OpenSlides core.
-                candidate_id = AssignmentOption.objects.filter(poll=poll_id).order_by('id').all()[value - 1].candidate_id
+                candidate_id = AssignmentOption.objects.filter(poll=poll_id).order_by('weight').all()[value - 1].candidate_id
 
             # Write poll connection.
             try:
@@ -686,8 +685,7 @@ class CandidateCallback(VotingCallbackView):
         # Get the elected candidate.
         candidate = None
         if key > 0 and key <= poll.assignment.related_users.all().count():
-            # TODO: Sort candidates by weight once implemented in OpenSlides core.
-            candidate = AssignmentOption.objects.filter(poll=poll_id).order_by('id').all()[key - 1].candidate
+            candidate = AssignmentOption.objects.filter(poll=poll_id).order_by('weight').all()[key - 1].candidate
 
         # Save vote.
         try:
