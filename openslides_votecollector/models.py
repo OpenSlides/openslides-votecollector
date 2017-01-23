@@ -100,9 +100,6 @@ class Keypad(RESTModelMixin, models.Model):
 
     class Meta:
         default_permissions = ()
-        permissions = (
-            ('can_manage_votecollector', 'Can manage VoteCollector'),
-        )
 
     def __str__(self):
         if self.user is not None:

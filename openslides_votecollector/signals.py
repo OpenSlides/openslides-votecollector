@@ -11,7 +11,7 @@ def add_permissions_to_builtin_groups(**kwargs):
     """
     Adds the permissions openslides_votecollector.can_manage_votecollector to the group staff.
     """
-    content_type = ContentType.objects.get(app_label='openslides_votecollector', model='keypad')
+    content_type = ContentType.objects.get(app_label='openslides_votecollector', model='votecollector')
 
     try:
         # Group with pk == 3 should be the staff group in OpenSlides 2.1

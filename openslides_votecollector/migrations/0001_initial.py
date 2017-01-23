@@ -54,7 +54,6 @@ class Migration(migrations.Migration):
                 ('in_range', models.BooleanField(default=False)),
             ],
             options={
-                'permissions': (('can_manage_votecollector', 'Can manage VoteCollector'),),
                 'default_permissions': (),
             },
             bases=(openslides.utils.models.RESTModelMixin, models.Model),
