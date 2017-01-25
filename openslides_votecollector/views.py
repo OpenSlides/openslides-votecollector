@@ -92,7 +92,7 @@ class VotecollectorViewSet(ModelViewSet):
     queryset = VoteCollector.objects.all()
 
     def check_view_permissions(self):
-        return self.request.user.has_perm('openslides_votecollector.can_manage_votecollector')
+        return self.request.user.has_perm('openslides_votecollector.can_manage')
 
 
 class SeatViewSet(ModelViewSet):

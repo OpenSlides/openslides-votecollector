@@ -15,7 +15,7 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
             'img_class': 'wifi',
             'title': 'VoteCollector',
             'weight': 700,
-            'perm': 'openslides_votecollector.can_manage_votecollector',
+            'perm': 'openslides_votecollector.can_manage',
         });
     }
 ])

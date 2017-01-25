@@ -99,7 +99,7 @@ class Migration(migrations.Migration):
                 ('is_voting', models.BooleanField(default=False)),
             ],
             options={
-                'permissions': (('can_manage_votecollector', 'Can manage VoteCollector'),),
+                'permissions': (('can_manage', 'Can manage VoteCollector'),),
                 'default_permissions': (),
             },
             bases=(openslides.utils.models.RESTModelMixin, models.Model),

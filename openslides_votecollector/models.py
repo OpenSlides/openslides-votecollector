@@ -43,7 +43,7 @@ class VoteCollector(RESTModelMixin, models.Model):
     class Meta:
         default_permissions = ()
         permissions = (
-            ('can_manage_votecollector', 'Can manage VoteCollector'),
+            ('can_manage', 'Can manage VoteCollector'),
         )
 
     def __str__(self):
