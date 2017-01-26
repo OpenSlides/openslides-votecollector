@@ -1,4 +1,5 @@
 from openslides.utils.access_permissions import BaseAccessPermissions
+from openslides.utils.auth import has_perm
 
 
 class VoteCollectorAccessPermissions(BaseAccessPermissions):
@@ -9,7 +10,7 @@ class VoteCollectorAccessPermissions(BaseAccessPermissions):
         """
         Returns True if the user has VoteCollector access.
         """
-        return user.has_perm('openslides_votecollector.can_manage')
+        return has_perm(user, 'openslides_votecollector.can_manage')
 
     def get_serializer_class(self, user=None):
         """
@@ -28,7 +29,7 @@ class SeatAccessPermissions(BaseAccessPermissions):
         """
         Returns True if the user has VoteCollector access.
         """
-        return user.has_perm('openslides_votecollector.can_manage')
+        return has_perm(user, 'openslides_votecollector.can_manage')
 
     def get_serializer_class(self, user=None):
         """
@@ -47,7 +48,7 @@ class KeypadAccessPermissions(BaseAccessPermissions):
         """
         Returns True if the user has VoteCollector access.
         """
-        return user.has_perm('openslides_votecollector.can_manage')
+        return has_perm(user, 'openslides_votecollector.can_manage')
 
     def get_serializer_class(self, user=None):
         """
@@ -66,7 +67,7 @@ class MotionPollKeypadConnectionAccessPermissions(BaseAccessPermissions):
         """
         Returns True if the user has VoteCollector access.
         """
-        return user.has_perm('openslides_votecollector.can_manage')
+        return has_perm(user, 'openslides_votecollector.can_manage')
 
     def get_serializer_class(self, user=None):
         """
@@ -85,7 +86,7 @@ class AssignmentPollKeypadConnectionAccessPermissions(BaseAccessPermissions):
         """
         Returns True if the user has VoteCollector access.
         """
-        return user.has_perm('openslides_votecollector.can_manage')
+        return has_perm(user, 'openslides_votecollector.can_manage')
 
     def get_serializer_class(self, user=None):
         """
