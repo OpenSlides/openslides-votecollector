@@ -14,6 +14,7 @@ from openslides.core.exceptions import OpenSlidesError
 from openslides.core.models import Projector
 from openslides.motions.models import MotionPoll
 from openslides.utils import views as utils_views
+from openslides.utils.auth import has_perm
 from openslides.utils.autoupdate import inform_changed_data, inform_deleted_data
 from openslides.utils.rest_api import ListModelMixin, ModelViewSet, PermissionMixin, RetrieveModelMixin, Response, list_route
 
@@ -54,7 +55,7 @@ class AjaxView(utils_views.View):
         if self.required_permission is None:
             return True
         else:
-            return request.user.has_perm(self.required_permission)
+            return has_perm(request.user, self.required_permission)
 
     def dispatch(self, request, *args, **kwargs):
         """
@@ -92,7 +93,7 @@ class VotecollectorViewSet(ModelViewSet):
     queryset = VoteCollector.objects.all()
 
     def check_view_permissions(self):
-        return self.request.user.has_perm('openslides_votecollector.can_manage')
+        return has_perm(self.request.user, 'openslides_votecollector.can_manage')
 
 
 class SeatViewSet(ModelViewSet):
