@@ -31,7 +31,7 @@ I. Installation on Windows (with OpenSlides portable version)
 
 1. Install and run VoteCollector
 
-   Download VoteColletor from http://files.softwein.de/Votecollector180.zip
+   Download VoteColletor from http://files.softwein.de/Votecollector.zip
 
    To use VoteCollector in simulation mode (no keypads required)
    please run from command line::
@@ -133,6 +133,7 @@ Version 2.0.0 (2016-12-20)
 Version 1.2.1 (2015-03-18)
 --------------------------
 Improved seating plan voting modus:
+
 * Show seat number in seating plan only if keypad/seat is active.
 * Seating plan and live mode: Show box with total result only if voting is finished.
   While voting the seating plan is visible only.
