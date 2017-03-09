@@ -9,7 +9,7 @@ angular.module('OpenSlidesApp.openslides_votecollector', ['OpenSlidesApp.users',
     'gettext',
     function (DS, gettext) {
         return DS.defineResource({
-            name: 'openslides_votecollector/votecollector',
+            name: 'openslides_votecollector/vote-collector',
             methods: {
                 getErrorMessage: function (status, text) {
                     if (status == 503) {

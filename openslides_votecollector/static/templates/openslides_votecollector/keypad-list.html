@@ -31,7 +31,7 @@
   <div class="row">
     <div class="col-sm-6">
       <!-- delete mode -->
-      <button class="btn"
+      <button class="btn btn-sm"
           ng-class="isDeleteMode ? 'btn-primary' : 'btn-default'"
           ng-click="isDeleteMode = !isDeleteMode; uncheckAll()">
         <i class="fa fa-check-square-o"></i>
@@ -48,7 +48,7 @@
                placeholder="{{ 'Search' | translate}}">
           </div>
         </div>
-        <button class="btn btn-default" ng-click="isFilterOpen = !isFilterOpen"
+        <button class="btn btn-sm btn-default" ng-click="isFilterOpen = !isFilterOpen"
             ng-class="isFilterOpen ? 'btn-primary' : 'btn-default'">
           <i class="fa fa-filter"></i>
           <translate>Filter ...</translate>
@@ -81,7 +81,7 @@
       <!-- delete button -->
       <a ng-show="isDeleteMode"
           ng-click="deleteMultiple()"
-          class="btn btn-primary">
+          class="btn btn-sm btn-danger">
         <i class="fa fa-trash fa-lg"></i>
         <translate>Delete selected keypads</translate>
       </a>
@@ -193,6 +193,7 @@
         width: 3em;
         height: 3em;
         border: none;
+        cursor: pointer;
     }
     #seating-plan table td.seat {
         border: 1px solid black;
@@ -207,11 +208,10 @@
   <div id="seating-plan">
     <table>
         <tr ng-repeat="row in seatingPlan.rows">
-          <td ng-repeat="seat in row" ng-class="seat.css">
-            <span ng-bootbox-prompt="{{ 'Change seat label for' | translate }} '{{seat.number}}':"
-                  ng-bootbox-prompt-action="changeSeat(seat, result)">
-              {{ seat.number }}
-            </span>
+          <td ng-repeat="seat in row" ng-class="seat.css"
+              ng-bootbox-prompt="{{ 'Change seat label for' | translate }} '{{seat.number}}':"
+              ng-bootbox-prompt-action="changeSeat(seat, result)">
+            {{ seat.number }}
           </td>
         </tr>
     </table>

@@ -38,9 +38,6 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
                 keypads: function (Keypad) {
                     return Keypad.findAll();
                 },
-                users: function (User) {
-                    return User.findAll();
-                },
                 seats: function (Seat) {
                     return Seat.findAll();
                 },
@@ -53,9 +50,6 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
             url: '/import',
             controller: 'KeypadImportCtrl',
             resolve: {
-                users: function(User) {
-                    return User.findAll();
-                },
                 keypads: function(Keypad) {
                     return Keypad.findAll();
                 },
@@ -72,17 +66,11 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
             url: '/motionpoll/:id',
             controller: 'MotionPollVoteDetailCtrl',
             resolve: {
-                motions: function (Motion) {
-                    return Motion.findAll();
-                },
                 motionpollkeypadconnections: function (MotionPollKeypadConnection) {
                     return MotionPollKeypadConnection.findAll();
                 },
                 keypads: function (Keypad) {
                     return Keypad.findAll();
-                },
-                users: function (User) {
-                    return User.findAll();
                 }
             }
         })
@@ -94,17 +82,11 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
             url: '/assignmentpoll/:id',
             controller: 'AssignmentPollVoteDetailCtrl',
             resolve: {
-                assignments: function (Assignment) {
-                    return Assignment.findAll();
-                },
                 assignmentpollkeypadconnections: function (AssignmentPollKeypadConnection) {
                     return AssignmentPollKeypadConnection.findAll();
                 },
                 keypads: function (Keypad) {
                     return Keypad.findAll();
-                },
-                users: function (User) {
-                    return User.findAll();
                 }
             }
         })
@@ -386,72 +368,45 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
     '$scope',
     '$http',
     'gettext',
+    'gettextCatalog',
+    'CsvDownload',
     'Keypad',
     'User',
     'Seat',
-    function ($scope, $http, gettext, Keypad, User, Seat) {
-
-        $scope.users = [];
-        $scope.separator = ',';
-        $scope.encoding = 'UTF-8';
-        $scope.encodingOptions = ['UTF-8', 'ISO-8859-1'];
-        $scope.accept = '.csv, .txt';
-        $scope.csv = {
-            content: null,
-            header: true,
-            headerVisible: false,
-            separator: $scope.separator,
-            separatorVisible: false,
-            encoding: $scope.encoding,
-            encodingVisible: false,
-            accept: $scope.accept,
-            result: null
-        };
-        // set csv file encoding
-        $scope.setEncoding = function () {
-            $scope.csv.encoding = $scope.encoding;
-        };
-        // set csv file encoding
-        $scope.setSeparator = function () {
-            $scope.csv.separator = $scope.separator;
+    function ($scope, $http, gettext, gettextCatalog, CsvDownload, Keypad, User, Seat) {
+        $scope.csvConfig = {
+            accept: '.csv, .txt',
+            encodingOptions: ['UTF-8', 'ISO-8859-1'],
+            parseConfig: {
+                skipEmptyLines: true,
+            },
         };
 
-        // detect if csv file is loaded
-        $scope.$watch('csv.result', function () {
-            $scope.users = [];
-            var quotionRe = /^"(.*)"$/;
-            angular.forEach($scope.csv.result, function (keypaduser) {
-                // title
-                if (keypaduser.title) {
-                    keypaduser.title = keypaduser.title.replace(quotionRe, '$1');
-                }
-                // first name
-                if (keypaduser.first_name) {
-                    keypaduser.first_name = keypaduser.first_name.replace(quotionRe, '$1');
-                }
-                // last name
-                if (keypaduser.last_name) {
-                    keypaduser.last_name = keypaduser.last_name.replace(quotionRe, '$1');
-                }
-                // structure level
-                if (keypaduser.structure_level) {
-                    keypaduser.structure_level = keypaduser.structure_level.replace(quotionRe, '$1');
-                }
-                // keypad id
-                if (keypaduser.keypad_id) {
-                    keypaduser.keypad_id = keypaduser.keypad_id.replace(quotionRe, '$1');
-                }
-                // seat label
-                if (keypaduser.seat_label) {
-                    keypaduser.seat_label = keypaduser.seat_label.replace(quotionRe, '$1');
-                }
+        var FIELDS = ['title', 'first_name', 'last_name', 'structure_level', 'number',
+        'groups', 'comment', 'is_active', 'is_present', 'is_committee', 'default_password',
+        'keypad_id', 'seat_label'];
+        $scope.keypads = [];
+        $scope.onCsvChange = function (csv) {
+            // All keypad objects are already loaded via the resolve statement from ui-router.
+            var keypads = Keypad.getAll();
+            $scope.keypads = [];
 
+            var csvKeypads = [];
+            _.forEach(csv.data, function (row) {
+                if (row.length >= 2) {
+                    var filledRow = _.zipObject(FIELDS, row);
+                    csvKeypads.push(filledRow);
+                }
+            });
+            _.forEach(csvKeypads, function (keypaduser) {
+                keypaduser.selected = true;
                 // check if given keypaduser already exists
                 if (keypaduser.first_name == '' && keypaduser.last_name == '') {
                     // no personalized keypad -> anonymous user
                     keypaduser.user_id = null;
                 } else {
-                    keypaduser.fullname = [keypaduser.title, keypaduser.first_name, keypaduser.last_name, keypaduser.structure_level].join(' ');
+                    keypaduser.fullname = [keypaduser.title, keypaduser.first_name,
+                        keypaduser.last_name, keypaduser.structure_level].join(' ');
                     angular.forEach(User.getAll(), function(user) {
                         user.fullname = [user.title, user.first_name, user.last_name, user.structure_level].join(' ');
                         if (user.fullname == keypaduser.fullname) {
@@ -461,6 +416,11 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
                     if (!keypaduser.user_id) {
                         keypaduser.importerror = true;
                         keypaduser.name_error = gettext('Error: Participant not found.');
+                        keypaduser.user_id = -1;
+                    }
+                    if (keypaduser.user_id && Keypad.filter({ 'user_id': keypaduser.user_id }).length > 0) {
+                        keypaduser.importerror = true;
+                        keypaduser.name_error = gettext('Error: Keypad with this participant already exists.');
                     }
                 }
 
@@ -474,7 +434,7 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
                             angular.forEach(Keypad.getAll(), function(keypad) {
                                 if (keypad.seat_id == seat.id) {
                                     keypaduser.importerror = true;
-                                    keypaduser.seat_error = gettext('Error: Seat ID already assigned to a keypad.');
+                                    keypaduser.seat_error = gettext('Error: The seat is already assigned to a keypad.');
                                 }
                             });
                             keypaduser.seat_id = seat.id;
@@ -489,23 +449,55 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
                         keypaduser.keypad_error = gettext('Error: Keypad ID already exists.');
                     }
                 });
-                $scope.users.push(keypaduser);
+
+                // validate keypad id
+                var num = parseInt(keypaduser.keypad_id);
+                if (isNaN(num) || num <= 0) {
+                    keypaduser.importerror = true;
+                    keypaduser.keypad_error = gettext('Error: Keypad ID must be a positive integer value.')
+                }
+                else {
+                    keypaduser.keypad_id = num;
+                    if (Keypad.filter({ 'keypad_id': keypaduser.keypad_id }).length > 0) {
+                        keypaduser.importerror = true;
+                        keypaduser.keypad_error = gettext('Error: Keypad ID already exists.');
+                    }
+                }
+
+                $scope.keypads.push(keypaduser);
             });
-        });
+            $scope.calcStats();
+        };
+
+        // Stats
+        $scope.calcStats = function() {
+            // not imported: if importerror
+            $scope.keypadsWillNotBeImported = 0;
+            // imported: all others
+            $scope.keypadsWillBeImported = 0;
+
+            $scope.keypads.forEach(function(keypad) {
+                if (!keypad.selected || keypad.importerror) {
+                    $scope.keypadsWillNotBeImported++;
+                } else {
+                    $scope.keypadsWillBeImported++;
+                }
+            });
+        };
 
         // import from csv file
         $scope.import = function () {
             $scope.csvImporting = true;
-            angular.forEach($scope.users, function (user) {
-                if (!user.importerror) {
-                    var keypad = {
-                        'keypad_id': user.keypad_id,
-                        'user_id': user.user_id,
-                        'seat_id': user.seat_id
+            _.forEach($scope.keypads, function (keypad) {
+                if (keypad.selected && !keypad.importerror) {
+                    var keypadobject = {
+                        'keypad_id': keypad.keypad_id,
+                        'user_id': keypad.user_id,
+                        'seat_id': keypad.seat_id
                     }
-                    Keypad.create(keypad).then(
+                    Keypad.create(keypadobject).then(
                         function(success) {
-                            user.imported = true;
+                            keypad.imported = true;
                         }
                     );
                 }
@@ -515,8 +507,32 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
 
         // clear csv import preview
         $scope.clear = function () {
-            $scope.csv.result = null;
+            $scope.keypads = null;
         };
+
+        // download CSV example file
+        $scope.downloadCSVExample = function () {
+            var element = document.getElementById('downloadLink');
+
+            var makeHeaderline = function () {
+                var headerline = ['Title', 'Given name', 'Surname', 'Structure level', 'Participant number', 'Groups',
+                    'Comment', 'Is active', 'Is present', 'Is a committee', 'Initial password',
+                    'Keypad ID', 'Seat'];
+                return _.map(headerline, function (entry) {
+                    return gettextCatalog.getString(entry);
+                });
+            };
+            var csvRows = [makeHeaderline(),
+                // example entries
+                ['Dr.', 'Max', 'Mustermann', 'Berlin','1234567890', '', 'xyz', '1', '1', '', '', '1', '1'],
+                ['', 'John', 'Doe', 'Washington','75/99/8-2', '', 'abc', '1', '1', '', '', '2', '2'],
+                ['', 'Fred', 'Bloggs', 'London', '', '', '', '', '', '', '', '3', '3'],
+                ['', '', 'Executive Board', '', '', '', '', '', '', '1', '', '4', '4'],
+
+            ];
+            CsvDownload(csvRows, 'keypads-example.csv');
+        }
+
 
     }
 ])
