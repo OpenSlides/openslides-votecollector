@@ -20,7 +20,7 @@ Requirements
 ============
 
 - OpenSlides 2.1.x (https://openslides.org/)
-- VoteCollector 1.8.0
+- VoteCollector 1.8.1
 
 
 Install
@@ -112,6 +112,13 @@ MIT License, see LICENSE file. The authors are mentioned in the AUTHORS file.
 
 Changelog
 =========
+
+Version 2.0.1 (2017-03-09)
+--------------------------
+* Updated OpenSlides 2.1 support:
+  Fixed usage of has_perm()).
+  Updated keypad csv import.
+
 
 Version 2.0.0 (2016-12-20)
 --------------------------
