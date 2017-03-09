@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-11-08 11:16+0100\n"
+"POT-Creation-Date: 2017-03-09 12:07+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Emanuel Schütze <emanuel.schuetze@intevation.de>, 2016\n"
 "Language-Team: German (https://www.transifex.com/openslides/teams/14270/de/)\n"
@@ -66,76 +66,76 @@ msgstr "Keine Verbindung zum VoteCollector."
 msgid "Please vote now!"
 msgstr "Bitte stimmen Sie jetzt ab!"
 
-#: models.py:109
+#: models.py:106
 #, python-format
 msgid "Keypad of %s"
 msgstr "Keypad von %s"
 
-#: models.py:110
+#: models.py:107
 #, python-format
 msgid "Keypad %d"
 msgstr "Keypad %d"
 
-#: views.py:131 views.py:151
+#: views.py:132 views.py:152
 msgid "All votes are successfully anonymized."
 msgstr "Alle Stimmen wurden erfolgreich anonymisiert."
 
-#: views.py:180
+#: views.py:181
 msgid "Unknown id."
 msgstr "Unbekannte ID."
 
-#: views.py:297
+#: views.py:298
 msgid "Yes"
 msgstr "Ja"
 
-#: views.py:298
+#: views.py:299
 msgid "No"
 msgstr "Nein"
 
-#: views.py:299 views.py:319
+#: views.py:300 views.py:320
 msgid "Abstain"
 msgstr "Enthaltung"
 
-#: views.py:438
+#: views.py:439
 msgid "Another voting is active."
 msgstr "Eine andere Abstimmung is aktiv."
 
-#: views.py:544 views.py:557 views.py:575 views.py:670 views.py:676
+#: views.py:545 views.py:558 views.py:576 views.py:670 views.py:676
 msgid "Vote rejected"
 msgstr "Stimme abgelehnt"
 
-#: views.py:549 views.py:682 views.py:684
+#: views.py:550 views.py:682 views.py:684
 msgid "Vote invalid"
 msgstr "Stimme ungültig"
 
-#: views.py:593 views.py:710
+#: views.py:594 views.py:709
 msgid "Vote submitted"
 msgstr "Stimme abgegeben"
 
-#: views.py:718
+#: views.py:717
 msgid "Keypad not registered"
 msgstr "Keypad nicht registriert"
 
-#: views.py:722
+#: views.py:721
 msgid "User unknown"
 msgstr "Nutzer unbekannt"
 
-#: views.py:728
+#: views.py:727
 msgid "No agenda item selected"
 msgstr "Kein Tagesordnungspunkt ausgewählt"
 
-#: views.py:739
+#: views.py:738
 msgid "Added to        list of speakers"
 msgstr "Zur Redeliste   hinzugefügt"
 
-#: views.py:750
+#: views.py:749
 msgid "Not exists on   list of speakers"
 msgstr "Auf Redeliste   nicht vorhanden"
 
-#: views.py:753
+#: views.py:752
 msgid "Removed from    list of speakers"
 msgstr "Von Redeliste   entfernt"
 
-#: views.py:755
+#: views.py:754
 msgid "Invalid entry"
 msgstr "Ungültiger Eintrag"

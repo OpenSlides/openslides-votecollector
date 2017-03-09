@@ -8,7 +8,7 @@ msgstr ""
 msgid "--- Select keypad usage ---"
 msgstr ""
 
-#: openslides_votecollector/site.js:169
+#: openslides_votecollector/site.js:151
 msgid "--- Select seat ---"
 msgstr ""
 
@@ -16,7 +16,7 @@ msgstr ""
 msgid "--- Select status ---"
 msgstr ""
 
-#: openslides_votecollector/site.js:1042
+#: openslides_votecollector/site.js:1058
 msgid "A motion voting is running."
 msgstr ""
 
@@ -36,7 +36,7 @@ msgstr ""
 msgid "All single votes"
 msgstr ""
 
-#: openslides_votecollector/site.js:844
+#: openslides_votecollector/site.js:860
 msgid "An election is running."
 msgstr ""
 
@@ -46,18 +46,18 @@ msgid "Anonymize votes"
 msgstr ""
 
 #: openslides_votecollector/assignmentpoll-detail.html:76
-#: openslides_votecollector/keypad-import.html:80
+#: openslides_votecollector/keypad-import.html:74
 #: openslides_votecollector/keypad-list.html:161
 #: openslides_votecollector/motionpoll-detail.html:100
-#: openslides_votecollector/site.js:150
+#: openslides_votecollector/site.js:132
 msgid "Anonymous"
 msgstr ""
 
-#: openslides_votecollector/site.js:1046
+#: openslides_votecollector/site.js:1062
 msgid "Another election is running."
 msgstr ""
 
-#: openslides_votecollector/site.js:848
+#: openslides_votecollector/site.js:864
 msgid "Another motion voting is running."
 msgstr ""
 
@@ -70,7 +70,7 @@ msgstr ""
 msgid "Are you sure you want to delete this entry?"
 msgstr ""
 
-#: openslides_votecollector/keypad-import.html:126
+#: openslides_votecollector/keypad-import.html:118
 #: openslides_votecollector/keypad-import.html:6
 msgid "Back to overview"
 msgstr ""
@@ -83,7 +83,7 @@ msgstr ""
 msgid "Battery state is checked with each voting. Available states: full, medium, low, empty"
 msgstr ""
 
-#: openslides_votecollector/site.js:1272
+#: openslides_votecollector/site.js:1288
 msgid "Can manage VoteCollector"
 msgstr ""
 
@@ -95,20 +95,24 @@ msgstr ""
 msgid "Candidate"
 msgstr ""
 
-#: openslides_votecollector/keypad-list.html:211
+#: openslides_votecollector/keypad-list.html:212
 msgid "Change seat label for"
 msgstr ""
 
-#: openslides_votecollector/keypad-import.html:116
+#: openslides_votecollector/keypad-import.html:108
 msgid "Clear preview"
 msgstr ""
 
-#: openslides_votecollector/site.js:1269
+#: openslides_votecollector/site.js:1285
 msgid "Clear votes"
 msgstr ""
 
-#: openslides_votecollector/keypad-list.html:206
+#: openslides_votecollector/keypad-list.html:207
 msgid "Click on a seat to edit its label."
+msgstr ""
+
+#: openslides_votecollector/keypad-import.html:28
+msgid "Comment"
 msgstr ""
 
 #: openslides_votecollector/keypad-list.html:149
@@ -119,8 +123,12 @@ msgstr ""
 msgid "Delete selected keypads"
 msgstr ""
 
-#: openslides_votecollector/site.js:1242
+#: openslides_votecollector/site.js:1258
 msgid "Distribution method for keypads"
+msgstr ""
+
+#: openslides_votecollector/keypad-import.html:37
+msgid "Download CSV example file"
 msgstr ""
 
 #: openslides_votecollector/keypad-list.html:148
@@ -139,32 +147,37 @@ msgstr ""
 
 #. ballot of a assignment
 #: openslides_votecollector/assignmentpoll-detail.html:40
-#: openslides_votecollector/site.js:1267
+#: openslides_votecollector/site.js:1283
 #: openslides_votecollector/slide_assignmentpoll.html:105
 msgid "Election result"
 msgstr ""
 
-#: openslides_votecollector/site.js:1003
+#: openslides_votecollector/site.js:1019
 msgid "Election voting has finished."
 msgstr ""
 
-#: openslides_votecollector/keypad-import.html:22
-msgid "Encoding"
-msgstr ""
-
-#: openslides_votecollector/site.js:489
+#: openslides_votecollector/site.js:449
+#: openslides_votecollector/site.js:463
 msgid "Error: Keypad ID already exists."
 msgstr ""
 
-#: openslides_votecollector/site.js:463
+#: openslides_votecollector/site.js:457
+msgid "Error: Keypad ID must be a positive integer value."
+msgstr ""
+
+#: openslides_votecollector/site.js:423
+msgid "Error: Keypad with this participant already exists."
+msgstr ""
+
+#: openslides_votecollector/site.js:418
 msgid "Error: Participant not found."
 msgstr ""
 
-#: openslides_votecollector/site.js:477
-msgid "Error: Seat ID already assigned to a keypad."
+#: openslides_votecollector/site.js:437
+msgid "Error: The seat is already assigned to a keypad."
 msgstr ""
 
-#: openslides_votecollector/site.js:1247
+#: openslides_votecollector/site.js:1263
 msgid "Example: http://localhost:8030"
 msgstr ""
 
@@ -177,6 +190,14 @@ msgstr ""
 msgid "Filter ..."
 msgstr ""
 
+#: openslides_votecollector/keypad-import.html:23
+msgid "Given name"
+msgstr ""
+
+#: openslides_votecollector/keypad-import.html:27
+msgid "Groups"
+msgstr ""
+
 #: openslides_votecollector/keypad-list.html:11
 msgid "Import"
 msgstr ""
@@ -185,23 +206,23 @@ msgstr ""
 msgid "Import keypads"
 msgstr ""
 
-#: openslides_votecollector/keypad-import.html:119
-msgid "Import {{ users.length - usersFailed.length }} keypads"
+#: openslides_votecollector/keypad-import.html:111
+msgid "Import {{ keypadsWillBeImported }} keypads"
 msgstr ""
 
 #: openslides_votecollector/keypad-list.html:124
 msgid "In range"
 msgstr ""
 
-#: openslides_votecollector/site.js:1255
+#: openslides_votecollector/site.js:1271
 msgid "Incoming votes will be shown in grey on seating plan. You can see only WHICH seat has voted but not HOW."
 msgstr ""
 
-#: openslides_votecollector/site.js:1253
+#: openslides_votecollector/site.js:1269
 msgid "Incoming votes will be shown in seating plan on projector for keypads with assigned seats."
 msgstr ""
 
-#: openslides_votecollector/site.js:1251
+#: openslides_votecollector/site.js:1267
 msgid "Incoming votes will be shown on projector while voting is active."
 msgstr ""
 
@@ -213,9 +234,22 @@ msgstr ""
 msgid "Invalid votes"
 msgstr ""
 
-#: openslides_votecollector/keypad-import.html:55
+#: openslides_votecollector/keypad-import.html:29
+msgid "Is active"
+msgstr ""
+
+#: openslides_votecollector/keypad-import.html:31
+msgid "Is committee"
+msgstr ""
+
+#: openslides_votecollector/keypad-import.html:30
+msgid "Is present"
+msgstr ""
+
+#: openslides_votecollector/keypad-import.html:32
+#: openslides_votecollector/keypad-import.html:49
 #: openslides_votecollector/keypad-list.html:106
-#: openslides_votecollector/site.js:157
+#: openslides_votecollector/site.js:139
 msgid "Keypad ID"
 msgstr ""
 
@@ -238,7 +272,7 @@ msgstr ""
 msgid "Motion"
 msgstr ""
 
-#: openslides_votecollector/site.js:805
+#: openslides_votecollector/site.js:821
 msgid "Motion voting has finished."
 msgstr ""
 
@@ -262,25 +296,29 @@ msgstr ""
 msgid "No"
 msgstr ""
 
-#: openslides_votecollector/keypad-import.html:43
+#: openslides_votecollector/keypad-import.html:36
 msgid "Only double quotes are accepted as text delimiter (no single quotes)."
 msgstr ""
 
-#: openslides_votecollector/site.js:1248
+#: openslides_votecollector/site.js:1264
 msgid "Overlay message 'Vote started'"
 msgstr ""
 
-#: openslides_votecollector/keypad-import.html:54
+#: openslides_votecollector/keypad-import.html:48
 #: openslides_votecollector/keypad-list.html:113
-#: openslides_votecollector/site.js:147
+#: openslides_votecollector/site.js:129
 msgid "Participant"
 msgstr ""
 
-#: openslides_votecollector/keypad-import.html:38
+#: openslides_votecollector/keypad-import.html:26
+msgid "Participant number"
+msgstr ""
+
+#: openslides_votecollector/keypad-import.html:18
 msgid "Please note:"
 msgstr ""
 
-#: openslides_votecollector/site.js:1249
+#: openslides_votecollector/site.js:1265
 msgid "Please vote now!"
 msgstr ""
 
@@ -289,11 +327,11 @@ msgstr ""
 msgid "Press 'Fn+6' on keypad to show the serial number."
 msgstr ""
 
-#: openslides_votecollector/keypad-import.html:47
+#: openslides_votecollector/keypad-import.html:41
 msgid "Preview"
 msgstr ""
 
-#: openslides_votecollector/site.js:1268
+#: openslides_votecollector/site.js:1284
 msgid "Project election result"
 msgstr ""
 
@@ -302,16 +340,16 @@ msgstr ""
 msgid "Project vote"
 msgstr ""
 
-#: openslides_votecollector/site.js:1266
+#: openslides_votecollector/site.js:1282
 msgid "Project vote result"
 msgstr ""
 
-#: openslides_votecollector/site.js:1004
-#: openslides_votecollector/site.js:806
+#: openslides_votecollector/site.js:1020
+#: openslides_votecollector/site.js:822
 msgid "Received votes:"
 msgstr ""
 
-#: openslides_votecollector/keypad-import.html:40
+#: openslides_votecollector/keypad-import.html:20
 msgid "Required comma or semicolon separated values with these column header names in the first row"
 msgstr ""
 
@@ -319,8 +357,8 @@ msgstr ""
 msgid "Save"
 msgstr ""
 
-#: openslides_votecollector/site.js:1006
-#: openslides_votecollector/site.js:808
+#: openslides_votecollector/site.js:1022
+#: openslides_votecollector/site.js:824
 msgid "Save this result now!"
 msgstr ""
 
@@ -328,16 +366,17 @@ msgstr ""
 msgid "Search"
 msgstr ""
 
+#: openslides_votecollector/keypad-import.html:33
 #: openslides_votecollector/keypad-list.html:120
-#: openslides_votecollector/site.js:166
+#: openslides_votecollector/site.js:148
 msgid "Seat"
 msgstr ""
 
-#: openslides_votecollector/keypad-import.html:56
+#: openslides_votecollector/keypad-import.html:50
 msgid "Seat label"
 msgstr ""
 
-#: openslides_votecollector/keypad-list.html:205
+#: openslides_votecollector/keypad-list.html:206
 msgid "Seating plan"
 msgstr ""
 
@@ -345,36 +384,32 @@ msgstr ""
 msgid "Select ..."
 msgstr ""
 
-#: openslides_votecollector/keypad-import.html:16
+#: openslides_votecollector/keypad-import.html:15
 msgid "Select a CSV file"
 msgstr ""
 
-#: openslides_votecollector/keypad-import.html:19
-msgid "Separator"
-msgstr ""
-
-#: openslides_votecollector/site.js:1254
+#: openslides_votecollector/site.js:1270
 msgid "Show grey seats on seating plan"
 msgstr ""
 
-#: openslides_votecollector/site.js:1252
+#: openslides_votecollector/site.js:1268
 msgid "Show seating plan"
 msgstr ""
 
-#: openslides_votecollector/site.js:1264
+#: openslides_votecollector/site.js:1280
 msgid "Single votes"
 msgstr ""
 
-#: openslides_votecollector/site.js:1038
-#: openslides_votecollector/site.js:840
+#: openslides_votecollector/site.js:1054
+#: openslides_votecollector/site.js:856
 msgid "Speakers voting is running for agenda item"
 msgstr ""
 
-#: openslides_votecollector/site.js:1260
+#: openslides_votecollector/site.js:1276
 msgid "Start election"
 msgstr ""
 
-#: openslides_votecollector/site.js:1262
+#: openslides_votecollector/site.js:1278
 msgid "Start speakers voting"
 msgstr ""
 
@@ -382,15 +417,15 @@ msgstr ""
 msgid "Start system test"
 msgstr ""
 
-#: openslides_votecollector/site.js:1258
+#: openslides_votecollector/site.js:1274
 msgid "Start voting"
 msgstr ""
 
-#: openslides_votecollector/site.js:1261
+#: openslides_votecollector/site.js:1277
 msgid "Stop election"
 msgstr ""
 
-#: openslides_votecollector/site.js:1263
+#: openslides_votecollector/site.js:1279
 msgid "Stop speakers voting"
 msgstr ""
 
@@ -398,37 +433,49 @@ msgstr ""
 msgid "Stop system test"
 msgstr ""
 
-#: openslides_votecollector/site.js:1259
+#: openslides_votecollector/site.js:1275
 msgid "Stop voting"
 msgstr ""
 
-#: openslides_votecollector/site.js:1035
-#: openslides_votecollector/site.js:837
+#: openslides_votecollector/keypad-import.html:25
+msgid "Structure level"
+msgstr ""
+
+#: openslides_votecollector/keypad-import.html:24
+msgid "Surname"
+msgstr ""
+
+#: openslides_votecollector/site.js:1051
+#: openslides_votecollector/site.js:853
 msgid "System test is running."
 msgstr ""
 
-#: openslides_votecollector/site.js:1246
+#: openslides_votecollector/keypad-import.html:22
+msgid "Title"
+msgstr ""
+
+#: openslides_votecollector/site.js:1262
 msgid "URL of VoteCollector"
 msgstr ""
 
-#: openslides_votecollector/site.js:1245
+#: openslides_votecollector/site.js:1261
 msgid "Use anonymous and personalized keypads"
 msgstr ""
 
-#: openslides_votecollector/site.js:1243
+#: openslides_votecollector/site.js:1259
 msgid "Use anonymous keypads only"
 msgstr ""
 
-#: openslides_votecollector/site.js:1250
+#: openslides_votecollector/site.js:1266
 msgid "Use live voting for motions"
 msgstr ""
 
-#: openslides_votecollector/site.js:1244
+#: openslides_votecollector/site.js:1260
 msgid "Use personalized keypads only"
 msgstr ""
 
-#: openslides_votecollector/keypad-import.html:42
-msgid "Use the participants import csv file and add a new column 'keypad_id' and 'seat_label'. A new keypad with 'keypad_id' will be created, referenced to existing participant and seat."
+#: openslides_votecollector/keypad-import.html:35
+msgid "Use the participants import csv file and add a new column 'Keypad ID' and 'Seat label'. A new keypad with 'Keypad ID' will be created, referenced to existing participant and seat."
 msgstr ""
 
 #: openslides_votecollector/motionpoll-detail.html:69
@@ -445,14 +492,14 @@ msgstr ""
 msgid "VoteCollector not running!"
 msgstr ""
 
-#: openslides_votecollector/site.js:1050
-#: openslides_votecollector/site.js:852
+#: openslides_votecollector/site.js:1066
+#: openslides_votecollector/site.js:868
 msgid "Votes received:"
 msgstr ""
 
 #. ballot of a motion
 #: openslides_votecollector/motionpoll-detail.html:40
-#: openslides_votecollector/site.js:1265
+#: openslides_votecollector/site.js:1281
 #: openslides_votecollector/slide_motionpoll.html:71
 msgid "Voting result"
 msgstr ""
@@ -489,15 +536,15 @@ msgstr ""
 msgid "keypads"
 msgstr ""
 
-#: openslides_votecollector/keypad-import.html:112
+#: openslides_votecollector/keypad-import.html:104
 msgid "keypads were successfully imported."
 msgstr ""
 
-#: openslides_votecollector/keypad-import.html:105
+#: openslides_votecollector/keypad-import.html:97
 msgid "keypads will be imported."
 msgstr ""
 
-#: openslides_votecollector/keypad-import.html:99
+#: openslides_votecollector/keypad-import.html:92
 msgid "keypads will be not imported."
 msgstr ""
 
