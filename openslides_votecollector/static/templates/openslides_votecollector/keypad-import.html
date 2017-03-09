@@ -89,31 +89,31 @@
       <div class="text-danger">
         <i class="fa fa-exclamation-triangle"></i>
         {{ keypadsWillNotBeImported }}
-        <translate>participants will be not imported.</translate>
+        <translate>keypads will be not imported.</translate>
       </div>
       <div>
         <i class="fa fa-check-circle-o fa-lg"></i>
         {{ keypadsWillBeImported }}
-        <translate>participants will be imported.</translate>
+        <translate>keypads will be imported.</translate>
       </div>
       <div ng-repeat="keypad in keypadsImported = (keypads | filter:{imported:true})"></div>
       <div ng-if="keypadsImported.length > 0" class="text-success">
         <hr class="smallhr">
         <i class="fa fa-check-circle fa-lg"></i>
         {{ keypadsImported.length }}
-        <translate>participants were successfully imported.</translate>
+        <translate>keypads were successfully imported.</translate>
       </div>
 
       <div class="spacer">
-        <button ng-click="clear()" class="btn btn-default" translate>
+        <button ng-click="clear()" class="btn btn-sm btn-default" translate>
           Clear preview
         </button>
-        <button ng-if="!csvImporting && keypadsWillBeImported > 0" ng-click="import()" class="btn btn-primary" translate>
+        <button ng-if="!csvImporting && keypadsWillBeImported > 0" ng-click="import()" class="btn btn-sm btn-primary" translate>
           Import {{ keypadsWillBeImported }} keypads
         </button>
       </div>
       <div class="spacer">
-        <a ng-if="csvimported" ui-sref="openslides_votecollector.keypad.list" class="btn btn-default">
+        <a ng-if="csvimported" ui-sref="openslides_votecollector.keypad.list" class="btn btn-sm btn-default">
           <i class="fa fa-angle-double-left fa-lg"></i>
           <translate>Back to overview</translate>
         </a>
