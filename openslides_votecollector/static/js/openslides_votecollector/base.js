@@ -119,7 +119,7 @@ angular.module('OpenSlidesApp.openslides_votecollector', ['OpenSlidesApp.users',
     'DS',
     function (DS) {
         return DS.defineResource({
-            name: 'openslides_votecollector/motionpollkeypadconnection',
+            name: 'openslides_votecollector/motion-poll-keypad-connection',
             relations: {
                 belongsTo: {
                     'openslides_votecollector/keypad': {
@@ -160,7 +160,7 @@ angular.module('OpenSlidesApp.openslides_votecollector', ['OpenSlidesApp.users',
     'DS',
     function (DS) {
         return DS.defineResource({
-            name: 'openslides_votecollector/assignmentpollkeypadconnection',
+            name: 'openslides_votecollector/assignment-poll-keypad-connection',
         });
     }
 ])

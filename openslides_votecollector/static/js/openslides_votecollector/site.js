@@ -563,10 +563,10 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
     'MotionPoll',
     'MotionPollFinder',
     'MotionPollKeypadConnection',
-    'motions',
-    function ($scope, $stateParams, $http, Keypad, Projector, User, MotionPoll, MotionPollFinder, MotionPollKeypadConnection, motions) {
+    'Motion',
+    function ($scope, $stateParams, $http, Keypad, Projector, User, MotionPoll, MotionPollFinder, MotionPollKeypadConnection, Motion) {
         // Find motion and poll from URL parameter (via $stateparams).
-        _.assign($scope, MotionPollFinder.find(motions, $stateParams.id));
+        _.assign($scope, MotionPollFinder.find(Motion.getAll(), $stateParams.id));
         // Bind poll to scope for autoupdate of total vote result
         MotionPoll.bindOne($scope.poll.id, $scope, 'poll');
 
@@ -626,7 +626,7 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
 
         $scope.anonymizeVotes = function () {
             return $http.post(
-                '/rest/openslides_votecollector/motionpollkeypadconnection/anonymize_votes/',
+                '/rest/openslides_votecollector/motion-poll-keypad-connection/anonymize_votes/',
                 {poll_id: $scope.poll.id}
             ).then(function (success) {}, function (error) {});
         };
@@ -659,10 +659,10 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
     'AssignmentPoll',
     'AssignmentPollFinder',
     'AssignmentPollKeypadConnection',
-    'assignments',
-    function ($scope, $http, $stateParams, Keypad, Projector, User, AssignmentPoll, AssignmentPollFinder, AssignmentPollKeypadConnection, assignments) {
+    'Assignment',
+    function ($scope, $http, $stateParams, Keypad, Projector, User, AssignmentPoll, AssignmentPollFinder, AssignmentPollKeypadConnection, Assignment) {
         // Find assignment and poll from URL parameter (via $stateparams).
-        _.assign($scope, AssignmentPollFinder.find(assignments, $stateParams.id));
+        _.assign($scope, AssignmentPollFinder.find(Assignment.getAll(), $stateParams.id));
         // Bind poll to scope for autoupdate of total vote result
         AssignmentPoll.bindOne($scope.poll.id, $scope, 'poll');
 
@@ -728,7 +728,7 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
 
         $scope.anonymizeVotes = function () {
             return $http.post(
-                '/rest/openslides_votecollector/assignmentpollkeypadconnection/anonymize_votes/',
+                '/rest/openslides_votecollector/assignment-poll-keypad-connection/anonymize_votes/',
                 {poll_id: $scope.poll.id}
             ).then(function (success) {}, function (error) {});
         };
