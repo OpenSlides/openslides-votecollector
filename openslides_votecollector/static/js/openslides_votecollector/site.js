@@ -237,6 +237,11 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
             Keypad.destroy(keypad.id);
         };
 
+        // save changed keypad user
+        $scope.saveUser = function (user) {
+            User.save(user);
+        };
+
         // keypad system test
         $scope.startSysTest = function () {
             $scope.device = null;
