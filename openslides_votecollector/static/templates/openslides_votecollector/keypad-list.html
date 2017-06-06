@@ -119,6 +119,10 @@
         <th class="optional">
           <translate>Seat</translate>
 
+        <!-- present column -->
+        <th os-perms="users.can_manage">
+          <translate>Present</translate>
+
         <!-- in_range column -->
         <th>
           <translate>In range</translate>
@@ -164,6 +168,12 @@
         <td class="optional">
           <span ng-if="keypad.seat">{{ keypad.seat.number }}</span>
           <span ng-if="!keypad.seat">–</span>
+
+        <!-- in range -->
+        <td os-perms="users.can_manage">
+          <span class="pointer nobr" ng-click="keypad.user.is_present = !keypad.user.is_present; save(keypad.user);">
+            <i class="fa" ng-class="keypad.user.is_present ? 'fa-check-square-o' : 'fa-square-o'"></i>
+          </span>
 
         <!-- in range -->
         <td>
