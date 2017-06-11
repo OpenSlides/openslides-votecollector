@@ -49,10 +49,10 @@
         text-align: center;
     }
     #seating-plan table td.seat-red {
-        background-color: #ff201c;
+        background-color: #d9534f;
     }
     #seating-plan table td.seat-green {
-        background-color: #008f2a;
+        background-color: #5cb85c
     }
     #seating-plan table td.seat-yellow {
         background-color: #f1d300;
@@ -80,7 +80,8 @@
     <tr>
       <td><img src='/static/img/button-yes.png'>
       <td class="bold">
-        {{ poll.yes || liveVotes.yes }}
+        <span ng-if="config('votecollector_live_voting')">{{ liveVotes.yes }}</span>
+        <span ng-if="!config('votecollector_live_voting')">{{ poll.yes }}</span>
       <td class="percentage">
         <div ng-if="poll.getVote(poll.yes, 'yes').percentNumber || !poll.has_votes">
           {{ poll.getVote(poll.yes, 'yes').percentStr || '&nbsp;' }}
@@ -92,7 +93,8 @@
     <tr>
       <td><img src='/static/img/button-no.png'>
       <td class="bold">
-        {{ poll.no || liveVotes.no }}
+        <span ng-if="config('votecollector_live_voting')">{{ liveVotes.no }}</span>
+        <span ng-if="!config('votecollector_live_voting')">{{ poll.no }}</span>
       <td class="percentage">
         <div ng-if="poll.getVote(poll.no, 'no').percentNumber || !poll.has_votes">
           {{ poll.getVote(poll.no, 'no').percentStr || '&nbsp;' }}
@@ -104,7 +106,8 @@
     <tr>
       <td><img src='/static/img/button-abstain.png'>
       <td class="bold">
-        {{ poll.abstain || liveVotes.abstain }}
+        <span ng-if="config('votecollector_live_voting')">{{ liveVotes.abstain }}</span>
+        <span ng-if="!config('votecollector_live_voting')">{{ poll.abstain }}</span>
       <td class="percentage">
         <div ng-if="poll.getVote(poll.abstain, 'abstain').percentNumber || !poll.has_votes">
           {{ poll.getVote(poll.abstain, 'abstain').percentStr || '&nbsp;'}}

@@ -1214,7 +1214,7 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
                         '{{ \'Stop election\' | translate }}</button> ' +
                     '<button type="button" ng-if="canClearVotes()" ' +
                         'ng-click="clearVotes()"' +
-                        'class="btn btn-primary">' +
+                        'class="btn btn-default">' +
                         '<i class="fa fa-wifi" aria-hidden="true"></i> '+
                         '{{ \'Clear votes\' | translate }}</button> ' +
                     '<button type="button" os-perms="core.can_manage_projector" class="btn btn-default"' +
