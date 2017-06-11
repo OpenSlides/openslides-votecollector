@@ -19,8 +19,8 @@ by Emanuel Schütze.
 Requirements
 ============
 
-- OpenSlides 2.1.x (https://openslides.org/)
-- VoteCollector 1.8.1
+- OpenSlides 2.1.1+ (https://openslides.org/)
+- VoteCollector 1.8.2+
 
 
 Install
@@ -112,6 +112,13 @@ MIT License, see LICENSE file. The authors are mentioned in the AUTHORS file.
 
 Changelog
 =========
+
+Version 2.0.2 (2017-06-11)
+--------------------------
+* Fixes for OpenSlides 2.1.1 support
+* Added new column for keypad list to set/unset active/present state.
+* Improved seat colors on motion and assignment poll slide.
+
 
 Version 2.0.1 (2017-03-09)
 --------------------------
