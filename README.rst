@@ -19,7 +19,7 @@ by Emanuel Schütze.
 Requirements
 ============
 
-- OpenSlides 2.1.1+ (https://openslides.org/)
+- OpenSlides 2.2+ (https://openslides.org/)
 - VoteCollector 1.8.2+
 
 
@@ -112,6 +112,10 @@ MIT License, see LICENSE file. The authors are mentioned in the AUTHORS file.
 
 Changelog
 =========
+
+Version 2.0.3 (unreleased)
+--------------------------
+* Fixes for OpenSlides 2.2 support
 
 Version 2.0.2 (2017-06-11)
 --------------------------

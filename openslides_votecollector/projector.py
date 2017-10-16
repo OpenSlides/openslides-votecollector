@@ -1,3 +1,5 @@
+from typing import Generator, Type
+
 from openslides.core.config import config
 from openslides.core.exceptions import ProjectorException
 from openslides.assignments.models import AssignmentPoll
@@ -115,3 +117,9 @@ class VotingIcon(ProjectorElement):
     Voting icon on the projector.
     """
     name = 'voting/icon'
+
+def get_projector_elements() -> Generator[Type[ProjectorElement], None, None]:
+    yield MotionPollSlide
+    yield AssignmentPollSlide
+    yield VotingPrompt
+    yield VotingIcon
