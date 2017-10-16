@@ -1,5 +1,7 @@
 from django.apps import AppConfig
 
+from openslides.utils.projector import register_projector_elements
+
 from . import __description__, __verbose_name__, __version__
 
 
@@ -17,15 +19,12 @@ class VoteCollectorAppConfig(AppConfig):
     ]
 
     def ready(self):
-        # Load projector elements.
-        # Do this by just importing all from these files.
-        from . import projector  # noqa
-
         # Import all required stuff.
         from openslides.core.config import config
         from openslides.core.signals import post_permission_creation
         from openslides.utils.rest_api import router
         from .config_variables import get_config_variables
+        from .projector import get_projector_elements
         from .signals import (
             add_default_seating_plan,
             add_permissions_to_builtin_groups
@@ -39,8 +38,9 @@ class VoteCollectorAppConfig(AppConfig):
             VotecollectorViewSet
         )
 
-        # Define config variables
+        # Define projector elements and projector elements.
         config.update_config_variables(get_config_variables())
+        register_projector_elements(get_projector_elements())
 
         # Connect signals.
         post_permission_creation.connect(
