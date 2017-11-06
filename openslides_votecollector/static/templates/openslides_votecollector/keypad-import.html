@@ -69,7 +69,8 @@
                 <i class="fa fa-exclamation-triangle"></i>
               </span>
               <span ng-if="keypad.user_id">
-                {{ keypad.title }} {{ keypad.first_name }} {{ keypad.last_name }} ({{ keypad.structure_level }})
+                {{ keypad.title }} {{ keypad.first_name }} {{ keypad.last_name }}
+                <span ng-if="keypad.structure_level">({{ keypad.structure_level }})</span>
               </span>
               <span ng-if="!keypad.user_id"><i><translate>Anonymous</translate></i></span>
 
