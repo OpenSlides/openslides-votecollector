@@ -211,12 +211,11 @@ class VotingView(AjaxView):
         args = []
         for instance_dict in model.objects.filter(poll=poll).values('pk'):
             pk = instance_dict['pk']
-            args.append(model.get_collection_string())
-            args.append(pk)
+            args.append((model.get_collection_string(), pk))
         model.objects.filter(poll=poll).delete()
         # trigger autoupdate
-        if args:
-            inform_deleted_data(*args)
+        if len(args) > 0:
+            inform_deleted_data(args)
 
         if Ballot and type(poll) == MotionPoll:
             ballot = Ballot(poll)

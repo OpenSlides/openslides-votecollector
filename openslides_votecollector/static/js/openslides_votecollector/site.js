@@ -147,7 +147,7 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
                     templateOptions: {
                         label: gettextCatalog.getString('Seat'),
                         options: Seat.getAll(),
-                        ngOptions: 'option.id as option.number for option in to.options',
+                        ngOptions: "option.id as option.number for option in to.options | orderBy: 'id'",
                         placeholder: gettextCatalog.getString('--- Select seat ---')
                     }
                 }
