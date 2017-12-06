@@ -20,7 +20,7 @@ Requirements
 ============
 
 - OpenSlides 2.2+ (https://openslides.org/)
-- VoteCollector 1.8.2+
+- VoteCollector 1.9.2+
 
 
 Install
@@ -31,7 +31,7 @@ I. Installation on Windows (with OpenSlides portable version)
 
 1. Install and run VoteCollector
 
-   Download VoteColletor from http://files.softwein.de/Votecollector.zip
+   Download VoteColletor from http://software.voteworks.eu/Votecollector.zip
 
    To use VoteCollector in simulation mode (no keypads required)
    please run from command line::
@@ -113,9 +113,13 @@ MIT License, see LICENSE file. The authors are mentioned in the AUTHORS file.
 Changelog
 =========
 
-Version 2.0.3 (unreleased)
+Version 2.0.3 (2017-12-06)
 --------------------------
-* Fixes for OpenSlides 2.2 support
+* Fixes for OpenSlides 2.2 support.
+* Support elections with more than 9 candidates (multi-digit mode).
+  Requires VoteCollector 1.9.2.
+* Improved CSS for seating plan.
+
 
 Version 2.0.2 (2017-06-11)
 --------------------------
