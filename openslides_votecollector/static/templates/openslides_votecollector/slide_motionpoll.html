@@ -70,7 +70,7 @@
 
   <!-- Title -->
   <div id="title">
-    <h1>{{ motion.agenda_item.getTitle() || motion.getTitle() }}</h1>
+    <h1>{{ motion.getTitle() }}</h1>
     <h2>
       <translate>Motion</translate> {{ motion.identifier }} |
       <translate translate-comment='ballot of a motion'>Voting result</translate>
@@ -90,8 +90,10 @@
       <td class="percentage">
         <div ng-if="poll.getVote(poll.yes, 'yes').percentNumber || !poll.has_votes">
           {{ poll.getVote(poll.yes, 'yes').percentStr || '&nbsp;' }}
+      <td class="progressbar">
+        <div ng-if="poll.getVote(poll.yes, 'yes').percentNumber">
           <uib-progressbar value="poll.getVote(poll.yes, 'yes').percentNumber" type="success"
-              ng-class="{ 'progress-striped active': !poll.has_votes }"></uib-progressbar>
+            ng-class="{ 'progress-striped active': !poll.has_votes }"></uib-progressbar>
         </div>
 
     <!-- no -->
@@ -103,8 +105,10 @@
       <td class="percentage">
         <div ng-if="poll.getVote(poll.no, 'no').percentNumber || !poll.has_votes">
           {{ poll.getVote(poll.no, 'no').percentStr || '&nbsp;' }}
+      <td class="progressbar">
+        <div ng-if="poll.getVote(poll.no, 'no').percentNumber">
           <uib-progressbar value="poll.getVote(poll.no, 'no').percentNumber" type="danger"
-              ng-class="{ 'progress-striped active': !poll.has_votes }"></uib-progressbar>
+            ng-class="{ 'progress-striped active': !poll.has_votes }"></uib-progressbar>
         </div>
 
     <!-- abstain -->
@@ -116,8 +120,10 @@
       <td class="percentage">
         <div ng-if="poll.getVote(poll.abstain, 'abstain').percentNumber || !poll.has_votes">
           {{ poll.getVote(poll.abstain, 'abstain').percentStr || '&nbsp;'}}
+      <td class="progressbar">
+        <div ng-if="poll.getVote(poll.abstain, 'abstain').percentNumber">
           <uib-progressbar value="poll.getVote(poll.abstain, 'abstain').percentNumber" type="warning"
-              ng-class="{ 'progress-striped active': !poll.has_votes }"></uib-progressbar>
+            ng-class="{ 'progress-striped active': !poll.has_votes }"></uib-progressbar>
         </div>
 
     <!-- valid votes -->
