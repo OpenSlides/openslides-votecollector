@@ -805,33 +805,23 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
                             msg: success.data.error, show: true };
                     }
                     else {
-                        $http.get('/votecollector/result_voting/' + $scope.poll.id + '/').then(
-                            function (success) {
-                                if (success.data.error) {
-                                    $scope.$parent.$parent.$parent.alert = { type: 'danger',
-                                        msg: success.data.error, show: true };
-                                }
-                                else {
-                                    // Store result in DS model; updates form inputs.
-                                    $scope.poll.yes = success.data.votes[0];
-                                    $scope.poll.no = success.data.votes[1];
-                                    $scope.poll.abstain = success.data.votes[2];
-                                    $scope.poll.votesvalid = $scope.poll.yes + $scope.poll.no + $scope.poll.abstain;
-                                    $scope.poll.votesinvalid = 0;
-                                    $scope.poll.votescast = $scope.poll.votesvalid;
+                        // Store result in DS model; updates form inputs.
+                        $scope.poll.yes = success.data.votes[0];
+                        $scope.poll.no = success.data.votes[1];
+                        $scope.poll.abstain = success.data.votes[2];
+                        $scope.poll.votesvalid = $scope.poll.yes + $scope.poll.no + $scope.poll.abstain;
+                        $scope.poll.votesinvalid = 0;
+                        $scope.poll.votescast = $scope.poll.votesvalid;
 
-                                    // Prompt user to save result.
-                                    $scope.$parent.$parent.$parent.alert = {
-                                        type: 'info',
-                                        msg: gettextCatalog.getString('Motion voting has finished.') + ' ' +
-                                             gettextCatalog.getString('Received votes:') + ' ' +
-                                             $scope.poll.votescast + ' / ' + $scope.vc.voters_count + '. ' +
-                                             gettextCatalog.getString('Save this result now!'),
-                                        show: true
-                                    };
-                                }
-                            }
-                        );
+                        // Prompt user to save result.
+                        $scope.$parent.$parent.$parent.alert = {
+                            type: 'info',
+                            msg: gettextCatalog.getString('Motion voting has finished.') + ' ' +
+                            gettextCatalog.getString('Received votes:') + ' ' +
+                            $scope.poll.votescast + ' / ' + $scope.vc.voters_count + '. ' +
+                            gettextCatalog.getString('Save this result now!'),
+                            show: true
+                        };
                     }
                 },
                 function (failure) {
@@ -909,12 +899,13 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
 .controller('ElectionCtrl', [
     '$scope',
     '$http',
+    'operator',
     'gettextCatalog',
     'AssignmentPollKeypadConnection',
     'Config',
     'Projector',
     'VoteCollector',
-    function ($scope, $http, gettextCatalog, AssignmentPollKeypadConnection, Config, Projector, VoteCollector) {
+    function ($scope, $http, operator, gettextCatalog, AssignmentPollKeypadConnection, Config, Projector, VoteCollector) {
         VoteCollector.find(1);
         VoteCollector.bindOne(1, $scope, 'vc');
 
@@ -937,7 +928,8 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
 
         $scope.canStartVoting = function () {
             var enabled = $scope.poll.assignment.open_posts == 1 &&
-                ($scope.poll.pollmethod == 'votes' || $scope.poll.pollmethod == 'yna');
+                ($scope.poll.pollmethod == 'votes' ||
+                ($scope.poll.pollmethod == 'yna' && $scope.poll.options.length == 1));
             return enabled && $scope.vc !== undefined  && $scope.poll.votescast === null &&
                     (!$scope.vc.is_voting || $scope.vc.voting_mode == 'Item' || $scope.vc.voting_mode == 'Test');
         };
@@ -951,6 +943,13 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
             return $scope.vc !== undefined && $scope.poll.votescast !== null;
         };
 
+        $scope.canProject = function () {
+            return operator.hasPerms('core.can_manage_projector') &&
+                $scope.poll.assignment.open_posts == 1 &&
+                ($scope.poll.pollmethod == 'votes' ||
+                ($scope.poll.pollmethod == 'yna' && $scope.poll.options.length == 1));
+        };
+
         $scope.startVoting = function () {
             $scope.$parent.$parent.$parent.alert = {};
 
@@ -958,7 +957,9 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
             var url;
             if ($scope.poll.pollmethod == 'votes') {
                 // Unlock all keys including 0/10 (allow invalid keys).
-                url = '/votecollector/start_election/' + $scope.poll.id + '/10/';
+                url = $scope.poll.options.length < 10 ?
+                    '/votecollector/start_election_sd/' : '/votecollector/start_election_md/';
+                url +=  $scope.poll.id + '/10/';
             } else {
                 url = '/votecollector/start_election_one/' + $scope.poll.id + '/';
             }
@@ -1217,7 +1218,7 @@ angular.module('OpenSlidesApp.openslides_votecollector.site', [
                         'class="btn btn-default">' +
                         '<i class="fa fa-wifi" aria-hidden="true"></i> '+
                         '{{ \'Clear votes\' | translate }}</button> ' +
-                    '<button type="button" os-perms="core.can_manage_projector" class="btn btn-default"' +
+                    '<button type="button" ng-if="canProject()" class="btn btn-default"' +
                       ' ng-class="{ \'btn-primary\': isProjected(poll.id) }"' +
                       ' ng-click="projectSlide()"' +
                       ' title="{{ \'Project election result\' | translate }}">' +

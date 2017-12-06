@@ -17,14 +17,23 @@ urlpatterns = [
         },
         name='votecollector_start_voting'),
 
-    url(r'^votecollector/start_election/(?P<id>\d+)/(?P<options>\d+)/$',
+    url(r'^votecollector/start_election_sd/(?P<id>\d+)/(?P<options>\d+)/$',
         views.StartElection.as_view(), {
             'app': 'assignments',
             'model': 'AssignmentPoll',
             'mode': 'SingleDigit',
             'resource': '/candidate/'
         },
-        name='votecollector_start_election'),
+        name='votecollector_start_election_sd'),
+
+    url(r'^votecollector/start_election_md/(?P<id>\d+)/(?P<options>\d+)/$',
+        views.StartElection.as_view(), {
+            'app': 'assignments',
+            'model': 'AssignmentPoll',
+            'mode': 'MultiDigit',
+            'resource': '/candidate/'
+        },
+        name='votecollector_start_election_md'),
 
     url(r'^votecollector/start_election_one/(?P<id>\d+)/$',
         views.StartYNA.as_view(), {

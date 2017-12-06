@@ -99,10 +99,10 @@ def start_voting(mode, options, callback_url):
 def stop_voting():
     server = get_server()
     try:
-        server.voteCollector.stopVoting()
+        result = server.voteCollector.stopVoting()
     except:
         raise VoteCollectorError(_('No connection to VoteCollector.'))
-    return True
+    return result
 
 
 def get_voting_status():

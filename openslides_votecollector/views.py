@@ -18,12 +18,6 @@ from openslides.utils.auth import has_perm
 from openslides.utils.autoupdate import inform_changed_data, inform_deleted_data
 from openslides.utils.rest_api import ListModelMixin, ModelViewSet, PermissionMixin, RetrieveModelMixin, Response, list_route
 
-try:
-    # Proxy voting hook
-    from openslides_proxyvoting.voting import Ballot
-except ImportError:
-    Ballot = None
-
 from .api import (
     get_device_status,
     get_voting_result,
@@ -217,10 +211,6 @@ class VotingView(AjaxView):
         if len(args) > 0:
             inform_deleted_data(args)
 
-        if Ballot and type(poll) == MotionPoll:
-            ballot = Ballot(poll)
-            ballot.delete_ballots()
-
 
 class DeviceStatus(VotingView):
     def get(self, request, *args, **kwargs):
@@ -278,10 +268,6 @@ class StartVoting(VotingView):
 
 class StartYNA(StartVoting):
     def on_start(self, poll):
-        if type(poll) == MotionPoll and Ballot:
-            ballot = Ballot(poll)
-            ballot.create_absentee_ballots()
-
         # Get candidate name (if is an election with one candidate only)
         candidate_str = ''
         if (type(poll) == AssignmentPoll) and (AssignmentOption.objects.filter(poll=poll).all().count() == 1):
@@ -372,6 +358,11 @@ class StopVoting(VotingView):
         vc.save()
         return super(StopVoting, self).get(request, *args, **kwargs)
 
+    def no_error_context(self):
+        return {
+            'votes': self.result
+        }
+
 
 class ClearVotes(VotingView):
     def get(self, request, *args, **kwargs):
@@ -419,15 +410,6 @@ class VotingResult(VotingView):
                             self.result['valid'] += 1
                         else:
                             self.result['invalid'] += 1
-                elif vc.voting_mode == 'MotionPoll' and Ballot:
-                    ballot = Ballot(poll)
-                    result = ballot.count_votes()
-                    # print(result)
-                    self.result = [
-                        int(result['Y'][1]),
-                        int(result['N'][1]),
-                        int(result['A'][1])
-                    ]
                 else:
                     # Get vote result from votecollector.
                     try:
@@ -480,9 +462,6 @@ class Votes(utils_views.View):
         except poll_model.DoesNotExist:
             return HttpResponse('')
 
-        # Get ballot instance.
-        ballot = Ballot(poll) if Ballot else None
-
         # Load json list from request body.
         votes = json.loads(request.body.decode('utf-8'))
         keypad_set = set()
@@ -504,29 +483,22 @@ class Votes(utils_views.View):
             if value not in ('Y', 'N', 'A'):
                 continue
 
-            # Write ballot and poll keypad connection.
-            is_valid_keypad = True
-            if ballot and vc.voting_mode == 'MotionPoll':
-                # TODO: Ballot currently only implemented for MotionPoll.
-                is_valid_keypad = ballot.register_vote(keypad_id, value, commit=False) > 0
-            if is_valid_keypad:
-                try:
-                    conn = conn_model.objects.get(poll=poll, keypad=keypad)
-                except conn_model.DoesNotExist:
-                    conn = conn_model(poll=poll, keypad=keypad)
-                conn.serial_number = vote['sn']
-                conn.value = value
-                if conn.pk:
-                    # Save updated connection.
-                    conn.save(skip_autoupdate=True)
-                else:
-                    # Add new connection to bulk create list.
-                    connections.append(conn)
-                keypad_set.add(keypad.id)
+            # Write poll keypad connection.
+            try:
+                conn = conn_model.objects.get(poll=poll, keypad=keypad)
+            except conn_model.DoesNotExist:
+                conn = conn_model(poll=poll, keypad=keypad)
+            conn.serial_number = vote['sn']
+            conn.value = value
+            if conn.pk:
+                # Save updated connection.
+                conn.save(skip_autoupdate=True)
+            else:
+                # Add new connection to bulk create list.
+                connections.append(conn)
+            keypad_set.add(keypad.id)
 
-        # Bulk create ballots and connections.
-        if ballot:
-            ballot.save_ballots()
+        # Bulk create connections.
         conn_model.objects.bulk_create(connections)
 
         # Trigger auto update.
@@ -557,22 +529,15 @@ class VoteCallback(VotingCallbackView):
             return HttpResponse(_('Vote rejected'))
 
         if vc.voting_mode == 'MotionPoll':
-            is_valid_keypad = 1
-            if Ballot:
-                ballot = Ballot(poll)
-                is_valid_keypad = ballot.register_vote(keypad_id, value) > 0
-            if is_valid_keypad:
-                try:
-                    conn = MotionPollKeypadConnection.objects.get(poll=poll, keypad=keypad)
-                except MotionPollKeypadConnection.DoesNotExist:
-                    conn = MotionPollKeypadConnection()
-                    conn.poll = poll
-                    conn.keypad = keypad
-                conn.serial_number = request.POST.get('sn')
-                conn.value = value
-                conn.save()
-            else:
-                return HttpResponse(_('Vote rejected'))
+            try:
+                conn = MotionPollKeypadConnection.objects.get(poll=poll, keypad=keypad)
+            except MotionPollKeypadConnection.DoesNotExist:
+                conn = MotionPollKeypadConnection()
+                conn.poll = poll
+                conn.keypad = keypad
+            conn.serial_number = request.POST.get('sn')
+            conn.value = value
+            conn.save()
 
         else:
             try:
@@ -626,14 +591,15 @@ class Candidates(utils_views.View):
                 value = int(vote['value'])
             except ValueError:
                 continue
-            if value < 0 or value > 9:
+            if value < 0:
                 # Invalid candidate number.
                 continue
 
             # Get the selected candidate.
             candidate_id = None
             if 0 < value <= candidate_count:
-                candidate_id = AssignmentOption.objects.filter(poll=poll_id).order_by('weight').all()[value - 1].candidate_id
+                candidate_id = AssignmentOption.objects.filter(
+                    poll=poll_id).order_by('weight').all()[value - 1].candidate_id
 
             # Write poll connection.
             try:
