@@ -16,9 +16,9 @@ setup(
     author='Authors of %s, see AUTHORS' % module.__verbose_name__,
     author_email='support@openslides.org',
     description=module.__verbose_name__,
-    license='MIT',
+    license=module.__license__,
     long_description=long_description,
-    url='https://openslides.org/',
+    url=module.__url__,
     version=module.__version__,
 
     keywords='OpenSlides',
